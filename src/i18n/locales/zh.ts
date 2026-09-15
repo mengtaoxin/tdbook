@@ -126,7 +126,7 @@ export default {
     noteCacheAfter: '。',
     clearCacheQuoted: '「清除全部缓存」',
     fields: {
-      id: '图书唯一标识，也是阅读页路由 /book/:id 的参数。须为非空字符串，不能包含 /、\\ 或 ..。重复的 id 只保留第一次出现的条目。',
+      id: '图书唯一标识，也是阅读页路由 /book/:id 的参数。须为非空字符串，不能包含 /、\\ 或 ..。推荐用小写字母与中横线拼接（如 my-book-title）。重复的 id 只保留第一次出现的条目。',
       title: '显示标题，可与其他书重复。',
       author: '作者。可省略或填空字符串。',
       type: '格式：epub 或 pdf。省略时按 epub 处理。',
