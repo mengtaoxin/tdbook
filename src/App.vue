@@ -67,7 +67,7 @@ function onLocaleChange(value: unknown) {
               {{ localeLabel }}
             </v-btn>
           </template>
-          <v-list density="compact" nav>
+          <v-list density="compact" nav bg-color="background">
             <v-list-item
               v-for="code in SUPPORTED_LOCALES"
               :key="code"
