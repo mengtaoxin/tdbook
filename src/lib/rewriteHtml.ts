@@ -5,12 +5,31 @@ import { normalizeEpubPath, resolveEpubAssetPath } from './paths'
 export type RewrittenPage = {
   html: string
   bodyClass: string
+  /** BCP 47 language from the EPUB page (not the app UI locale). */
+  lang: string
   /** Resolved blob: URLs for stylesheets */
   stylesheetUrls: string[]
   inlineStyles: string[]
 }
 
 const EXTERNAL_HREF = /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i
+const XML_NS = 'http://www.w3.org/XML/1998/namespace'
+
+function elementLang(el: Element | null | undefined): string {
+  if (!el) return ''
+  return (
+    el.getAttributeNS(XML_NS, 'lang')?.trim() ||
+    el.getAttribute('xml:lang')?.trim() ||
+    el.getAttribute('lang')?.trim() ||
+    ''
+  )
+}
+
+/** Prefer body, then root; default en so UI locale never leaks in. */
+export function documentLang(doc: Document): string {
+  const body = doc.body ?? doc.querySelector('body')
+  return elementLang(body) || elementLang(doc.documentElement) || 'en'
+}
 
 function splitHash(href: string) {
   const hashIndex = href.indexOf('#')
@@ -141,6 +160,7 @@ async function rewriteFromDocument(
   return {
     html: body?.innerHTML ?? '',
     bodyClass: body?.getAttribute('class') ?? '',
+    lang: documentLang(doc),
     stylesheetUrls,
     inlineStyles,
   }
