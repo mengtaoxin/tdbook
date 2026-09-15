@@ -1,4 +1,4 @@
-# Books
+# tdbook
 
 Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, download once into IndexedDB, then read offline in the browser. Static deploy only — no backend.
 

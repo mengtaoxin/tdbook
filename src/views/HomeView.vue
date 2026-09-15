@@ -21,7 +21,7 @@ const features = [
 <template>
   <v-container class="py-8" style="max-width: 800px">
     <div class="mb-8">
-      <h1 class="text-h4 mb-3">图书</h1>
+      <h1 class="text-h4 mb-3">tdbook</h1>
       <p class="text-body-1 text-medium-emphasis mb-2">
         个人电子书浏览器：从远程目录列出 EPUB / PDF 书目，首次打开时下载到本机 IndexedDB，之后即可在浏览器中离线阅读。
       </p>
