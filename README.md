@@ -1,57 +1,59 @@
 # tdbook
 
-个人电子书浏览器：从 `configs.json` 拉取远程 EPUB / PDF 书目，首次打开时下载到浏览器 IndexedDB，之后可离线阅读。纯静态部署，无后端。
+[English](./README.md) | [中文](./docs/README.zh-CN.md)
 
-## 功能
+A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, download once into IndexedDB, then read offline in the browser. Static deploy only — no backend.
 
-- 书目列表与在线阅读器（EPUB / PDF）
-- 按远程 URL 缓存整书；支持清除缓存后重新下载
-- 书目以 `configs.json` 为唯一数据源，添加书籍只需改配置
+## Features
 
-## 技术栈
+- Book list and in-browser reader (EPUB / PDF)
+- Cache whole books by remote URL; clear cache to re-download
+- Catalog is driven solely by `configs.json` — add books by editing the config
+
+## Stack
 
 - Vue 3 + Vite + TypeScript + Vue Router + Vuetify 4
-- EPUB：`jszip` + `fast-xml-parser`
-- PDF：`pdfjs-dist`
+- EPUB: `jszip` + `fast-xml-parser`
+- PDF: `pdfjs-dist`
 
-## 快速开始
+## Quick start
 
 ```sh
 npm install
-npm run dev      # 开发：http://localhost:3000
-npm run build    # 类型检查 + 生产构建
-npm run preview  # 预览生产构建
+npm run dev      # Dev server: http://localhost:3000
+npm run build    # Typecheck + production build
+npm run preview  # Preview production build
 ```
 
-## 添加书籍
+## Adding a book
 
-在 `configs.json` 的 `books` 数组中追加条目：
+Append an entry to the `books` array in `configs.json`:
 
 ```json
 {
   "id": "unique-book-id",
-  "title": "书名",
-  "author": "作者（可选）",
+  "title": "Book title",
+  "author": "Author (optional)",
   "type": "epub",
   "path": "https://example.com/book.epub"
 }
 ```
 
-| 字段 | 说明 |
-|------|------|
-| `id` | 路由标识，对应 `/book/:id`；不可含 `/`、`\`、`..`。若重复，保留首次出现的条目，列表会提示错误 |
-| `title` | 展示标题，可重复 |
-| `author` | 可选 |
-| `type` | `epub` 或 `pdf`（可省略，由扩展名推断） |
-| `path` | 远程 `http(s)://…`，或同源静态路径 `/…`（如 `public/` 下的文件） |
-| `hover` | 可选封面图，规则同 `path`；有则优先于从书内提取的封面 |
+| Field | Description |
+|-------|-------------|
+| `id` | Route identity for `/book/:id`; must not contain `/`, `\`, or `..`. On duplicates, the first entry is kept and the list shows an error |
+| `title` | Display title; may repeat |
+| `author` | Optional |
+| `type` | `epub` or `pdf` (optional; inferred from the file extension) |
+| `path` | Remote `http(s)://…`, or a same-origin absolute path `/…` (e.g. a file under `public/`) |
+| `hover` | Optional cover image URL with the same rules as `path`; when set, overrides covers extracted from the book |
 
-## 目录结构（简要）
+## Layout (brief)
 
 ```
-configs.json     书目配置
-src/views/       列表页、阅读页
-src/lib/         书目加载、IndexedDB 缓存、EPUB/PDF 解析
+configs.json     Book catalog
+src/views/       List and reader pages
+src/lib/         Catalog load, IndexedDB cache, EPUB/PDF parsing
 ```
 
-更细的约定与数据模型见 [AGENTS.md](./AGENTS.md)。
+See [AGENTS.md](./AGENTS.md) for conventions and the data model.
