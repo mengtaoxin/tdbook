@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { clearAllBookCaches } from '@/lib/bookCache'
 import {
   DEFAULT_CONFIGS_URL,
@@ -87,8 +88,13 @@ async function confirmClearCache() {
       persistent-hint
       clearable
       autocomplete="off"
-      class="mb-4"
+      class="mb-2"
     />
+    <p class="text-body-small mb-4">
+      <RouterLink :to="{ name: 'config-guide' }" class="text-primary">
+        查看配置说明
+      </RouterLink>
+    </p>
 
     <div class="d-flex flex-wrap ga-3 mb-10">
       <v-btn color="primary" variant="flat" class="text-none" @click="save">

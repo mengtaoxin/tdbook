@@ -5,6 +5,7 @@ const navItems = [
   { title: '首页', to: { name: 'home' } },
   { title: '图书列表', to: { name: 'books' } },
   { title: '设置', to: { name: 'settings' } },
+  { title: '配置说明', to: { name: 'config-guide' } },
   { title: '关于', to: { name: 'about' } },
 ] as const
 </script>
