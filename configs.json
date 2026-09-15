@@ -1,0 +1,12 @@
+{
+  "books": [
+    {
+      "id": "alices-adventures-in-wonderland",
+      "title": "Alice's Adventures in Wonderland",
+      "author": "Lewis Carroll",
+      "type": "epub",
+      "path": "/sample.epub",
+      "hover": "/sample.jpg"
+    }
+  ]
+}
