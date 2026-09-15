@@ -1,0 +1,18 @@
+{
+  "books": [
+    {
+      "id": "sample-epub",
+      "title": "Sample EPUB",
+      "author": "Test Author",
+      "type": "epub",
+      "path": "http://127.0.0.1:3000/testdata/sample.epub"
+    },
+    {
+      "id": "sample-pdf",
+      "title": "Sample PDF",
+      "author": "Test Author",
+      "type": "pdf",
+      "path": "http://127.0.0.1:3000/testdata/sample.pdf"
+    }
+  ]
+}
