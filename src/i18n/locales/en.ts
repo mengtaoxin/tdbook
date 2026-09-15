@@ -130,7 +130,7 @@ export default {
     noteCacheAfter: 'in Settings.',
     clearCacheQuoted: 'Clear all cache',
     fields: {
-      id: 'Unique book id and the /book/:id route param. Must be a non-empty string without /, \\, or ... Duplicate ids keep only the first entry.',
+      id: 'Unique book id and the /book/:id route param. Must be a non-empty string without /, \\, or ... Prefer lowercase letters and hyphens (e.g. my-book-title). Duplicate ids keep only the first entry.',
       title: 'Display title; may repeat across books.',
       author: 'Author. May be omitted or an empty string.',
       type: 'Format: epub or pdf. Defaults to epub when omitted.',
