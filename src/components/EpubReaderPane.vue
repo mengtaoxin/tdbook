@@ -20,7 +20,7 @@ async function paint() {
   const host = hostEl.value
   if (!host) return
   shadow = attachEpubShadow(host)
-  renderEpubShadow(shadow, props.rewritten)
+  renderEpubShadow(shadow, props.rewritten, host)
   if (props.hash) {
     scrollEpubHash(shadow, props.hash)
   }

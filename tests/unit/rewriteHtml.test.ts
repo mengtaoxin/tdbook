@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { EpubBookRecord } from '@/lib/bookTypes'
-import { rewritePageHtml } from '@/lib/rewriteHtml'
+import { documentLang, rewritePageHtml } from '@/lib/rewriteHtml'
 
 vi.mock('@/lib/bookCache', () => ({
   getCachedBlobUrl: vi.fn(async (_source: string, path: string) => {
@@ -56,8 +56,43 @@ describe('rewritePageHtml', () => {
     )
 
     expect(rewritten.bodyClass).toBe('body')
+    expect(rewritten.lang).toBe('en')
     expect(rewritten.stylesheetUrls).toEqual(['data:text/css,/*cached*/'])
     expect(rewritten.html).toContain('/book/sample?page=2#sec')
     expect(rewritten.html).toContain('data:image/png;base64,aa==')
+  })
+
+  it('preserves page language from xml:lang / lang', async () => {
+    const xhtml = `<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-Hans">
+<head></head>
+<body><p>你好</p></body></html>`
+
+    const rewritten = await rewritePageHtml(
+      xhtml,
+      epubBook(),
+      'OEBPS/chapter1.xhtml',
+      epubBook().pages,
+    )
+
+    expect(rewritten.lang).toBe('zh-Hans')
+  })
+})
+
+describe('documentLang', () => {
+  it('prefers body lang over html lang', () => {
+    const doc = new DOMParser().parseFromString(
+      `<html lang="en"><body lang="fr">x</body></html>`,
+      'text/html',
+    )
+    expect(documentLang(doc)).toBe('fr')
+  })
+
+  it('defaults to en when missing', () => {
+    const doc = new DOMParser().parseFromString(
+      `<html><body>x</body></html>`,
+      'text/html',
+    )
+    expect(documentLang(doc)).toBe('en')
   })
 })

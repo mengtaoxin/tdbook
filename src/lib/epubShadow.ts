@@ -1,13 +1,39 @@
 import type { RewrittenPage } from './rewriteHtml'
 
+/**
+ * Defaults that override host/theme inheritance (Vuetify font, UI `lang`, etc.).
+ * Book stylesheets still win when they set the same properties.
+ */
 const BASE_CSS = `
 :host {
   display: block;
+  color: #000;
+  background: transparent;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+  font-variant: normal;
   line-height: 1.6;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-align: start;
+  text-indent: 0;
+  text-transform: none;
+  text-decoration: none;
+  text-shadow: none;
+  -webkit-font-smoothing: auto;
 }
 
 body {
   margin: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  text-align: inherit;
+  text-indent: inherit;
+  text-transform: inherit;
 }
 
 img,
@@ -30,7 +56,11 @@ export function clearEpubShadow(shadow: ShadowRoot | null | undefined) {
 }
 
 /** Render EPUB HTML + CSS inside a shadow root so book styles stay isolated. */
-export function renderEpubShadow(shadow: ShadowRoot, page: RewrittenPage) {
+export function renderEpubShadow(
+  shadow: ShadowRoot,
+  page: RewrittenPage,
+  host?: HTMLElement,
+) {
   shadow.innerHTML = ''
 
   const base = document.createElement('style')
@@ -50,8 +80,12 @@ export function renderEpubShadow(shadow: ShadowRoot, page: RewrittenPage) {
     shadow.appendChild(style)
   }
 
+  // Book language (not UI locale) so font shaping / -webkit-locale stay stable.
+  if (host) host.lang = page.lang
+
   // Fake <body> so EPUB rules targeting `body` still apply inside the shadow tree.
   const body = document.createElement('body')
+  body.lang = page.lang
   if (page.bodyClass) body.className = page.bodyClass
   body.innerHTML = page.html
   shadow.appendChild(body)
