@@ -2,18 +2,18 @@
 const features = [
   {
     icon: 'mdi-book-open-variant',
-    title: 'EPUB / PDF',
-    description: '从远程目录读取书目，在浏览器内直接打开阅读。',
+    title: '多种格式',
+    description: '支持常见的电子书与 PDF，打开即可在网页里阅读。',
   },
   {
-    icon: 'mdi-database',
-    title: '本地缓存',
-    description: '首次下载后写入 IndexedDB，之后可离线阅读。',
+    icon: 'mdi-download',
+    title: '本机保存',
+    description: '第一次打开时会自动下载到本机，之后无需反复加载。',
   },
   {
     icon: 'mdi-cloud-off-outline',
-    title: '纯静态部署',
-    description: '无后端服务，书目由 configs.json 配置，部署即可用。',
+    title: '离线阅读',
+    description: '书下载完成后，没有网络也能继续翻页阅读。',
   },
 ] as const
 </script>
@@ -23,11 +23,10 @@ const features = [
     <div class="mb-8">
       <h1 class="text-h4 mb-3">tdbook</h1>
       <p class="text-body-1 text-medium-emphasis mb-2">
-        个人电子书浏览器：从远程目录列出 EPUB / PDF 书目，首次打开时下载到本机 IndexedDB，之后即可在浏览器中离线阅读。
+        个人电子书阅读器：在浏览器里浏览书目、打开电子书或 PDF，第一次阅读时会下载到本机，之后即使没有网络也能继续读。
       </p>
       <p class="text-body-2 text-medium-emphasis">
-        应用以静态页面部署，不依赖后端；书目来源为
-        <code>configs.json</code>，可在设置中更换配置地址。
+        书目由配置文件提供，如需更换书单来源，可在设置中修改配置地址。
       </p>
     </div>
 
