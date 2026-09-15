@@ -18,7 +18,7 @@ const navItems = [
           class="d-inline-flex align-center text-inherit text-decoration-none"
         >
           <v-icon icon="mdi-book-open-page-variant" class="mr-2" />
-          图书
+          tdbook
         </RouterLink>
       </v-app-bar-title>
       <template #append>

@@ -1,4 +1,4 @@
-# Books
+# tdbook
 
 个人电子书浏览器：从 `configs.json` 拉取远程 EPUB / PDF 书目，首次打开时下载到浏览器 IndexedDB，之后可离线阅读。纯静态部署，无后端。
 
