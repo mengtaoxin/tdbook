@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import EpubReaderPane from '@/components/EpubReaderPane.vue'
 import PdfReaderPane from '@/components/PdfReaderPane.vue'
 import ReaderPager from '@/components/ReaderPager.vue'
+import { translateError } from '@/i18n'
 import { type CacheProgress } from '@/lib/bookCache'
 import { getBook } from '@/lib/bookService'
 import { bookPageCount, type BookRecord } from '@/lib/bookTypes'
@@ -14,6 +16,7 @@ const props = defineProps<{
   id: string
 }>()
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
@@ -41,15 +44,18 @@ const progressLabel = computed(() => {
   if (progress.phase === 'download') {
     if (progress.total && progress.total > 0) {
       const pct = Math.min(100, Math.round((progress.loaded / progress.total) * 100))
-      return `正在下载图书… ${pct}%`
+      return t('reader.downloadingPct', { pct })
     }
-    return '正在下载图书…'
+    return t('reader.downloading')
   }
   if (progress.phase === 'extract') {
     if (progress.total && progress.total > 0) {
-      return `正在解压 EPUB… ${progress.loaded}/${progress.total}`
+      return t('reader.extractingProgress', {
+        loaded: progress.loaded,
+        total: progress.total,
+      })
     }
-    return '正在解压 EPUB…'
+    return t('reader.extracting')
   }
   return ''
 })
@@ -92,7 +98,7 @@ async function load() {
     }
 
     if (!book.value || totalPages.value === 0) {
-      error.value = '未找到图书。'
+      error.value = t('reader.notFound')
       return
     }
 
@@ -110,14 +116,14 @@ async function load() {
       page.value < 1 ||
       page.value > totalPages.value
     ) {
-      error.value = '页码无效。'
+      error.value = t('reader.invalidPage')
       return
     }
 
     const adapter = getFormatAdapter(book.value.type)
     const content = await adapter.getPage(book.value, page.value - 1)
     if (!content) {
-      error.value = '无法加载该页内容。'
+      error.value = t('reader.pageLoadFailed')
       return
     }
 
@@ -127,7 +133,7 @@ async function load() {
     }
   } catch (err) {
     cacheProgress.value = null
-    error.value = err instanceof Error ? err.message : '加载失败。'
+    error.value = translateError(err, 'reader.loadFailed')
   } finally {
     loading.value = false
   }
@@ -190,7 +196,7 @@ onUnmounted(() => {
         @ready="pdfReady = $event"
       />
       <p v-if="!pdfReady" class="text-center text-medium-emphasis mt-4">
-        正在绘制页面…
+        {{ t('reader.rendering') }}
       </p>
       <ReaderPager
         wide

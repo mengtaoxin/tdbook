@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 defineProps<{
   page: number
   totalPages: number
@@ -10,6 +12,8 @@ defineProps<{
 const emit = defineEmits<{
   go: [target: number]
 }>()
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -23,11 +27,11 @@ const emit = defineEmits<{
       color="primary"
       size="large"
       :disabled="prevPage == null"
-      aria-label="上一页"
+      :aria-label="t('reader.prevPage')"
       @click="prevPage != null && emit('go', prevPage)"
     />
     <span class="text-medium-emphasis text-body-2">
-      第 {{ page }} / {{ totalPages }} 页
+      {{ t('reader.pageOf', { page, total: totalPages }) }}
     </span>
     <v-btn
       icon="mdi-chevron-right"
@@ -35,7 +39,7 @@ const emit = defineEmits<{
       color="primary"
       size="large"
       :disabled="nextPage == null"
-      aria-label="下一页"
+      :aria-label="t('reader.nextPage')"
       @click="nextPage != null && emit('go', nextPage)"
     />
   </div>

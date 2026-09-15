@@ -4,7 +4,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 
 ## Stack
 
-- Vue 3.5, Vite 8, TypeScript, Vue Router 5, Vuetify 4 (`vite-plugin-vuetify` auto-import), MDI icons.
+- Vue 3.5, Vite 8, TypeScript, Vue Router 5, Vuetify 4 (`vite-plugin-vuetify` auto-import), vue-i18n (en/zh), MDI icons.
 - EPUB: `jszip` + `fast-xml-parser` (OPF / spine). PDF: `pdfjs-dist` (worker + text layer).
 - Prefer Vuetify components; scoped CSS for local tweaks. No Nuxt, React, Pinia, or Tailwind.
 
@@ -48,6 +48,8 @@ src/
     epubShadow.ts     EPUB shadow-DOM mounting helpers
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
+    locale.ts         UI locale preference (en/zh, default en)
+  i18n/               vue-i18n setup + en/zh message catalogs
   tests/unit/         Vitest
   e2e/                Playwright
   public/testdata/    generated sample.epub / sample.pdf / configs.json
@@ -67,7 +69,7 @@ src/
 - Vue SFCs: `<script setup lang="ts">`, then template, then scoped style. Import via `@/`. 2-space indent.
 - Keep book I/O and parsing in `src/lib/`; views stay UI + routing. Extend existing modules before adding new top-level folders.
 - When adding a book, append to `configs.json` with a distinct `id` when possible — do not hardcode titles in the app. Later duplicate ids are ignored at runtime.
-- UI copy is Chinese; keep new user-facing strings in Chinese unless editing English-only text.
+- UI copy goes through vue-i18n (`src/i18n/locales/{en,zh}.ts`); default locale is English. Add both `en` and `zh` keys for new user-facing strings.
 - Do not commit `dist/`, `node_modules/`, or secrets.
 
 ## Verify
@@ -75,4 +77,4 @@ src/
 - After TypeScript or Vue changes: `npm run build` and `npm run test`.
 - After reader/cache changes: also `npm run test:e2e` (needs Playwright browsers: `npx playwright install chromium`).
 - After catalog edits: open `/books` in `npm run dev` and confirm the new title appears and opens.
-- After cache/reader changes: exercise both EPUB and PDF open, page turn, and Settings “清除全部缓存”.
+- After cache/reader changes: exercise both EPUB and PDF open, page turn, and Settings “Clear all cache”.
