@@ -106,7 +106,7 @@ export function renderPdfPage(
     pageEl.style.setProperty('--user-unit', String(page.userUnit || 1))
 
     const context = canvas.getContext('2d')
-    if (!context) throw new Error('无法创建画布。')
+    if (!context) throw new Error('errors.canvasCreateFailed')
 
     const transform =
       outputScale === 1 ? undefined : [outputScale, 0, 0, outputScale, 0, 0]

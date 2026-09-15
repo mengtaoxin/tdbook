@@ -31,7 +31,7 @@ export async function getBook(
   try {
     await adapter.ensure(config.path, config.id, onProgress)
   } catch (error) {
-    throw error instanceof Error ? error : new Error('下载或缓存图书失败。')
+    throw error instanceof Error ? error : new Error('errors.cacheBookFailed')
   }
 
   const record = await adapter.open(id, config)

@@ -1,21 +1,26 @@
 <script setup lang="ts">
-const features = [
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+const features = computed(() => [
   {
     icon: 'mdi-book-open-variant',
-    title: '多种格式',
-    description: '支持常见的电子书与 PDF，打开即可在网页里阅读。',
+    title: t('home.features.formats.title'),
+    description: t('home.features.formats.description'),
   },
   {
     icon: 'mdi-download',
-    title: '本机保存',
-    description: '第一次打开时会自动下载到本机，之后无需反复加载。',
+    title: t('home.features.local.title'),
+    description: t('home.features.local.description'),
   },
   {
     icon: 'mdi-cloud-off-outline',
-    title: '离线阅读',
-    description: '书下载完成后，没有网络也能继续翻页阅读。',
+    title: t('home.features.offline.title'),
+    description: t('home.features.offline.description'),
   },
-] as const
+])
 </script>
 
 <template>
@@ -23,10 +28,10 @@ const features = [
     <div class="mb-8">
       <h1 class="text-h4 mb-3">tdbook</h1>
       <p class="text-body-1 text-medium-emphasis mb-2">
-        个人电子书阅读器：在浏览器里浏览书目、打开电子书或 PDF，第一次阅读时会下载到本机，之后即使没有网络也能继续读。
+        {{ t('home.tagline') }}
       </p>
       <p class="text-body-2 text-medium-emphasis">
-        书目由配置文件提供，如需更换书单来源，可在设置中修改配置地址。
+        {{ t('home.catalogHint') }}
       </p>
     </div>
 
@@ -53,7 +58,7 @@ const features = [
       class="text-none"
       :to="{ name: 'books' }"
     >
-      浏览图书列表
+      {{ t('home.browseBooks') }}
     </v-btn>
   </v-container>
 </template>

@@ -35,7 +35,7 @@ export function getStoredConfigsUrl(): string {
 export function setConfigsUrl(url: string): void {
   const trimmed = url.trim()
   if (!isValidConfigsUrl(trimmed)) {
-    throw new Error('无效的配置文件地址')
+    throw new Error('errors.invalidConfigsUrl')
   }
   try {
     if (!trimmed) {
@@ -44,6 +44,6 @@ export function setConfigsUrl(url: string): void {
       localStorage.setItem(CONFIGS_URL_KEY, trimmed)
     }
   } catch {
-    throw new Error('无法写入本地存储')
+    throw new Error('errors.localStorageWrite')
   }
 }

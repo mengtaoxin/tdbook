@@ -44,7 +44,7 @@ async function fetchAsBlob(
   // Remote hosts must allow CORS for browser fetch.
   const response = await fetch(sourceUrl)
   if (!response.ok) {
-    throw new Error(`下载失败（HTTP ${response.status}）。`)
+    throw new Error(`errors.downloadFailed:${response.status}`)
   }
 
   const totalHeader = response.headers.get('Content-Length')
@@ -89,7 +89,7 @@ export async function extractEpubToCache(
   try {
     zip = await JSZip.loadAsync(zipBlob)
   } catch {
-    throw new Error('无法解压 EPUB（文件可能已损坏或不是有效的 zip）。')
+    throw new Error('errors.epubExtractFailed')
   }
 
   const fileEntries = Object.values(zip.files).filter((entry) => !entry.dir)

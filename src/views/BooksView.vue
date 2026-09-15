@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { listBooks } from '@/lib/bookService'
 import type { BookListItem } from '@/lib/bookTypes'
@@ -9,6 +10,7 @@ const COVER_ASPECT_RATIO = 5 / 7
 const TITLE_LINE_HEIGHT = 1.4
 const TITLE_LINES = 2
 
+const { t } = useI18n()
 const router = useRouter()
 const books = ref<BookListItem[]>([])
 const duplicateIds = ref<string[]>([])
@@ -21,7 +23,7 @@ onMounted(async () => {
     books.value = result.books
     duplicateIds.value = result.duplicateIds
   } catch {
-    error.value = '加载图书列表失败。'
+    error.value = t('books.loadFailed')
   } finally {
     loading.value = false
   }
@@ -41,13 +43,13 @@ function goToBook(book: BookListItem) {
     <v-container class="books-container py-10">
       <header class="books-header mb-8">
         <h1 class="books-heading text-headline-small font-weight-medium mb-1">
-          图书列表
+          {{ t('books.title') }}
         </h1>
         <p
           v-if="!loading && books.length > 0"
           class="text-body-medium text-medium-emphasis mb-0"
         >
-          {{ books.length }} 本
+          {{ t('books.count', { n: books.length }) }}
         </p>
       </header>
 
@@ -73,14 +75,14 @@ function goToBook(book: BookListItem) {
           rounded="lg"
           class="mb-4"
         >
-          配置文件错误，存在id重复的图书。id={{ id }}
+          {{ t('books.duplicateId', { id }) }}
         </v-alert>
 
         <p
           v-if="books.length === 0"
           class="text-body-large text-medium-emphasis text-center py-16 mb-0"
         >
-          暂无图书。
+          {{ t('books.empty') }}
         </p>
 
         <v-row v-else class="books-grid" density="compact">
@@ -131,7 +133,7 @@ function goToBook(book: BookListItem) {
                     label
                     class="book-chip"
                   >
-                    {{ book.cached ? '已缓存' : '未下载' }}
+                    {{ book.cached ? t('books.cached') : t('books.notDownloaded') }}
                   </v-chip>
                   <v-chip
                     size="x-small"
