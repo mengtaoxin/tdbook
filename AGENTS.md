@@ -6,6 +6,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 
 - Vue 3.5, Vite 8, TypeScript, Vue Router 5, Vuetify 4 (`vite-plugin-vuetify` auto-import), vue-i18n (en/zh), MDI icons.
 - EPUB: `jszip` + `fast-xml-parser` (OPF / spine). PDF: `pdfjs-dist` (worker + text layer).
+- Config Guide: `marked` renders `public/how-to-write-config-file.md` / `.zh.md`.
 - Prefer Vuetify components; scoped CSS for local tweaks. No Nuxt, React, Pinia, or Tailwind.
 
 ## Commands
@@ -25,15 +26,17 @@ npm run test:e2e  # generate public/testdata fixtures + Playwright (Chromium)
 
 ```
 configs.json          book catalog (id, title, author?, type, path, hover?) — source of truth
+public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
 vite.config.ts        Vue + Vuetify + repoStaticPlugin (/configs.json, /pdfjs/**)
 src/
   main.ts             app bootstrap (router + vuetify)
-  router/             /books list, /book/:id reader
-  views/              HomeView, BooksView, BookReaderView, SettingsView, AboutView
+  router/             /books list, /book/:id reader, /config-guide
+  views/              HomeView, BooksView, BookReaderView, SettingsView, ConfigGuideView, AboutView
   plugins/vuetify.ts
   components/         ReaderPager, EpubReaderPane, PdfReaderPane
   lib/
     catalog.ts        configs.json fetch + normalize (BookConfig)
+    configGuideMarkdown.ts  locale → guide .md URL + marked render
     bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount
     bookService.ts    listBooks / getBook orchestration
     formats.ts        FormatAdapter registry (epub / pdf)

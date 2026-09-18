@@ -88,54 +88,8 @@ export default {
     projectUrl: '项目地址',
   },
   configGuide: {
-    title: '配置说明',
-    introBefore:
-      'tdbook 的书目来自一份 JSON 配置文件（默认',
-    introAfter:
-      '）。把文件放到可访问的地址后，在「设置」里填写该地址即可使用自己的书单。',
-    stepsTitle: '使用步骤',
-    step1Before: '按下方格式编写',
-    step1After:
-      '，把 EPUB / PDF 放到静态站点、对象存储或任意可公开访问的 URL。',
-    step2Before: '打开',
-    step2Middle: '，将「图书配置文件地址」改为你的',
-    step2After: ' 地址（例如',
-    step2End: '），然后保存。',
-    step3Before: '回到',
-    step3After:
-      ' 刷新查看。首次打开某本书时会下载到本机 IndexedDB，之后可离线阅读。',
-    settingsLink: '设置',
-    booksLink: '图书列表',
-    structureTitle: '文件结构',
-    structureIntroBefore: '根对象包含',
-    structureIntroAfter: ' 数组，每一项描述一本书：',
-    colField: '字段',
-    colRequired: '必填',
-    colDescription: '说明',
-    yes: '是',
-    no: '否',
-    exampleTitle: '示例',
-    notesTitle: '注意事项',
-    noteInvalid:
-      '无效条目（缺 id、非法 path、未知 type 等）会被静默忽略，不会出现在列表中。',
-    noteDuplicateBefore: '若存在重复',
-    noteDuplicateAfter:
-      '，列表页会提示，且只保留第一次出现的书。',
-    noteCors:
-      '跨域托管配置或图书文件时，服务器需允许浏览器跨域读取（CORS）。',
-    noteCacheBefore:
-      '更换配置地址或书目后，已缓存的旧书不会自动删除；可在设置中',
-    noteCacheAfter: '。',
-    clearCacheQuoted: '「清除全部缓存」',
-    fields: {
-      id: '图书唯一标识，也是阅读页路由 /book/:id 的参数。须为非空字符串，不能包含 /、\\ 或 ..。推荐用小写字母与中横线拼接（如 my-book-title）。重复的 id 只保留第一次出现的条目。',
-      title: '显示标题，可与其他书重复。',
-      author: '作者。可省略或填空字符串。',
-      type: '格式：epub 或 pdf。省略时按 epub 处理。',
-      path: '图书文件地址。须为 http(s)://… 远程链接，或站点绝对路径 /…（例如放在 public/ 下）。不支持相对路径、//… 或本地文件系统路径。',
-      hover:
-        '封面图地址，规则与 path 相同。设置后会覆盖从 EPUB/PDF 内提取的封面，用于图书列表展示。',
-    },
+    loading: '加载中…',
+    loadError: '无法加载配置说明。',
   },
   errors: {
     invalidConfigsUrl: '无效的配置文件地址',

@@ -92,54 +92,8 @@ export default {
     projectUrl: 'Project URL',
   },
   configGuide: {
-    title: 'Config Guide',
-    introBefore:
-      'tdbook loads its catalog from a JSON config file (default',
-    introAfter:
-      '). Host the file somewhere reachable, then set that URL in Settings to use your own book list.',
-    stepsTitle: 'Steps',
-    step1Before: 'Write a',
-    step1After:
-      ' in the format below, and host EPUB / PDF files on a static site, object storage, or any publicly reachable URL.',
-    step2Before: 'Open',
-    step2Middle: ', change the “Book config URL” to your',
-    step2After: ' address (for example',
-    step2End: '), then save.',
-    step3Before: 'Go back to',
-    step3After:
-      ' and refresh. The first time you open a book it downloads into IndexedDB; afterward you can read offline.',
-    settingsLink: 'Settings',
-    booksLink: 'Books',
-    structureTitle: 'File structure',
-    structureIntroBefore: 'The root object contains a',
-    structureIntroAfter: ' array; each item describes one book:',
-    colField: 'Field',
-    colRequired: 'Required',
-    colDescription: 'Description',
-    yes: 'Yes',
-    no: 'No',
-    exampleTitle: 'Example',
-    notesTitle: 'Notes',
-    noteInvalid:
-      'Invalid entries (missing id, illegal path, unknown type, etc.) are silently ignored and do not appear in the list.',
-    noteDuplicateBefore: 'If a duplicate',
-    noteDuplicateAfter:
-      ' appears, the book list shows a warning and only the first occurrence is kept.',
-    noteCors:
-      'When the config or book files are hosted cross-origin, the server must allow browser CORS reads.',
-    noteCacheBefore:
-      'Changing the config URL or catalog does not auto-delete old cached books; use',
-    noteCacheAfter: 'in Settings.',
-    clearCacheQuoted: 'Clear all cache',
-    fields: {
-      id: 'Unique book id and the /book/:id route param. Must be a non-empty string without /, \\, or ... Prefer lowercase letters and hyphens (e.g. my-book-title). Duplicate ids keep only the first entry.',
-      title: 'Display title; may repeat across books.',
-      author: 'Author. May be omitted or an empty string.',
-      type: 'Format: epub or pdf. Defaults to epub when omitted.',
-      path: 'Book file URL. Must be an http(s)://… remote link or a site-absolute path /… (e.g. under public/). Relative paths, //…, and local filesystem paths are rejected.',
-      hover:
-        'Cover image URL; same rules as path. When set, it overrides covers extracted from EPUB/PDF on the book list.',
-    },
+    loading: 'Loading…',
+    loadError: 'Could not load the config guide.',
   },
   errors: {
     invalidConfigsUrl: 'Invalid config URL',
