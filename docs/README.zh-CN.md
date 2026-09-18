@@ -21,9 +21,20 @@
 ```sh
 npm install
 npm run dev      # 开发：http://localhost:3000
-npm run build    # 类型检查 + 生产构建
-npm run preview  # 预览生产构建
 ```
+
+打开 [http://localhost:3000](http://localhost:3000)。停止：Ctrl+C。
+
+日常命令用 `package.json` 里的 `npm run`，不要新增 `scripts/*.sh` 包装脚本。
+
+| 命令 | 用途 |
+| ---- | ---- |
+| `npm run dev` | Vite 开发服务器（端口 3000） |
+| `npm run build` | 类型检查 + 生产构建 |
+| `npm run preview` | 预览生产构建 |
+| `npm run test` | Vitest 单元测试 |
+| `npm run testdata` | 生成 `public/testdata` EPUB/PDF 夹具 |
+| `npm run test:e2e` | 生成夹具 + Playwright（Chromium） |
 
 ## 添加书籍
 
