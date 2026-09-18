@@ -2,9 +2,8 @@ import fs from 'node:fs'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import vue from '@vitejs/plugin-vue'
+import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
-import vuetify from 'vite-plugin-vuetify'
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = webRoot
@@ -106,7 +105,7 @@ function repoStaticPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [vue(), vuetify({ autoImport: true }), repoStaticPlugin()],
+  plugins: [react(), repoStaticPlugin()],
   resolve: {
     alias: {
       '@': path.join(webRoot, 'src'),

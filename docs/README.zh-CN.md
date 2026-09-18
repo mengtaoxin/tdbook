@@ -12,7 +12,7 @@
 
 ## 技术栈
 
-- Vue 3 + Vite + TypeScript + Vue Router + Vuetify 4
+- React 19 + Vite + TypeScript + TanStack Router + MUI 7 + Zustand + react-i18next
 - EPUB：`jszip` + `fast-xml-parser`
 - PDF：`pdfjs-dist`
 
