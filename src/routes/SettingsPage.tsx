@@ -117,7 +117,7 @@ export function SettingsPage() {
           </Link>
         </Typography>
 
-        <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap" sx={{ mb: 5 }}>
+        <Stack direction="row" spacing={1.5} useFlexGap sx={{ mb: 5, flexWrap: 'wrap' }}>
           <Button variant="contained" onClick={save}>
             {t('settings.save')}
           </Button>
@@ -145,7 +145,6 @@ export function SettingsPage() {
       <Dialog
         open={confirmClear}
         onClose={closeClearConfirm}
-        disableEscapeKeyDown={clearing}
         maxWidth="xs"
         fullWidth
       >
