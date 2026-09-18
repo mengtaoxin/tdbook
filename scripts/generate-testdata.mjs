@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates minimal EPUB/PDF fixtures under public/testdata for e2e + local smoke.
+ * Invoked via `npm run testdata` (also run by `npm run test:e2e`).
  * Do not overwrite committed demo assets in the same folder
  * (alices-adventures-in-wonderland.epub, sample.jpg, example-hover.webp).
  */

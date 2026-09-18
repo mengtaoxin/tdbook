@@ -21,9 +21,20 @@ A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, d
 ```sh
 npm install
 npm run dev      # Dev server: http://localhost:3000
-npm run build    # Typecheck + production build
-npm run preview  # Preview production build
 ```
+
+Open [http://localhost:3000](http://localhost:3000). Stop with Ctrl+C.
+
+Use `npm run` scripts from `package.json`. Do not add `scripts/*.sh` wrappers.
+
+| Command | Purpose |
+| ------- | ------- |
+| `npm run dev` | Vite dev server (port 3000) |
+| `npm run build` | Typecheck + production build |
+| `npm run preview` | Preview production build |
+| `npm run test` | Vitest unit tests |
+| `npm run testdata` | Generate `public/testdata` EPUB/PDF fixtures |
+| `npm run test:e2e` | Generate fixtures + Playwright (Chromium) |
 
 ## Adding a book
 

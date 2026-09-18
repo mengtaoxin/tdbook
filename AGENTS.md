@@ -11,16 +11,19 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 
 ## Commands
 
-Run from the repo root (this app is not under `web/`):
+Run from the repo root (this app is not under `web/`). Use `package.json` scripts for day-to-day work. Do not add `scripts/*.sh` wrappers.
 
 ```sh
 npm install
-npm run dev       # Vite; serves /configs.json and /pdfjs/** via vite.config.ts plugin
+npm run dev       # Vite on port 3000; serves /configs.json and /pdfjs/** via vite.config.ts plugin
 npm run build     # tsc -b && vite build (copies configs.json + pdfjs assets into dist/)
 npm run preview   # preview production build
 npm run test      # Vitest unit tests (happy-dom + fake-indexeddb)
-npm run test:e2e  # generate public/testdata fixtures + Playwright (Chromium)
+npm run testdata  # generate public/testdata sample.epub / sample.pdf / configs.json
+npm run test:e2e  # npm run testdata + Playwright (Chromium)
 ```
+
+Stop the dev server with Ctrl+C.
 
 ## Layout
 
@@ -61,6 +64,7 @@ src/
   i18n/               i18next setup + en/zh message catalogs
   tests/unit/         Vitest
   e2e/                Playwright
+  scripts/generate-testdata.mjs  Node helper for `npm run testdata` (not a shell wrapper)
   public/testdata/    demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
 ```
 
