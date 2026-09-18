@@ -16,5 +16,15 @@ export default defineConfig({
     environment: 'happy-dom',
     include: ['tests/unit/**/*.test.ts'],
     setupFiles: ['tests/unit/setup.ts'],
+    // happy-dom fetches <link rel="stylesheet"> during DOMParser; real browsers do not.
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          disableCSSFileLoading: true,
+          disableJavaScriptFileLoading: true,
+          handleDisabledFileLoadingAsSuccess: true,
+        },
+      },
+    },
   },
 })
