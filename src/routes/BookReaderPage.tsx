@@ -4,6 +4,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Typography from '@mui/material/Typography'
 import { useEffect, useState } from 'react'
 import { FormatReaderPane } from '@/components/FormatReaderPane'
+import { usesPaintGate } from '@/components/formatPanes'
 import { useBookReader } from '@/hooks/useBookReader'
 
 export function BookReaderPage() {
@@ -27,7 +28,7 @@ export function BookReaderPage() {
   }, [pageContent])
 
   const awaitingPaint = Boolean(
-    pageContent && pageContent.type === 'pdf' && !paintReady,
+    pageContent && usesPaintGate(pageContent.type) && !paintReady,
   )
   const showRenderProgress = loading || (awaitingPaint && !error)
 

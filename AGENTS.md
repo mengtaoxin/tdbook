@@ -36,25 +36,24 @@ src/
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, …)
-  components/         AppShell, ReaderPager, FormatReaderPane, Epub/Pdf panes
+  components/         AppShell, ReaderPager, FormatReaderPane, formatPanes, Epub/Pdf panes
   stores/             Zustand (locale, settings, books list)
-  hooks/              useBookReader
+  hooks/              useBookSession (open book) + useBookReader (page view)
   lib/
-    catalog.ts        configs.json fetch + normalize (BookConfig)
+    catalog.ts        configs.json fetch + normalize (BookConfig); in-memory URL cache
     configGuideMarkdown.ts  locale → guide .md URL + marked render
     navLayout.ts      shouldCollapseNav for compact header
     bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount
     bookService.ts    listBooks / getBook orchestration
-    formats.ts        FormatAdapter registry + cache-clear hook wiring
-    formatAdapter.ts  adapter + PageContent types (ingest / ensure / open / cover / getPage)
+    formats.ts        typed FormatAdapter registry + getBookPage + cache-clear notify
+    formatAdapter.ts  adapter + PageContent + FormatSnapshot (ingest / snapshot / open / getPage)
     epubFormat.ts     EPUB adapter
     epubPackage.ts    OPF / spine / cover-href parse
     epubIngest.ts     EPUB zip → cached files
-    pdfFormat.ts      PDF adapter (ingest + pdf.js unload on cache clear)
-    bookCache.ts      public clear API (format hooks, no pdf.js import)
-    cacheHooks.ts     cache-clear hook registry
-    cacheStore.ts     IndexedDB + blob URL lifecycle
-    cacheIngest.ts    download-once + format ingest callback
+    pdfFormat.ts      PDF adapter (ingest + cover snapshot + pdf.js unload on cache clear)
+    bookCache.ts      public clear API (notifies format adapters)
+    cacheStore.ts     IndexedDB connection reuse + blob URL lifecycle
+    cacheIngest.ts    download-once + format ingest + snapshot meta
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
     epubShadow.ts     EPUB shadow-DOM mounting helpers
@@ -73,9 +72,9 @@ src/
 - Catalog entry: `{ id, title, author?, type?: "epub"|"pdf", path, hover? }` where `id` is a non-empty string (no `/`, `\`, `..`), `author` may be omitted or `""`, and `path` / optional `hover` are each either `http(s)://…` or a site-absolute path `/…` (e.g. under `public/`). Relative paths, `//…`, and local filesystem paths are rejected. When `hover` is set it overrides EPUB/PDF-extracted covers on the book list.
 - Route identity = catalog `id` (param `$id` on `/book/$id`). Display title is separate and may repeat. Runtime records and cache meta use the same `id` field (not `slug` / `bookName`).
 - Duplicate `id`s: keep the first entry; later duplicates are ignored. The book list shows an error alert for each duplicated id.
-- Cache key = catalog `path` (`sourceUrl`). EPUB files stored by package-relative path; PDF as a single `__pdf__` blob.
-- `BookRecord`: EPUB keeps spine `pages`; PDF uses `pageCount` + `pdfUrl` (no fake spine). Cross-format page payload is `PageContent`; use `bookPageCount()` for total pages.
-- Reader page is `?page=1`-based search on `/book/$id` (TanStack validated search).
+- Cache key = catalog `path` (`sourceUrl`). EPUB files stored by package-relative path; PDF as `__pdf__` plus optional `__cover__` snapshot. Cache meta may include `pageCount` and `coverPath` written at ingest (legacy rows without those fields are backfilled on list).
+- `BookRecord`: EPUB keeps spine `pages`; PDF uses `pageCount` + `pdfUrl` (no fake spine). Cross-format page payload is `PageContent`; use `bookPageCount()` for total pages. Format adapters are typed per book/page; `getBookPage()` is the dispatcher.
+- Reader: `useBookSession` loads the book; `useBookReader` loads the page. Page is `?page=1`-based search on `/book/$id` (TanStack validated search).
 
 ## Conventions
 

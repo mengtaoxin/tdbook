@@ -23,6 +23,13 @@ export type BookConfigsResult = {
   duplicateIds: string[]
 }
 
+let catalogCache: { url: string; result: Promise<BookConfigsResult> } | null =
+  null
+
+export function invalidateBookConfigsCache() {
+  catalogCache = null
+}
+
 /** Accept `http(s)://…` or same-origin `/…` cover paths; ignore anything else. */
 export function optionalCoverUrl(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined
@@ -69,13 +76,21 @@ export function normalizeBookConfigs(books: BookConfig[]): BookConfigsResult {
   return { books: deduped, duplicateIds }
 }
 
-export async function getBookConfigs(): Promise<BookConfigsResult> {
+async function fetchBookConfigs(url: string): Promise<BookConfigsResult> {
   try {
-    const response = await fetch(getConfigsUrl())
+    const response = await fetch(url)
     if (!response.ok) return { books: [], duplicateIds: [] }
     const parsed = (await response.json()) as BookConfigsFile
     return normalizeBookConfigs(parsed.books ?? [])
   } catch {
     return { books: [], duplicateIds: [] }
   }
+}
+
+export async function getBookConfigs(): Promise<BookConfigsResult> {
+  const url = getConfigsUrl()
+  if (catalogCache?.url === url) return catalogCache.result
+  const result = fetchBookConfigs(url)
+  catalogCache = { url, result }
+  return result
 }

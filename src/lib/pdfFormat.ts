@@ -1,23 +1,31 @@
+import { type CacheProgress } from './cacheIngest'
 import {
-  ensureBookCached,
-  type CacheProgress,
-} from './cacheIngest'
-import {
+  getBookCacheMeta,
   getCachedBlobUrl,
-  isBookCached,
   peekBlobUrl,
   peekBlobUrlsForRelativePath,
   putFiles,
 } from './cacheStore'
 import type { PdfBookRecord } from './bookTypes'
 import type { BookConfig } from './catalog'
-import type { FormatAdapter, PageContent } from './formatAdapter'
+import type {
+  FormatAdapter,
+  FormatSnapshot,
+  PdfPageContent,
+} from './formatAdapter'
 import { loadPdfDocument, renderPdfCover, unloadPdfDocument } from './pdfReader'
 
 /** IndexedDB relative path for the cached PDF blob. */
 export const PDF_CACHE_FILE_KEY = '__pdf__'
 
-async function ingestPdf(sourceUrl: string, blob: Blob, _onProgress?: (progress: CacheProgress) => void) {
+/** Snapshot cover rendered from page 1. */
+export const PDF_COVER_CACHE_FILE_KEY = '__cover__'
+
+async function ingestPdf(
+  sourceUrl: string,
+  blob: Blob,
+  _onProgress?: (progress: CacheProgress) => void,
+) {
   await putFiles(sourceUrl, [{ relativePath: PDF_CACHE_FILE_KEY, blob }])
 }
 
@@ -39,11 +47,46 @@ async function loadCachedPdf(sourceUrl: string) {
   return { pdfUrl, doc }
 }
 
-async function coverFromDoc(
+async function coverBlobFromDoc(
   doc: Awaited<ReturnType<typeof loadPdfDocument>>,
-): Promise<string | null> {
+): Promise<Blob | null> {
   try {
-    return await renderPdfCover(doc)
+    const dataUrl = await renderPdfCover(doc)
+    if (!dataUrl) return null
+    const response = await fetch(dataUrl)
+    if (!response.ok) return null
+    return response.blob()
+  } catch {
+    return null
+  }
+}
+
+async function snapshotPdf(sourceUrl: string): Promise<FormatSnapshot | null> {
+  const loaded = await loadCachedPdf(sourceUrl)
+  if (!loaded) return null
+
+  const coverBlob = await coverBlobFromDoc(loaded.doc)
+  if (coverBlob) {
+    await putFiles(sourceUrl, [
+      { relativePath: PDF_COVER_CACHE_FILE_KEY, blob: coverBlob },
+    ])
+  }
+
+  return {
+    pageCount: loaded.doc.numPages,
+    coverPath: coverBlob ? PDF_COVER_CACHE_FILE_KEY : null,
+  }
+}
+
+async function coverUrlForPdf(sourceUrl: string): Promise<string | null> {
+  const meta = await getBookCacheMeta(sourceUrl)
+  if (meta?.coverPath) {
+    return getCachedBlobUrl(sourceUrl, meta.coverPath)
+  }
+  try {
+    const loaded = await loadCachedPdf(sourceUrl)
+    if (!loaded) return null
+    return await renderPdfCover(loaded.doc)
   } catch {
     return null
   }
@@ -65,7 +108,7 @@ async function openPdf(
       description: '',
       sourceUrl: config.path,
       coverHref: null,
-      coverUrl: await coverFromDoc(loaded.doc),
+      coverUrl: await coverUrlForPdf(config.path),
       pdfUrl: loaded.pdfUrl,
       pageCount: loaded.doc.numPages,
     }
@@ -74,37 +117,21 @@ async function openPdf(
   }
 }
 
-export const pdfAdapter: FormatAdapter = {
+export const pdfAdapter: FormatAdapter<PdfBookRecord, PdfPageContent> = {
   type: 'pdf',
 
   ingest: ingestPdf,
-
-  ensure(sourceUrl, catalogId, onProgress) {
-    return ensureBookCached(sourceUrl, {
-      type: 'pdf',
-      catalogId,
-      ingest: ingestPdf,
-      onProgress,
-    })
-  },
+  snapshot: snapshotPdf,
 
   open(id, config) {
     return openPdf(id, config)
   },
 
-  async extractCover(config) {
-    if (!(await isBookCached(config.path))) return null
-    try {
-      const loaded = await loadCachedPdf(config.path)
-      if (!loaded) return null
-      return await coverFromDoc(loaded.doc)
-    } catch {
-      return null
-    }
+  pageCount(book) {
+    return book.pageCount
   },
 
-  async getPage(book, pageIndex): Promise<PageContent | null> {
-    if (book.type !== 'pdf') return null
+  async getPage(book, pageIndex): Promise<PdfPageContent | null> {
     if (pageIndex < 0 || pageIndex >= book.pageCount) return null
     return {
       type: 'pdf',
