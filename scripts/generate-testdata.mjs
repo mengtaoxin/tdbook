@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates minimal EPUB/PDF fixtures under public/testdata for e2e + local smoke.
+ * Invoked via `npm run testdata` (also run by `npm run test:e2e`).
  */
 import fs from 'node:fs'
 import path from 'node:path'
