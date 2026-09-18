@@ -4,7 +4,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 
 ## Stack
 
-- React 19, Vite 8, TypeScript, TanStack Router, MUI 7, Zustand, react-i18next (en/zh), `@mui/icons-material`.
+- React 19, Vite 8, TypeScript, TanStack Router, MUI 9, Zustand, react-i18next (en/zh), `@mui/icons-material`.
 - EPUB: `jszip` + `fast-xml-parser` (OPF / spine). PDF: `pdfjs-dist` (worker + text layer).
 - Config Guide: `marked` renders `public/how-to-write-config-file.md` / `.zh.md`.
 - Prefer MUI components; `sx` / theme tokens for local tweaks. No Vue, Vuetify, Pinia, or Tailwind.
