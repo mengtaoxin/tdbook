@@ -28,6 +28,7 @@ Stop the dev server with Ctrl+C.
 ## Layout
 
 ```
+docs/change-code-steps.md  how to change code (TDD, structure, tests, format, check)
 configs.json          book catalog (id, title, author?, type, path, hover?) — source of truth
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
 vite.config.ts        React + repoStaticPlugin (/configs.json, /pdfjs/**)
@@ -84,9 +85,6 @@ src/
 - UI copy goes through react-i18next (`src/i18n/locales/{en,zh}.ts`); default locale is English. Add both `en` and `zh` keys for new user-facing strings. Config Guide body lives in `public/how-to-write-config-file*.md`.
 - Do not commit `dist/`, `node_modules/`, or secrets.
 
-## Verify
+## Changing code
 
-- After TypeScript or React changes: `npm run build` and `npm run test`.
-- After reader/cache changes: also `npm run test:e2e` (needs Playwright browsers: `npx playwright install chromium`).
-- After catalog edits: open `/books` in `npm run dev` and confirm the new title appears and opens.
-- After cache/reader changes: exercise both EPUB and PDF open, page turn, and Settings “Clear all cache”.
+Follow [docs/change-code-steps.md](docs/change-code-steps.md) (structure check, TDD, tests, format, `npm run build`, and manual checks). Do not repeat those steps here.
