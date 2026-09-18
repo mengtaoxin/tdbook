@@ -26,10 +26,12 @@ async function seedSampleEpub(sourceUrl: string) {
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:title>From OPF</dc:title>
     <dc:creator>OPF Author</dc:creator>
+    <meta name="cover" content="cover-img"/>
   </metadata>
   <manifest>
     <item id="c1" href="c1.xhtml" media-type="application/xhtml+xml"/>
     <item id="css" href="style.css" media-type="text/css"/>
+    <item id="cover-img" href="cover.png" media-type="image/png"/>
   </manifest>
   <spine><itemref idref="c1"/></spine>
 </package>`,
@@ -39,6 +41,7 @@ async function seedSampleEpub(sourceUrl: string) {
     `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><body><p>Hi</p></body></html>`,
   )
   zip.file('OEBPS/style.css', 'p{}')
+  zip.file('OEBPS/cover.png', new Uint8Array([137, 80, 78, 71]))
 
   const entries = await Promise.all(
     Object.values(zip.files)
@@ -83,6 +86,8 @@ describe('epubAdapter', () => {
     if (book?.type === 'epub') {
       expect(book.opfDir).toBe('OEBPS')
       expect(book.stylesheetHrefs).toContain('OEBPS/style.css')
+      expect(book.coverHref).toBe('OEBPS/cover.png')
+      expect(book.coverUrl).toMatch(/^blob:/)
       expect('pdfUrl' in book).toBe(false)
     }
   })
@@ -100,5 +105,15 @@ describe('epubAdapter', () => {
     if (page?.type === 'epub') {
       expect(page.rewritten.html).toContain('Hi')
     }
+  })
+
+  it('extracts cover without assembling a full reader record path beyond OPF', async () => {
+    const cover = await epubAdapter.extractCover({
+      id: 'sample-epub',
+      title: 'Fallback',
+      path: sourceUrl,
+      type: 'epub',
+    })
+    expect(cover).toMatch(/^blob:/)
   })
 })

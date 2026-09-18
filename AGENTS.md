@@ -33,7 +33,7 @@ src/
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, …)
-  components/         AppShell, ReaderPager, EpubReaderPane, PdfReaderPane
+  components/         AppShell, ReaderPager, FormatReaderPane, Epub/Pdf panes
   stores/             Zustand (locale, settings, books list)
   hooks/              useBookReader
   lib/
@@ -42,13 +42,16 @@ src/
     navLayout.ts      shouldCollapseNav for compact header
     bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount
     bookService.ts    listBooks / getBook orchestration
-    formats.ts        FormatAdapter registry (epub / pdf)
-    formatAdapter.ts  adapter + PageContent types
-    epubFormat.ts     EPUB ensure / open / cover / getPage
-    pdfFormat.ts      PDF ensure / open / cover / getPage
-    bookCache.ts      public cache API (clear hooks pdf.js unload)
+    formats.ts        FormatAdapter registry + cache-clear hook wiring
+    formatAdapter.ts  adapter + PageContent types (ingest / ensure / open / cover / getPage)
+    epubFormat.ts     EPUB adapter
+    epubPackage.ts    OPF / spine / cover-href parse
+    epubIngest.ts     EPUB zip → cached files
+    pdfFormat.ts      PDF adapter (ingest + pdf.js unload on cache clear)
+    bookCache.ts      public clear API (format hooks, no pdf.js import)
+    cacheHooks.ts     cache-clear hook registry
     cacheStore.ts     IndexedDB + blob URL lifecycle
-    cacheIngest.ts    download + EPUB extract / PDF put
+    cacheIngest.ts    download-once + format ingest callback
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
     epubShadow.ts     EPUB shadow-DOM mounting helpers

@@ -2,23 +2,16 @@ import Alert from '@mui/material/Alert'
 import Container from '@mui/material/Container'
 import LinearProgress from '@mui/material/LinearProgress'
 import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
-import { EpubReaderPane } from '@/components/EpubReaderPane'
-import { PdfReaderPane } from '@/components/PdfReaderPane'
-import { ReaderPager } from '@/components/ReaderPager'
+import { useEffect, useState } from 'react'
+import { FormatReaderPane } from '@/components/FormatReaderPane'
 import { useBookReader } from '@/hooks/useBookReader'
-import '@/lib/pdfTextLayer.css'
 
 export function BookReaderPage() {
-  const { t } = useTranslation()
   const {
-    book,
     page,
     pageContent,
     loading,
     error,
-    pdfReady,
-    setPdfReady,
     cacheProgress,
     progressLabel,
     totalPages,
@@ -27,9 +20,16 @@ export function BookReaderPage() {
     hash,
     goToPage,
   } = useBookReader()
+  const [paintReady, setPaintReady] = useState(false)
 
-  const showRenderProgress =
-    loading || (pageContent?.type === 'pdf' && !pdfReady && !error)
+  useEffect(() => {
+    setPaintReady(false)
+  }, [pageContent])
+
+  const awaitingPaint = Boolean(
+    pageContent && pageContent.type === 'pdf' && !paintReady,
+  )
+  const showRenderProgress = loading || (awaitingPaint && !error)
 
   return (
     <Container maxWidth={false} sx={{ py: 2, maxWidth: 960 }}>
@@ -59,44 +59,18 @@ export function BookReaderPage() {
         <Alert severity="error">{error}</Alert>
       ) : null}
 
-      {pageContent?.type === 'pdf' && book && !error ? (
-        <>
-          <PdfReaderPane
-            pdfUrl={pageContent.pdfUrl}
-            pageNumber={pageContent.pageNumber}
-            onReady={setPdfReady}
-          />
-          {!pdfReady ? (
-            <Typography
-              align="center"
-              color="text.secondary"
-              sx={{ mt: 2 }}
-            >
-              {t('reader.rendering')}
-            </Typography>
-          ) : null}
-          <ReaderPager
-            wide
-            page={page}
-            totalPages={totalPages}
-            prevPage={prevPage}
-            nextPage={nextPage}
-            onGo={goToPage}
-          />
-        </>
-      ) : null}
-
-      {pageContent?.type === 'epub' && book && !error ? (
-        <>
-          <EpubReaderPane rewritten={pageContent.rewritten} hash={hash} />
-          <ReaderPager
-            page={page}
-            totalPages={totalPages}
-            prevPage={prevPage}
-            nextPage={nextPage}
-            onGo={goToPage}
-          />
-        </>
+      {pageContent && !error ? (
+        <FormatReaderPane
+          content={pageContent}
+          hash={hash ?? ''}
+          page={page}
+          totalPages={totalPages}
+          prevPage={prevPage}
+          nextPage={nextPage}
+          awaitingPaint={awaitingPaint}
+          onGo={goToPage}
+          onReady={setPaintReady}
+        />
       ) : null}
     </Container>
   )
