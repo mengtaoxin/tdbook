@@ -1,10 +1,9 @@
-import './formats'
 import {
   cancelEnsureInFlight,
   clearEnsureInFlight,
   type CacheProgress,
 } from './cacheIngest'
-import { runCacheClearHooks } from './cacheHooks'
+import { notifyFormatCacheCleared } from './formats'
 import {
   clearAllCacheRecords,
   deleteBookCacheRecords,
@@ -20,14 +19,14 @@ export type { BookType } from './bookTypes'
 export { getCachedBlobUrl, getCachedFile, isBookCached, readCachedText }
 
 export async function clearBookCache(sourceUrl: string): Promise<void> {
-  runCacheClearHooks(sourceUrl)
+  notifyFormatCacheCleared(sourceUrl)
   cancelEnsureInFlight(sourceUrl)
   await deleteBookCacheRecords(sourceUrl)
 }
 
 /** Clears IndexedDB cache and in-memory blob URLs for every book. */
 export async function clearAllBookCaches(): Promise<void> {
-  runCacheClearHooks(null)
+  notifyFormatCacheCleared(null)
   clearEnsureInFlight()
   await clearAllCacheRecords()
 }

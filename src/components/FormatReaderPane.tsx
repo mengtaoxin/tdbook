@@ -1,7 +1,6 @@
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-import { EpubReaderPane } from '@/components/EpubReaderPane'
-import { PdfReaderPane } from '@/components/PdfReaderPane'
+import { formatPanes, pagerWide } from '@/components/formatPanes'
 import { ReaderPager } from '@/components/ReaderPager'
 import type { PageContent } from '@/lib/formatAdapter'
 import '@/lib/pdfTextLayer.css'
@@ -30,40 +29,24 @@ export function FormatReaderPane({
   onReady,
 }: FormatReaderPaneProps) {
   const { t } = useTranslation()
-
-  const pager = (
-    <ReaderPager
-      wide={content.type === 'pdf'}
-      page={page}
-      totalPages={totalPages}
-      prevPage={prevPage}
-      nextPage={nextPage}
-      onGo={onGo}
-    />
-  )
-
-  if (content.type === 'pdf') {
-    return (
-      <>
-        <PdfReaderPane
-          pdfUrl={content.pdfUrl}
-          pageNumber={content.pageNumber}
-          onReady={onReady}
-        />
-        {awaitingPaint ? (
-          <Typography align="center" color="text.secondary" sx={{ mt: 2 }}>
-            {t('reader.rendering')}
-          </Typography>
-        ) : null}
-        {pager}
-      </>
-    )
-  }
+  const Pane = formatPanes[content.type]
 
   return (
     <>
-      <EpubReaderPane rewritten={content.rewritten} hash={hash} />
-      {pager}
+      <Pane content={content} hash={hash} onReady={onReady} />
+      {awaitingPaint ? (
+        <Typography align="center" color="text.secondary" sx={{ mt: 2 }}>
+          {t('reader.rendering')}
+        </Typography>
+      ) : null}
+      <ReaderPager
+        wide={pagerWide(content.type)}
+        page={page}
+        totalPages={totalPages}
+        prevPage={prevPage}
+        nextPage={nextPage}
+        onGo={onGo}
+      />
     </>
   )
 }

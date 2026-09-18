@@ -1,5 +1,5 @@
 import type { CacheProgress } from './cacheIngest'
-import type { BookRecord, BookType } from './bookTypes'
+import type { BookRecord } from './bookTypes'
 import type { BookConfig } from './catalog'
 import type { RewrittenPage } from './rewriteHtml'
 
@@ -16,27 +16,33 @@ export type PdfPageContent = {
 
 export type PageContent = EpubPageContent | PdfPageContent
 
+/** List/open metadata written after format ingest (optional fields on cache meta). */
+export type FormatSnapshot = {
+  pageCount: number
+  /** Cached cover file path, or null when the package has no cover. */
+  coverPath: string | null
+}
+
 /**
- * Per-format pipeline: ingest blob → assemble BookRecord → page content.
- * Cover extraction is separate so the book list can stay lighter than a full open.
+ * Per-format pipeline: ingest blob → snapshot meta → assemble BookRecord → page content.
+ * `TBook` / `TPage` stay aligned so callers do not type-narrow inside the adapter.
  */
-export type FormatAdapter = {
-  readonly type: BookType
+export type FormatAdapter<
+  TBook extends BookRecord = BookRecord,
+  TPage extends PageContent = PageContent,
+> = {
+  readonly type: TBook['type']
   ingest(
     sourceUrl: string,
     blob: Blob,
     onProgress?: (progress: CacheProgress) => void,
   ): Promise<void>
-  ensure(
-    sourceUrl: string,
-    catalogId: string,
-    onProgress?: (progress: CacheProgress) => void,
-  ): Promise<void>
-  open(id: string, config: BookConfig): Promise<BookRecord | null>
-  /** Package/cover bitmap when cached; caller applies `hover` override. */
-  extractCover(config: BookConfig): Promise<string | null>
+  /** After files are stored, derive page count and cover path for the list. */
+  snapshot(sourceUrl: string): Promise<FormatSnapshot | null>
+  open(id: string, config: BookConfig): Promise<TBook | null>
+  pageCount(book: TBook): number
   /** `pageIndex` is 0-based. */
-  getPage(book: BookRecord, pageIndex: number): Promise<PageContent | null>
+  getPage(book: TBook, pageIndex: number): Promise<TPage | null>
   /** Called before IndexedDB/blob URLs for this source (or all) are dropped. */
   onCacheCleared?(sourceUrl: string | null): void
 }
