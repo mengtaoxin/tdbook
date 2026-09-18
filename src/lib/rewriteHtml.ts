@@ -1,4 +1,4 @@
-import { getCachedBlobUrl } from './bookCache'
+import { getCachedBlobUrl } from './cacheStore'
 import type { BookPage, EpubBookRecord } from './bookTypes'
 import { normalizeEpubPath, resolveEpubAssetPath } from './paths'
 

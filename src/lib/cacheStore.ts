@@ -14,7 +14,6 @@ const DB_VERSION = 1
 const META_STORE = 'meta'
 const FILES_STORE = 'files'
 
-export const PDF_FILE_KEY = '__pdf__'
 const KEY_SEP = '\0'
 
 const blobUrlCache = new Map<string, string>()
@@ -111,8 +110,13 @@ export function peekBlobUrl(
   return blobUrlCache.get(fileRecordKey(sourceUrl, relativePath))
 }
 
-export function listBlobUrlEntries(): Array<[string, string]> {
-  return Array.from(blobUrlCache.entries())
+export function peekBlobUrlsForRelativePath(relativePath: string): string[] {
+  const suffix = `${KEY_SEP}${relativePath}`
+  const urls: string[] = []
+  for (const [key, url] of blobUrlCache) {
+    if (key.endsWith(suffix)) urls.push(url)
+  }
+  return urls
 }
 
 function revokeBlobUrlsForSource(sourceUrl: string) {
@@ -193,10 +197,6 @@ export async function putMeta(meta: BookCacheMeta) {
   } finally {
     db.close()
   }
-}
-
-export function pdfCacheRelativePath() {
-  return PDF_FILE_KEY
 }
 
 export async function readCachedText(

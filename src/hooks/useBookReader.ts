@@ -2,9 +2,9 @@ import { useNavigate, useParams, useRouterState } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { translateError } from '@/i18n'
-import { type CacheProgress } from '@/lib/bookCache'
 import { getBook } from '@/lib/bookService'
 import { bookPageCount, type BookRecord } from '@/lib/bookTypes'
+import type { CacheProgress } from '@/lib/cacheIngest'
 import { getFormatAdapter, type PageContent } from '@/lib/formats'
 
 export function useBookReader() {
@@ -23,7 +23,6 @@ export function useBookReader() {
   const [pageContent, setPageContent] = useState<PageContent | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [pdfReady, setPdfReady] = useState(false)
   const [cacheProgress, setCacheProgress] = useState<CacheProgress | null>(null)
   const bookRef = useRef<BookRecord | null>(null)
   bookRef.current = book
@@ -73,7 +72,6 @@ export function useBookReader() {
     async function load() {
       setError('')
       setPageContent(null)
-      setPdfReady(false)
 
       const current = bookRef.current
       const switchingBook = !current || current.id !== id
@@ -151,8 +149,6 @@ export function useBookReader() {
     pageContent,
     loading,
     error,
-    pdfReady,
-    setPdfReady,
     cacheProgress,
     progressLabel,
     totalPages,

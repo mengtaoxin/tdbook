@@ -1,30 +1,61 @@
 import {
   ensureBookCached,
+  type CacheProgress,
+} from './cacheIngest'
+import {
   getCachedBlobUrl,
   isBookCached,
-  pdfCacheRelativePath,
-} from './bookCache'
+  peekBlobUrl,
+  peekBlobUrlsForRelativePath,
+  putFiles,
+} from './cacheStore'
 import type { PdfBookRecord } from './bookTypes'
 import type { BookConfig } from './catalog'
 import type { FormatAdapter, PageContent } from './formatAdapter'
-import { loadPdfDocument, renderPdfCover } from './pdfReader'
+import { loadPdfDocument, renderPdfCover, unloadPdfDocument } from './pdfReader'
+
+/** IndexedDB relative path for the cached PDF blob. */
+export const PDF_CACHE_FILE_KEY = '__pdf__'
+
+async function ingestPdf(sourceUrl: string, blob: Blob, _onProgress?: (progress: CacheProgress) => void) {
+  await putFiles(sourceUrl, [{ relativePath: PDF_CACHE_FILE_KEY, blob }])
+}
+
+function unloadPdfForSource(sourceUrl: string | null) {
+  if (sourceUrl) {
+    const pdfUrl = peekBlobUrl(sourceUrl, PDF_CACHE_FILE_KEY)
+    if (pdfUrl) unloadPdfDocument(pdfUrl)
+    return
+  }
+  for (const url of peekBlobUrlsForRelativePath(PDF_CACHE_FILE_KEY)) {
+    unloadPdfDocument(url)
+  }
+}
+
+async function loadCachedPdf(sourceUrl: string) {
+  const pdfUrl = await getCachedBlobUrl(sourceUrl, PDF_CACHE_FILE_KEY)
+  if (!pdfUrl) return null
+  const doc = await loadPdfDocument(pdfUrl)
+  return { pdfUrl, doc }
+}
+
+async function coverFromDoc(
+  doc: Awaited<ReturnType<typeof loadPdfDocument>>,
+): Promise<string | null> {
+  try {
+    return await renderPdfCover(doc)
+  } catch {
+    return null
+  }
+}
 
 async function openPdf(
   id: string,
   config: BookConfig,
 ): Promise<PdfBookRecord | null> {
-  const pdfUrl = await getCachedBlobUrl(config.path, pdfCacheRelativePath())
-  if (!pdfUrl) return null
-
   try {
-    const doc = await loadPdfDocument(pdfUrl)
-
-    let extractedCover: string | null = null
-    try {
-      extractedCover = await renderPdfCover(doc)
-    } catch {
-      extractedCover = null
-    }
+    const loaded = await loadCachedPdf(config.path)
+    if (!loaded) return null
 
     return {
       id,
@@ -34,9 +65,9 @@ async function openPdf(
       description: '',
       sourceUrl: config.path,
       coverHref: null,
-      coverUrl: extractedCover,
-      pdfUrl,
-      pageCount: doc.numPages,
+      coverUrl: await coverFromDoc(loaded.doc),
+      pdfUrl: loaded.pdfUrl,
+      pageCount: loaded.doc.numPages,
     }
   } catch {
     return null
@@ -46,8 +77,15 @@ async function openPdf(
 export const pdfAdapter: FormatAdapter = {
   type: 'pdf',
 
+  ingest: ingestPdf,
+
   ensure(sourceUrl, catalogId, onProgress) {
-    return ensureBookCached(sourceUrl, 'pdf', onProgress, catalogId)
+    return ensureBookCached(sourceUrl, {
+      type: 'pdf',
+      catalogId,
+      ingest: ingestPdf,
+      onProgress,
+    })
   },
 
   open(id, config) {
@@ -57,10 +95,9 @@ export const pdfAdapter: FormatAdapter = {
   async extractCover(config) {
     if (!(await isBookCached(config.path))) return null
     try {
-      const pdfUrl = await getCachedBlobUrl(config.path, pdfCacheRelativePath())
-      if (!pdfUrl) return null
-      const doc = await loadPdfDocument(pdfUrl)
-      return await renderPdfCover(doc)
+      const loaded = await loadCachedPdf(config.path)
+      if (!loaded) return null
+      return await coverFromDoc(loaded.doc)
     } catch {
       return null
     }
@@ -74,5 +111,9 @@ export const pdfAdapter: FormatAdapter = {
       pageNumber: pageIndex + 1,
       pdfUrl: book.pdfUrl,
     }
+  },
+
+  onCacheCleared(sourceUrl) {
+    unloadPdfForSource(sourceUrl)
   },
 }

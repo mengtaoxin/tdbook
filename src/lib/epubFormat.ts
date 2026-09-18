@@ -1,168 +1,50 @@
-import { XMLParser } from 'fast-xml-parser'
 import {
   ensureBookCached,
+  type CacheProgress,
+} from './cacheIngest'
+import {
   getCachedBlobUrl,
   isBookCached,
   readCachedText,
-} from './bookCache'
-import type { BookPage, EpubBookRecord } from './bookTypes'
+} from './cacheStore'
+import type { EpubBookRecord } from './bookTypes'
 import type { BookConfig } from './catalog'
+import { extractEpubToCache } from './epubIngest'
+import { parseCachedEpubPackage } from './epubPackage'
 import type { FormatAdapter, PageContent } from './formatAdapter'
-import { normalizeEpubPath } from './paths'
 import { rewritePageHtml } from './rewriteHtml'
 
-type ManifestItem = {
-  id: string
-  href: string
-  mediaType: string
-}
-
-const xmlParser = new XMLParser({
-  ignoreAttributes: false,
-  attributeNamePrefix: '@_',
-  removeNSPrefix: true,
-  isArray: (name) =>
-    ['item', 'itemref', 'meta', 'reference', 'rootfile'].includes(name),
-})
-
-function asArray<T>(value: T | T[] | undefined | null): T[] {
-  if (value == null) return []
-  return Array.isArray(value) ? value : [value]
-}
-
-function textOf(node: unknown): string {
-  if (node == null) return ''
-  if (typeof node === 'string' || typeof node === 'number') {
-    return String(node)
-  }
-  if (typeof node === 'object' && '#text' in node) {
-    return String((node as { '#text': unknown })['#text'] ?? '')
-  }
-  return ''
-}
-
-function stripHtml(value: string) {
-  return value
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-function attr(node: Record<string, unknown> | undefined, name: string) {
-  if (!node) return ''
-  return String(node[`@_${name}`] ?? '')
-}
-
-function packagePath(opfDir: string, href: string) {
-  const cleaned = href.replace(/^\/+/, '')
-  if (!opfDir) return normalizeEpubPath(cleaned)
-  return normalizeEpubPath(`${opfDir}/${cleaned}`)
-}
-
-async function resolveOpfPath(
+async function ingestEpub(
   sourceUrl: string,
-): Promise<{ opfPath: string; opfDir: string } | null> {
-  const containerXml = await readCachedText(sourceUrl, 'META-INF/container.xml')
-  if (containerXml) {
-    const parsed = xmlParser.parse(containerXml) as {
-      container?: {
-        rootfiles?: { rootfile?: Record<string, unknown>[] }
-      }
-    }
-    const rootfile = asArray(parsed.container?.rootfiles?.rootfile)[0]
-    const fullPath = attr(rootfile, 'full-path')
-    if (fullPath) {
-      const opfPath = normalizeEpubPath(fullPath)
-      const slash = opfPath.lastIndexOf('/')
-      const opfDir = slash === -1 ? '' : opfPath.slice(0, slash)
-      return { opfPath, opfDir }
-    }
-  }
-
-  // Fallback for packages that place content.opf at the root.
-  const fallback = await readCachedText(sourceUrl, 'content.opf')
-  if (fallback != null) {
-    return { opfPath: 'content.opf', opfDir: '' }
-  }
-  return null
+  blob: Blob,
+  onProgress?: (progress: CacheProgress) => void,
+) {
+  await extractEpubToCache(sourceUrl, blob, onProgress)
 }
 
 async function openEpub(
   id: string,
   config: BookConfig,
 ): Promise<EpubBookRecord | null> {
-  const opfInfo = await resolveOpfPath(config.path)
-  if (!opfInfo) return null
+  const parsed = await parseCachedEpubPackage(config.path, config.title)
+  if (!parsed) return null
 
-  const opfXml = await readCachedText(config.path, opfInfo.opfPath)
-  if (opfXml == null) return null
-
-  const parsed = xmlParser.parse(opfXml) as {
-    package?: {
-      metadata?: Record<string, unknown>
-      manifest?: { item?: Record<string, unknown>[] }
-      spine?: { itemref?: Record<string, unknown>[] }
-    }
-  }
-
-  const metadata = parsed.package?.metadata ?? {}
-  const items = asArray(parsed.package?.manifest?.item).map((item) => ({
-    id: attr(item, 'id'),
-    href: attr(item, 'href'),
-    mediaType: attr(item, 'media-type'),
-  })) satisfies ManifestItem[]
-
-  const itemsById = new Map(items.map((item) => [item.id, item]))
-  const spineRefs = asArray(parsed.package?.spine?.itemref)
-
-  const pages: BookPage[] = []
-  for (const ref of spineRefs) {
-    const item = itemsById.get(attr(ref, 'idref'))
-    if (!item) continue
-    if (
-      item.mediaType === 'application/xhtml+xml' ||
-      item.mediaType === 'text/html'
-    ) {
-      pages.push({
-        ...item,
-        href: packagePath(opfInfo.opfDir, item.href),
-      })
-    }
-  }
-
-  const title = textOf(metadata.title) || config.title
-  const author = textOf(metadata.creator)
-  const description = stripHtml(textOf(metadata.description))
-
-  const coverId = asArray(
-    metadata.meta as Record<string, unknown>[] | undefined,
-  ).find((meta) => attr(meta, 'name') === 'cover')?.['@_content']
-  const coverItem =
-    typeof coverId === 'string' ? itemsById.get(coverId) : undefined
-  const coverHref = coverItem
-    ? packagePath(opfInfo.opfDir, coverItem.href)
+  const extractedCover = parsed.coverHref
+    ? await getCachedBlobUrl(config.path, parsed.coverHref)
     : null
-  const extractedCover = coverHref
-    ? await getCachedBlobUrl(config.path, coverHref)
-    : null
-
-  const stylesheetHrefs = items
-    .filter((item) => item.mediaType === 'text/css')
-    .map((item) => packagePath(opfInfo.opfDir, item.href))
 
   return {
     id,
     type: 'epub',
-    title,
-    author,
-    description,
+    title: parsed.title,
+    author: parsed.author,
+    description: parsed.description,
     sourceUrl: config.path,
-    opfDir: opfInfo.opfDir,
-    coverHref,
+    opfDir: parsed.opfDir,
+    coverHref: parsed.coverHref,
     coverUrl: extractedCover,
-    pages,
-    stylesheetHrefs,
+    pages: parsed.pages,
+    stylesheetHrefs: parsed.stylesheetHrefs,
   }
 }
 
@@ -175,8 +57,15 @@ async function readPageSource(book: EpubBookRecord, pageIndex: number) {
 export const epubAdapter: FormatAdapter = {
   type: 'epub',
 
+  ingest: ingestEpub,
+
   ensure(sourceUrl, catalogId, onProgress) {
-    return ensureBookCached(sourceUrl, 'epub', onProgress, catalogId)
+    return ensureBookCached(sourceUrl, {
+      type: 'epub',
+      catalogId,
+      ingest: ingestEpub,
+      onProgress,
+    })
   },
 
   open(id, config) {
@@ -185,8 +74,9 @@ export const epubAdapter: FormatAdapter = {
 
   async extractCover(config) {
     if (!(await isBookCached(config.path))) return null
-    const book = await openEpub(config.id, config)
-    return book?.coverUrl ?? null
+    const parsed = await parseCachedEpubPackage(config.path, config.title)
+    if (!parsed?.coverHref) return null
+    return getCachedBlobUrl(config.path, parsed.coverHref)
   },
 
   async getPage(book, pageIndex): Promise<PageContent | null> {
@@ -204,5 +94,3 @@ export const epubAdapter: FormatAdapter = {
     return { type: 'epub', rewritten }
   },
 }
-
-export type { ManifestItem }

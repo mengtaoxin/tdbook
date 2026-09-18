@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { EpubBookRecord } from '@/lib/bookTypes'
 import { documentLang, rewritePageHtml } from '@/lib/rewriteHtml'
 
-vi.mock('@/lib/bookCache', () => ({
+vi.mock('@/lib/cacheStore', () => ({
   getCachedBlobUrl: vi.fn(async (_source: string, path: string) => {
     if (path.endsWith('.css')) return 'data:text/css,/*cached*/'
     if (path.endsWith('.png')) return 'data:image/png;base64,aa=='

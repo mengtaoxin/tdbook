@@ -8,7 +8,7 @@ import {
   readCachedText,
   resetBlobUrlCacheForTests,
 } from '@/lib/cacheStore'
-import { extractEpubToCache } from '@/lib/cacheIngest'
+import { extractEpubToCache } from '@/lib/epubIngest'
 import JSZip from 'jszip'
 
 describe('cacheStore + cacheIngest', () => {
