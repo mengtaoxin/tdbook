@@ -61,7 +61,7 @@ src/
   i18n/               i18next setup + en/zh message catalogs
   tests/unit/         Vitest
   e2e/                Playwright
-  public/testdata/    generated sample.epub / sample.pdf / configs.json
+  public/testdata/    demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
 ```
 
 ## Data model

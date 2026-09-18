@@ -5,8 +5,8 @@
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/sample.epub",
-      "hover": "/sample.jpg"
+      "path": "/testdata/alices-adventures-in-wonderland.epub",
+      "hover": "/testdata/sample.jpg"
     }
   ]
 }

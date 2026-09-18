@@ -31,14 +31,15 @@ tdbook 的书目来自一份 JSON 配置文件（默认 `/configs.json`）。把
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/sample.epub",
-      "hover": "/sample.jpg"
+      "path": "/testdata/alices-adventures-in-wonderland.epub",
+      "hover": "/testdata/sample.jpg"
     },
     {
       "id": "sample-pdf",
       "title": "Sample PDF",
       "type": "pdf",
-      "path": "https://example.com/books/sample.pdf"
+      "path": "https://example.com/books/sample.pdf",
+      "hover": "/testdata/example-hover.webp"
     }
   ]
 }

@@ -31,14 +31,15 @@ The root object contains a `books` array; each item describes one book.
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/sample.epub",
-      "hover": "/sample.jpg"
+      "path": "/testdata/alices-adventures-in-wonderland.epub",
+      "hover": "/testdata/sample.jpg"
     },
     {
       "id": "sample-pdf",
       "title": "Sample PDF",
       "type": "pdf",
-      "path": "https://example.com/books/sample.pdf"
+      "path": "https://example.com/books/sample.pdf",
+      "hover": "/testdata/example-hover.webp"
     }
   ]
 }
