@@ -5,6 +5,8 @@ export default {
     settings: 'Settings',
     configGuide: 'Config Guide',
     about: 'About',
+    language: 'Language',
+    openMenu: 'Open menu',
   },
   locale: {
     label: 'Language',

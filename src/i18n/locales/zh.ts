@@ -5,6 +5,8 @@ export default {
     settings: '设置',
     configGuide: '配置说明',
     about: '关于',
+    language: '语言',
+    openMenu: '打开菜单',
   },
   locale: {
     label: '语言',
