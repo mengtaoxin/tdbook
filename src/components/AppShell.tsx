@@ -1,4 +1,3 @@
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -30,7 +29,6 @@ import { shouldCollapseNav } from '@/lib/navLayout'
 import { useLocaleStore } from '@/stores/localeStore'
 
 const NAV_ITEMS = [
-  { labelKey: 'nav.home', to: '/' as const, Icon: HomeOutlinedIcon },
   { labelKey: 'nav.books', to: '/books' as const, Icon: AutoStoriesOutlinedIcon },
   { labelKey: 'nav.settings', to: '/settings' as const, Icon: SettingsOutlinedIcon },
   {
@@ -203,6 +201,7 @@ export function AppShell() {
             ref={brandRef}
             to="/"
             data-testid="brand-title"
+            aria-label={t('nav.home')}
             variant="h6"
             sx={{
               display: 'inline-flex',
