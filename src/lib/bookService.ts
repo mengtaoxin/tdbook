@@ -1,4 +1,5 @@
-import { isBookCached, type CacheProgress } from './bookCache'
+import type { CacheProgress } from './cacheIngest'
+import { isBookCached } from './cacheStore'
 import type { BookListItem, BookRecord } from './bookTypes'
 import {
   bookTypeOf,

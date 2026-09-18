@@ -1,12 +1,5 @@
-import JSZip from 'jszip'
 import type { BookType } from './bookTypes'
-import {
-  isBookCached,
-  PDF_FILE_KEY,
-  putFiles,
-  putMeta,
-  type BookCacheMeta,
-} from './cacheStore'
+import { isBookCached, putMeta, type BookCacheMeta } from './cacheStore'
 
 export type CacheProgress = {
   phase: 'download' | 'extract' | 'done'
@@ -14,28 +7,13 @@ export type CacheProgress = {
   total: number | null
 }
 
-const ensureInFlight = new Map<string, Promise<void>>()
+export type BookIngestFn = (
+  sourceUrl: string,
+  blob: Blob,
+  onProgress?: (progress: CacheProgress) => void,
+) => Promise<void>
 
-function guessMime(path: string): string {
-  const lower = path.toLowerCase()
-  if (lower.endsWith('.html') || lower.endsWith('.xhtml') || lower.endsWith('.htm')) {
-    return 'application/xhtml+xml'
-  }
-  if (lower.endsWith('.css')) return 'text/css'
-  if (lower.endsWith('.xml') || lower.endsWith('.opf') || lower.endsWith('.ncx')) {
-    return 'application/xml'
-  }
-  if (lower.endsWith('.png')) return 'image/png'
-  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg'
-  if (lower.endsWith('.gif')) return 'image/gif'
-  if (lower.endsWith('.svg')) return 'image/svg+xml'
-  if (lower.endsWith('.webp')) return 'image/webp'
-  if (lower.endsWith('.woff')) return 'font/woff'
-  if (lower.endsWith('.woff2')) return 'font/woff2'
-  if (lower.endsWith('.ttf')) return 'font/ttf'
-  if (lower.endsWith('.otf')) return 'font/otf'
-  return 'application/octet-stream'
-}
+const ensureInFlight = new Map<string, Promise<void>>()
 
 async function fetchAsBlob(
   sourceUrl: string,
@@ -80,59 +58,15 @@ async function fetchAsBlob(
   })
 }
 
-export async function extractEpubToCache(
-  sourceUrl: string,
-  zipBlob: Blob,
-  onProgress?: (progress: CacheProgress) => void,
-) {
-  let zip: JSZip
-  try {
-    zip = await JSZip.loadAsync(zipBlob)
-  } catch {
-    throw new Error('errors.epubExtractFailed')
-  }
-
-  const fileEntries = Object.values(zip.files).filter((entry) => !entry.dir)
-  const total = fileEntries.length
-  const batch: Array<{ relativePath: string; blob: Blob }> = []
-  let loaded = 0
-
-  for (const entry of fileEntries) {
-    const relativePath = entry.name.replace(/^\/+/, '')
-    if (!relativePath || relativePath.endsWith('/')) continue
-    const data = await entry.async('uint8array')
-    const copy = new Uint8Array(data)
-    batch.push({
-      relativePath,
-      blob: new Blob([copy], { type: guessMime(relativePath) }),
-    })
-    loaded += 1
-    onProgress?.({ phase: 'extract', loaded, total })
-
-    if (batch.length >= 32) {
-      await putFiles(sourceUrl, batch)
-      batch.length = 0
-    }
-  }
-
-  if (batch.length) {
-    await putFiles(sourceUrl, batch)
-  }
-}
-
 async function downloadAndStore(
   sourceUrl: string,
   type: BookType,
   catalogId: string,
+  ingest: BookIngestFn,
   onProgress?: (progress: CacheProgress) => void,
 ) {
   const blob = await fetchAsBlob(sourceUrl, onProgress)
-
-  if (type === 'pdf') {
-    await putFiles(sourceUrl, [{ relativePath: PDF_FILE_KEY, blob }])
-  } else {
-    await extractEpubToCache(sourceUrl, blob, onProgress)
-  }
+  await ingest(sourceUrl, blob, onProgress)
 
   const meta: BookCacheMeta = {
     sourceUrl,
@@ -145,21 +79,31 @@ async function downloadAndStore(
   onProgress?.({ phase: 'done', loaded: 1, total: 1 })
 }
 
+/** Download once, then let the format adapter persist files. */
 export async function ensureBookCached(
   sourceUrl: string,
-  type: BookType,
-  onProgress?: (progress: CacheProgress) => void,
-  catalogId?: string,
+  options: {
+    type: BookType
+    ingest: BookIngestFn
+    catalogId?: string
+    onProgress?: (progress: CacheProgress) => void
+  },
 ): Promise<void> {
   if (await isBookCached(sourceUrl)) {
-    onProgress?.({ phase: 'done', loaded: 1, total: 1 })
+    options.onProgress?.({ phase: 'done', loaded: 1, total: 1 })
     return
   }
 
-  const id = catalogId ?? sourceUrl
+  const id = options.catalogId ?? sourceUrl
   let pending = ensureInFlight.get(sourceUrl)
   if (!pending) {
-    pending = downloadAndStore(sourceUrl, type, id, onProgress).finally(() => {
+    pending = downloadAndStore(
+      sourceUrl,
+      options.type,
+      id,
+      options.ingest,
+      options.onProgress,
+    ).finally(() => {
       ensureInFlight.delete(sourceUrl)
     })
     ensureInFlight.set(sourceUrl, pending)
