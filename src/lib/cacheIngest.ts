@@ -1,5 +1,6 @@
 import type { BookType } from './bookTypes'
 import { isBookCached, putMeta, type BookCacheMeta } from './cacheStore'
+import type { FormatSnapshot } from './formatAdapter'
 
 export type CacheProgress = {
   phase: 'download' | 'extract' | 'done'
@@ -63,10 +64,18 @@ async function downloadAndStore(
   type: BookType,
   catalogId: string,
   ingest: BookIngestFn,
+  snapshot: ((sourceUrl: string) => Promise<FormatSnapshot | null>) | undefined,
   onProgress?: (progress: CacheProgress) => void,
 ) {
   const blob = await fetchAsBlob(sourceUrl, onProgress)
   await ingest(sourceUrl, blob, onProgress)
+
+  let snap: FormatSnapshot | null = null
+  try {
+    snap = (await snapshot?.(sourceUrl)) ?? null
+  } catch {
+    snap = null
+  }
 
   const meta: BookCacheMeta = {
     sourceUrl,
@@ -74,17 +83,20 @@ async function downloadAndStore(
     id: catalogId,
     status: 'ready',
     downloadedAt: Date.now(),
+    pageCount: snap?.pageCount,
+    coverPath: snap ? snap.coverPath : undefined,
   }
   await putMeta(meta)
   onProgress?.({ phase: 'done', loaded: 1, total: 1 })
 }
 
-/** Download once, then let the format adapter persist files. */
+/** Download once, then let the format adapter persist files and snapshot meta. */
 export async function ensureBookCached(
   sourceUrl: string,
   options: {
     type: BookType
     ingest: BookIngestFn
+    snapshot?: (sourceUrl: string) => Promise<FormatSnapshot | null>
     catalogId?: string
     onProgress?: (progress: CacheProgress) => void
   },
@@ -102,6 +114,7 @@ export async function ensureBookCached(
       options.type,
       id,
       options.ingest,
+      options.snapshot,
       options.onProgress,
     ).finally(() => {
       ensureInFlight.delete(sourceUrl)

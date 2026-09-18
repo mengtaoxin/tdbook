@@ -7,6 +7,12 @@ export type BookCacheMeta = {
   id: string
   status: 'ready'
   downloadedAt: number
+  /** Set by format snapshot after ingest; omitted on pre-snapshot caches. */
+  pageCount?: number
+  /**
+   * Cached cover file path. `null` means no cover; omitted means snapshot not written yet.
+   */
+  coverPath?: string | null
 }
 
 const DB_NAME = 'books-cache'
@@ -18,8 +24,15 @@ const KEY_SEP = '\0'
 
 const blobUrlCache = new Map<string, string>()
 
+let dbPromise: Promise<IDBDatabase> | null = null
+
 export function fileRecordKey(sourceUrl: string, relativePath: string) {
   return `${sourceUrl}${KEY_SEP}${relativePath}`
+}
+
+export function fileKeyRange(sourceUrl: string): IDBKeyRange {
+  const prefix = `${sourceUrl}${KEY_SEP}`
+  return IDBKeyRange.bound(prefix, `${prefix}\uffff`)
 }
 
 function openDb(): Promise<IDBDatabase> {
@@ -40,6 +53,27 @@ function openDb(): Promise<IDBDatabase> {
   })
 }
 
+async function getDb(): Promise<IDBDatabase> {
+  if (!dbPromise) {
+    dbPromise = openDb().then((db) => {
+      db.onclose = () => {
+        dbPromise = null
+      }
+      db.onversionchange = () => {
+        db.close()
+        dbPromise = null
+      }
+      return db
+    })
+  }
+  try {
+    return await dbPromise
+  } catch (error) {
+    dbPromise = null
+    throw error
+  }
+}
+
 function idbRequest<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     request.onsuccess = () => resolve(request.result)
@@ -58,32 +92,31 @@ function idbTransactionDone(tx: IDBTransaction): Promise<void> {
   })
 }
 
+export async function getBookCacheMeta(
+  sourceUrl: string,
+): Promise<BookCacheMeta | null> {
+  const db = await getDb()
+  const meta = await idbRequest(
+    db.transaction(META_STORE, 'readonly').objectStore(META_STORE).get(sourceUrl),
+  )
+  if (!meta || (meta as BookCacheMeta).status !== 'ready') return null
+  return meta as BookCacheMeta
+}
+
 export async function isBookCached(sourceUrl: string): Promise<boolean> {
-  const db = await openDb()
-  try {
-    const meta = await idbRequest(
-      db.transaction(META_STORE, 'readonly').objectStore(META_STORE).get(sourceUrl),
-    )
-    return Boolean(meta && (meta as BookCacheMeta).status === 'ready')
-  } finally {
-    db.close()
-  }
+  return Boolean(await getBookCacheMeta(sourceUrl))
 }
 
 export async function getCachedFile(
   sourceUrl: string,
   relativePath: string,
 ): Promise<Blob | null> {
-  const db = await openDb()
-  try {
-    const key = fileRecordKey(sourceUrl, relativePath)
-    const blob = await idbRequest(
-      db.transaction(FILES_STORE, 'readonly').objectStore(FILES_STORE).get(key),
-    )
-    return blob instanceof Blob ? blob : null
-  } finally {
-    db.close()
-  }
+  const db = await getDb()
+  const key = fileRecordKey(sourceUrl, relativePath)
+  const blob = await idbRequest(
+    db.transaction(FILES_STORE, 'readonly').objectStore(FILES_STORE).get(key),
+  )
+  return blob instanceof Blob ? blob : null
 }
 
 export async function getCachedBlobUrl(
@@ -132,26 +165,19 @@ function revokeBlobUrlsForSource(sourceUrl: string) {
 export async function deleteBookCacheRecords(sourceUrl: string): Promise<void> {
   revokeBlobUrlsForSource(sourceUrl)
 
-  const db = await openDb()
-  try {
-    const tx = db.transaction([META_STORE, FILES_STORE], 'readwrite')
-    const metaStore = tx.objectStore(META_STORE)
-    const filesStore = tx.objectStore(FILES_STORE)
+  const db = await getDb()
+  const tx = db.transaction([META_STORE, FILES_STORE], 'readwrite')
+  const metaStore = tx.objectStore(META_STORE)
+  const filesStore = tx.objectStore(FILES_STORE)
 
-    metaStore.delete(sourceUrl)
+  metaStore.delete(sourceUrl)
 
-    const prefix = `${sourceUrl}${KEY_SEP}`
-    const keys = await idbRequest(filesStore.getAllKeys())
-    for (const key of keys) {
-      if (typeof key === 'string' && key.startsWith(prefix)) {
-        filesStore.delete(key)
-      }
-    }
-
-    await idbTransactionDone(tx)
-  } finally {
-    db.close()
+  const keys = await idbRequest(filesStore.getAllKeys(fileKeyRange(sourceUrl)))
+  for (const key of keys) {
+    filesStore.delete(key)
   }
+
+  await idbTransactionDone(tx)
 }
 
 export async function clearAllCacheRecords(): Promise<void> {
@@ -160,43 +186,31 @@ export async function clearAllCacheRecords(): Promise<void> {
   }
   blobUrlCache.clear()
 
-  const db = await openDb()
-  try {
-    const tx = db.transaction([META_STORE, FILES_STORE], 'readwrite')
-    tx.objectStore(META_STORE).clear()
-    tx.objectStore(FILES_STORE).clear()
-    await idbTransactionDone(tx)
-  } finally {
-    db.close()
-  }
+  const db = await getDb()
+  const tx = db.transaction([META_STORE, FILES_STORE], 'readwrite')
+  tx.objectStore(META_STORE).clear()
+  tx.objectStore(FILES_STORE).clear()
+  await idbTransactionDone(tx)
 }
 
 export async function putFiles(
   sourceUrl: string,
   entries: Array<{ relativePath: string; blob: Blob }>,
 ) {
-  const db = await openDb()
-  try {
-    const tx = db.transaction(FILES_STORE, 'readwrite')
-    const store = tx.objectStore(FILES_STORE)
-    for (const entry of entries) {
-      store.put(entry.blob, fileRecordKey(sourceUrl, entry.relativePath))
-    }
-    await idbTransactionDone(tx)
-  } finally {
-    db.close()
+  const db = await getDb()
+  const tx = db.transaction(FILES_STORE, 'readwrite')
+  const store = tx.objectStore(FILES_STORE)
+  for (const entry of entries) {
+    store.put(entry.blob, fileRecordKey(sourceUrl, entry.relativePath))
   }
+  await idbTransactionDone(tx)
 }
 
 export async function putMeta(meta: BookCacheMeta) {
-  const db = await openDb()
-  try {
-    const tx = db.transaction(META_STORE, 'readwrite')
-    tx.objectStore(META_STORE).put(meta)
-    await idbTransactionDone(tx)
-  } finally {
-    db.close()
-  }
+  const db = await getDb()
+  const tx = db.transaction(META_STORE, 'readwrite')
+  tx.objectStore(META_STORE).put(meta)
+  await idbTransactionDone(tx)
 }
 
 export async function readCachedText(

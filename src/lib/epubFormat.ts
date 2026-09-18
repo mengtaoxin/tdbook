@@ -1,17 +1,14 @@
-import {
-  ensureBookCached,
-  type CacheProgress,
-} from './cacheIngest'
-import {
-  getCachedBlobUrl,
-  isBookCached,
-  readCachedText,
-} from './cacheStore'
+import { type CacheProgress } from './cacheIngest'
+import { getCachedBlobUrl, readCachedText } from './cacheStore'
 import type { EpubBookRecord } from './bookTypes'
 import type { BookConfig } from './catalog'
 import { extractEpubToCache } from './epubIngest'
 import { parseCachedEpubPackage } from './epubPackage'
-import type { FormatAdapter, PageContent } from './formatAdapter'
+import type {
+  EpubPageContent,
+  FormatAdapter,
+  FormatSnapshot,
+} from './formatAdapter'
 import { rewritePageHtml } from './rewriteHtml'
 
 async function ingestEpub(
@@ -20,6 +17,15 @@ async function ingestEpub(
   onProgress?: (progress: CacheProgress) => void,
 ) {
   await extractEpubToCache(sourceUrl, blob, onProgress)
+}
+
+async function snapshotEpub(sourceUrl: string): Promise<FormatSnapshot | null> {
+  const parsed = await parseCachedEpubPackage(sourceUrl, '')
+  if (!parsed) return null
+  return {
+    pageCount: parsed.pages.length,
+    coverPath: parsed.coverHref,
+  }
 }
 
 async function openEpub(
@@ -54,33 +60,21 @@ async function readPageSource(book: EpubBookRecord, pageIndex: number) {
   return readCachedText(book.sourceUrl, page.href)
 }
 
-export const epubAdapter: FormatAdapter = {
+export const epubAdapter: FormatAdapter<EpubBookRecord, EpubPageContent> = {
   type: 'epub',
 
   ingest: ingestEpub,
-
-  ensure(sourceUrl, catalogId, onProgress) {
-    return ensureBookCached(sourceUrl, {
-      type: 'epub',
-      catalogId,
-      ingest: ingestEpub,
-      onProgress,
-    })
-  },
+  snapshot: snapshotEpub,
 
   open(id, config) {
     return openEpub(id, config)
   },
 
-  async extractCover(config) {
-    if (!(await isBookCached(config.path))) return null
-    const parsed = await parseCachedEpubPackage(config.path, config.title)
-    if (!parsed?.coverHref) return null
-    return getCachedBlobUrl(config.path, parsed.coverHref)
+  pageCount(book) {
+    return book.pages.length
   },
 
-  async getPage(book, pageIndex): Promise<PageContent | null> {
-    if (book.type !== 'epub') return null
+  async getPage(book, pageIndex): Promise<EpubPageContent | null> {
     const source = await readPageSource(book, pageIndex)
     if (source == null) return null
     const current = book.pages[pageIndex]

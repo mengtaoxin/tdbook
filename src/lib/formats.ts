@@ -1,22 +1,32 @@
-import type { BookType } from './bookTypes'
-import { registerCacheClearHook } from './cacheHooks'
+import type { BookRecord, BookType } from './bookTypes'
 import { epubAdapter } from './epubFormat'
-import type { FormatAdapter } from './formatAdapter'
+import type { FormatAdapter, PageContent } from './formatAdapter'
 import { pdfAdapter } from './pdfFormat'
 
-const adapters: Record<BookType, FormatAdapter> = {
+export const formatAdapters = {
   epub: epubAdapter,
   pdf: pdfAdapter,
+} as const satisfies { [K in BookType]: FormatAdapter }
+
+export function getFormatAdapter<T extends BookType>(
+  type: T,
+): (typeof formatAdapters)[T] {
+  return formatAdapters[type]
 }
 
-for (const adapter of Object.values(adapters)) {
-  registerCacheClearHook(adapter.type, (sourceUrl) => {
+export function notifyFormatCacheCleared(sourceUrl: string | null) {
+  for (const adapter of Object.values(formatAdapters)) {
     adapter.onCacheCleared?.(sourceUrl)
-  })
+  }
 }
 
-export function getFormatAdapter(type: BookType): FormatAdapter {
-  return adapters[type]
+/** Type-narrowing dispatcher so getPage stays format-safe. */
+export async function getBookPage(
+  book: BookRecord,
+  pageIndex: number,
+): Promise<PageContent | null> {
+  if (book.type === 'epub') return epubAdapter.getPage(book, pageIndex)
+  return pdfAdapter.getPage(book, pageIndex)
 }
 
-export type { FormatAdapter, PageContent } from './formatAdapter'
+export type { FormatAdapter, FormatSnapshot, PageContent } from './formatAdapter'

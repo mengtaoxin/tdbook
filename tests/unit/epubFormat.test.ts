@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import JSZip from 'jszip'
 import {
   clearAllCacheRecords,
+  getCachedBlobUrl,
   putFiles,
   putMeta,
   resetBlobUrlCacheForTests,
@@ -89,6 +90,7 @@ describe('epubAdapter', () => {
       expect(book.coverHref).toBe('OEBPS/cover.png')
       expect(book.coverUrl).toMatch(/^blob:/)
       expect('pdfUrl' in book).toBe(false)
+      expect(epubAdapter.pageCount(book)).toBe(1)
     }
   })
 
@@ -107,13 +109,12 @@ describe('epubAdapter', () => {
     }
   })
 
-  it('extracts cover without assembling a full reader record path beyond OPF', async () => {
-    const cover = await epubAdapter.extractCover({
-      id: 'sample-epub',
-      title: 'Fallback',
-      path: sourceUrl,
-      type: 'epub',
+  it('snapshots cover path and page count from the cached package', async () => {
+    const snap = await epubAdapter.snapshot(sourceUrl)
+    expect(snap).toEqual({
+      pageCount: 1,
+      coverPath: 'OEBPS/cover.png',
     })
-    expect(cover).toMatch(/^blob:/)
+    expect(await getCachedBlobUrl(sourceUrl, snap!.coverPath!)).toMatch(/^blob:/)
   })
 })
