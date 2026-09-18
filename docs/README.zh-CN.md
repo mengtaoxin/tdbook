@@ -12,7 +12,7 @@
 
 ## 技术栈
 
-- React 19 + Vite + TypeScript + TanStack Router + MUI 7 + Zustand + react-i18next
+- React 19 + Vite + TypeScript + TanStack Router + MUI 9 + Zustand + react-i18next
 - EPUB：`jszip` + `fast-xml-parser`
 - PDF：`pdfjs-dist`
 
