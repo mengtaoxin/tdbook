@@ -5,6 +5,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 ## Stack
 
 - React 19, Vite 8, TypeScript, TanStack Router, MUI 9, Zustand, react-i18next (en/zh), `@mui/icons-material`.
+- Shared kit: `tdkit` → `@mengtaoxin/tdkit` (GitHub Packages) for durable app logs (`TdLog`).
 - EPUB: `jszip` + `fast-xml-parser` (OPF / spine). PDF: `pdfjs-dist` (worker + text layer).
 - Config Guide: `marked` renders `public/how-to-write-config-file.md` / `.zh.md`.
 - Prefer MUI components; `sx` / theme tokens for local tweaks. No Vue, Vuetify, Pinia, or Tailwind.
@@ -36,7 +37,7 @@ src/
   main.tsx            app bootstrap (router + MUI theme + i18n)
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
-  routes/             page components (Home, Books, Reader, Settings, …)
+  routes/             page components (Home, Books, Reader, Settings, Logs, …)
   components/         AppShell, ReaderPager, FormatReaderPane, formatPanes, Epub/Pdf panes
   stores/             Zustand (locale, settings, books list)
   hooks/              useBookSession (open book) + useBookReader (page view)
@@ -61,12 +62,15 @@ src/
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
     locale.ts         UI locale preference (en/zh, default en)
+    reportFailure.ts  console.error for failures (TdLog is separate)
   i18n/               i18next setup + en/zh message catalogs
   tests/unit/         Vitest
   e2e/                Playwright
   scripts/generate-testdata.mjs  Node helper for `npm run testdata` (not a shell wrapper)
   public/testdata/    demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
 ```
+
+Install notes: `tdkit` comes from GitHub Packages. Set `NODE_AUTH_TOKEN` (PAT with `read:packages`) so `.npmrc` can fetch `@mengtaoxin/tdkit`.
 
 ## Data model
 
@@ -76,6 +80,7 @@ src/
 - Cache key = catalog `path` (`sourceUrl`). EPUB files stored by package-relative path; PDF as `__pdf__` plus optional `__cover__` snapshot. Cache meta may include `pageCount` and `coverPath` written at ingest (legacy rows without those fields are backfilled on list).
 - `BookRecord`: EPUB keeps spine `pages`; PDF uses `pageCount` + `pdfUrl` (no fake spine). Cross-format page payload is `PageContent`; use `bookPageCount()` for total pages. Format adapters are typed per book/page; `getBookPage()` is the dispatcher.
 - Reader: `useBookSession` loads the book; `useBookReader` loads the page. Page is `?page=1`-based search on `/book/$id` (TanStack validated search).
+- App logs: durable English diagnostics via `tdkit` (`TdLog`). Open-book and page-load failures call `reportFailure` + `TdLog.error`. Logs UI is `/logs` (list + clear with confirm).
 
 ## Conventions
 

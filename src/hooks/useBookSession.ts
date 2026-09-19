@@ -1,10 +1,12 @@
 import { useParams, useRouterState } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { TdLog } from 'tdkit'
 import { translateError } from '@/i18n'
 import { getBook } from '@/lib/bookService'
 import { bookPageCount, type BookRecord } from '@/lib/bookTypes'
 import type { CacheProgress } from '@/lib/cacheIngest'
+import { reportFailure } from '@/lib/reportFailure'
 
 export function useBookSession() {
   const { t } = useTranslation()
@@ -41,6 +43,10 @@ export function useBookSession() {
       } catch (err) {
         if (cancelled) return
         setCacheProgress(null)
+        const detail = err instanceof Error ? err.message : String(err)
+        const message = `Failed to open book id=${id}: ${detail}`
+        reportFailure(message)
+        void TdLog.error(message)
         setError(translateError(err, 'reader.loadFailed'))
       } finally {
         if (!cancelled) setLoading(false)

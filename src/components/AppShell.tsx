@@ -1,6 +1,7 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
+import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import TranslateIcon from '@mui/icons-material/Translate'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
@@ -37,6 +38,7 @@ const NAV_ITEMS = [
     Icon: DescriptionOutlinedIcon,
   },
   { labelKey: 'nav.about', to: '/about' as const, Icon: InfoOutlinedIcon },
+  { labelKey: 'nav.logs', to: '/logs' as const, Icon: NotesOutlinedIcon },
 ]
 
 export function AppShell() {

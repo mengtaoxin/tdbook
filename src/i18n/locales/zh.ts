@@ -5,6 +5,7 @@ export default {
     settings: '设置',
     configGuide: '配置说明',
     about: '关于',
+    logs: '日志',
     language: '语言',
     openMenu: '打开菜单',
   },
@@ -78,6 +79,7 @@ export default {
     clearCacheConfirmBody:
       '将删除本机所有图书的本地缓存，下次打开需重新下载。',
     cancel: '取消',
+    confirm: '确认',
     clear: '清除',
     cacheCleared: '已清除全部图书缓存。下次打开需重新下载。',
     clearCacheFailed: '清除缓存失败。',
@@ -90,6 +92,11 @@ export default {
   configGuide: {
     loading: '加载中…',
     loadError: '无法加载配置说明。',
+  },
+  logs: {
+    clear: '清除日志',
+    clearConfirm: '清除全部日志？此操作无法撤销。',
+    empty: '暂无日志。',
   },
   errors: {
     invalidConfigsUrl: '无效的配置文件地址',
