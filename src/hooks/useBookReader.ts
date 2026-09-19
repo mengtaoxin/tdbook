@@ -1,9 +1,11 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { TdLog } from 'tdkit'
 import { useBookSession, useReaderPageSearch } from '@/hooks/useBookSession'
 import { bookPageCount } from '@/lib/bookTypes'
 import { getBookPage, type PageContent } from '@/lib/formats'
+import { reportFailure } from '@/lib/reportFailure'
 
 export function useBookReader() {
   const { t } = useTranslation()
@@ -98,8 +100,12 @@ export function useBookReader() {
         }
         setPageError('')
         setPageContent(content)
-      } catch {
+      } catch (err) {
         if (cancelled) return
+        const detail = err instanceof Error ? err.message : String(err)
+        const message = `Failed to load page ${page} for book id=${sessionBook.id}: ${detail}`
+        reportFailure(message)
+        void TdLog.error(message)
         setPageError(t('reader.pageLoadFailed'))
       } finally {
         if (!cancelled) setPageLoading(false)

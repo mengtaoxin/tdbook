@@ -9,6 +9,7 @@ import { BookReaderPage } from '@/routes/BookReaderPage'
 import { BooksPage } from '@/routes/BooksPage'
 import { ConfigGuidePage } from '@/routes/ConfigGuidePage'
 import { HomePage } from '@/routes/HomePage'
+import { LogsPage } from '@/routes/LogsPage'
 import { SettingsPage } from '@/routes/SettingsPage'
 
 function parsePageSearch(search: Record<string, unknown>): { page: number } {
@@ -58,6 +59,12 @@ const aboutRoute = createRoute({
   component: AboutPage,
 })
 
+const logsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/logs',
+  component: LogsPage,
+})
+
 const bookRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/book/$id',
@@ -71,6 +78,7 @@ const routeTree = rootRoute.addChildren([
   settingsRoute,
   configGuideRoute,
   aboutRoute,
+  logsRoute,
   bookRoute,
 ])
 

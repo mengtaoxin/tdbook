@@ -5,6 +5,7 @@ export default {
     settings: 'Settings',
     configGuide: 'Config Guide',
     about: 'About',
+    logs: 'Logs',
     language: 'Language',
     openMenu: 'Open menu',
   },
@@ -81,6 +82,7 @@ export default {
     clearCacheConfirmBody:
       'This deletes every local book cache on this device. Opening a book again will require a fresh download.',
     cancel: 'Cancel',
+    confirm: 'Confirm',
     clear: 'Clear',
     cacheCleared:
       'All book caches cleared. Opening a book again will require a download.',
@@ -94,6 +96,11 @@ export default {
   configGuide: {
     loading: 'Loading…',
     loadError: 'Could not load the config guide.',
+  },
+  logs: {
+    clear: 'Clear logs',
+    clearConfirm: 'Clear all logs? This cannot be undone.',
+    empty: 'No logs yet.',
   },
   errors: {
     invalidConfigsUrl: 'Invalid config URL',

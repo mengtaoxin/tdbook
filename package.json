@@ -26,6 +26,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-i18next": "^17.0.14",
+    "tdkit": "npm:@mengtaoxin/tdkit@^0.1.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
