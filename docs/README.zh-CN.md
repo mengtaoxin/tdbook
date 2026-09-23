@@ -33,6 +33,7 @@ npm run dev      # 开发：http://localhost:3000
 | `npm run build` | 类型检查 + 生产构建 |
 | `npm run preview` | 预览生产构建 |
 | `npm run test` | Vitest 单元测试 |
+| `npm run test:coverage` | 单元测试 + V8 覆盖率（`coverage/` HTML 报告） |
 | `npm run testdata` | 生成 `public/testdata` EPUB/PDF 夹具 |
 | `npm run test:e2e` | 生成夹具 + Playwright（Chromium） |
 

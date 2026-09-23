@@ -49,6 +49,7 @@ dist-ssr
 *.local
 
 # Tests
+coverage/
 test-results/
 playwright-report/
 blob-report/

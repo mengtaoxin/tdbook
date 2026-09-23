@@ -26,5 +26,11 @@ export default defineConfig({
         },
       },
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      // Unit tests target lib; UI routes/components are covered by e2e smoke.
+      include: ['src/lib/**/*.{ts,tsx}'],
+    },
   },
 })

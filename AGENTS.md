@@ -20,6 +20,7 @@ npm run dev       # Vite on port 3000; serves /configs.json and /pdfjs/** via vi
 npm run build     # tsc -b && vite build (copies configs.json + pdfjs assets into dist/)
 npm run preview   # preview production build
 npm run test      # Vitest unit tests (happy-dom + fake-indexeddb)
+npm run test:coverage  # unit tests + V8 coverage (text + coverage/html)
 npm run testdata  # generate public/testdata sample.epub / sample.pdf / configs.json
 npm run test:e2e  # npm run testdata + Playwright (Chromium)
 ```
