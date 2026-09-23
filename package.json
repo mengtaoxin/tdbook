@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "npm run testdata && playwright test",
     "testdata": "node scripts/generate-testdata.mjs"
   },
@@ -36,6 +37,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/coverage-v8": "^5.0.1",
     "fake-indexeddb": "^6.2.5",
     "happy-dom": "^20.14.5",
     "typescript": "~7.0.2",

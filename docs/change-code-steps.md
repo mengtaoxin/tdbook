@@ -71,6 +71,7 @@
 ```sh
 npm run test                         # 全部单元测试（Vitest）
 npm run test -- tests/unit/foo.test.ts   # 单个文件（Red/Green 时用）
+npm run test:coverage                # 单元测试 + V8 覆盖率（终端摘要 + coverage/）
 npm run test:e2e                     # 夹具 + Playwright Chromium
 ```
 
