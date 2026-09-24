@@ -9,10 +9,12 @@
 - 书目列表与在线阅读器（EPUB / PDF）
 - 按远程 URL 缓存整书；支持清除缓存后重新下载
 - 书目以 `configs.json` 为唯一数据源，添加书籍只需改配置
+- 可安装 PWA（生产构建）：应用壳与静态资源可离线；书籍内容仍存 IndexedDB
 
 ## 技术栈
 
 - React 19 + Vite + TypeScript + TanStack Router + MUI 9 + Zustand + react-i18next
+- PWA：`vite-plugin-pwa`（生产环境 Service Worker + Web App Manifest）
 - EPUB：`jszip` + `fast-xml-parser`
 - PDF：`pdfjs-dist`
 
