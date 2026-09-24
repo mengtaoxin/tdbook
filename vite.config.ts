@@ -4,6 +4,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+import { pwaManifest } from './src/lib/pwaManifest.ts'
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = webRoot
@@ -105,7 +107,53 @@ function repoStaticPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), repoStaticPlugin()],
+  plugins: [
+    react(),
+    repoStaticPlugin(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      // Keep SW off in `npm run dev` so Playwright e2e stays stable.
+      injectRegister: false,
+      includeAssets: [
+        'favicon.svg',
+        'icons/pwa-192.png',
+        'icons/pwa-512.png',
+        'icons/pwa-512-maskable.png',
+      ],
+      manifest: pwaManifest,
+      workbox: {
+        globPatterns: [
+          '**/*.{js,css,html,ico,svg,png,woff2,webmanifest}',
+        ],
+        navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            urlPattern: /\/configs\.json$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'configs-json',
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 4,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+              },
+            },
+          },
+          {
+            urlPattern: /\/pdfjs\//i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'pdfjs-assets',
+              expiration: {
+                maxEntries: 64,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+        ],
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.join(webRoot, 'src'),

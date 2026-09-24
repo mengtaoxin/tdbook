@@ -9,10 +9,12 @@ A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, d
 - Book list and in-browser reader (EPUB / PDF)
 - Cache whole books by remote URL; clear cache to re-download
 - Catalog is driven solely by `configs.json` — add books by editing the config
+- Installable PWA (production build): app shell + static assets work offline; book bytes stay in IndexedDB
 
 ## Stack
 
 - React 19 + Vite + TypeScript + TanStack Router + MUI 9 + Zustand + react-i18next
+- PWA: `vite-plugin-pwa` (production service worker + web app manifest)
 - EPUB: `jszip` + `fast-xml-parser`
 - PDF: `pdfjs-dist`
 

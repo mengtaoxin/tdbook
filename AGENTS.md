@@ -5,6 +5,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 ## Stack
 
 - React 19, Vite 8, TypeScript, TanStack Router, MUI 9, Zustand, react-i18next (en/zh), `@mui/icons-material`.
+- PWA: `vite-plugin-pwa` (production service worker + web app manifest; SW off in `npm run dev`).
 - Shared kit: `tdkit` → `@mengtaoxin/tdkit` (GitHub Packages) for durable app logs (`TdLog`).
 - EPUB: `jszip` + `fast-xml-parser` (OPF / spine). PDF: `pdfjs-dist` (worker + text layer).
 - Config Guide: `marked` renders `public/how-to-write-config-file.md` / `.zh.md`.
@@ -33,9 +34,10 @@ Stop the dev server with Ctrl+C.
 docs/change-code-steps.md  how to change code (TDD, structure, tests, format, check)
 configs.json          book catalog (id, title, author?, type, path, hover?) — source of truth
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
-vite.config.ts        React + repoStaticPlugin (/configs.json, /pdfjs/**)
+public/icons/         PWA icons (192 / 512 / maskable)
+vite.config.ts        React + repoStaticPlugin (/configs.json, /pdfjs/**) + VitePWA
 src/
-  main.tsx            app bootstrap (router + MUI theme + i18n)
+  main.tsx            app bootstrap (router + MUI theme + i18n + SW register)
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
@@ -64,6 +66,7 @@ src/
     settings.ts       configs URL preference (localStorage)
     locale.ts         UI locale preference (en/zh, default en)
     reportFailure.ts  console.error for failures (TdLog is separate)
+    pwaManifest.ts    web app manifest fields for vite-plugin-pwa
   i18n/               i18next setup + en/zh message catalogs
   tests/unit/         Vitest
   e2e/                Playwright
