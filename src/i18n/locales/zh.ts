@@ -72,6 +72,15 @@ export default {
     saveFailed: '保存失败。',
     restoreFailed: '恢复失败。',
     cacheTitle: '缓存',
+    catalogCacheDescription:
+      '成功下载的 configs.json 会保存在本地存储中，以便在网络不可用时仍能加载书目列表。',
+    clearCatalogCache: '清除目录缓存',
+    clearCatalogCacheConfirmTitle: '清除目录缓存？',
+    clearCatalogCacheConfirmBody:
+      '将删除本机保存的 configs.json。下次加载书目时会重新下载（离线时可能显示空列表）。',
+    catalogCacheCleared:
+      '已清除目录缓存。下次加载书目时会重新下载 configs.json。',
+    clearCatalogCacheFailed: '清除目录缓存失败。',
     cacheDescription:
       '清除本机已下载的全部图书文件。下次打开任意图书时需重新下载。',
     clearCache: '清除全部缓存',

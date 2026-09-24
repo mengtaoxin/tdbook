@@ -1,4 +1,5 @@
 import CachedIcon from '@mui/icons-material/Cached'
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
@@ -15,9 +16,15 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { translateError } from '@/i18n'
 import { clearAllBookCaches } from '@/lib/bookCache'
+import {
+  clearPersistedBookConfigs,
+  invalidateBookConfigsCache,
+} from '@/lib/catalog'
 import { DEFAULT_CONFIGS_URL } from '@/lib/settings'
 import { useBooksStore } from '@/stores/booksStore'
 import { useSettingsStore } from '@/stores/settingsStore'
+
+type ClearTarget = 'catalog' | 'books' | null
 
 export function SettingsPage() {
   const { t } = useTranslation()
@@ -27,7 +34,7 @@ export function SettingsPage() {
   const [draft, setDraft] = useState(configsUrl)
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState<'success' | 'error'>('success')
-  const [confirmClear, setConfirmClear] = useState(false)
+  const [clearTarget, setClearTarget] = useState<ClearTarget>(null)
   const [clearing, setClearing] = useState(false)
 
   function showMessage(text: string, type: 'success' | 'error') {
@@ -66,23 +73,45 @@ export function SettingsPage() {
 
   function closeClearConfirm() {
     if (clearing) return
-    setConfirmClear(false)
+    setClearTarget(null)
   }
 
   async function confirmClearCache() {
-    if (clearing) return
+    if (clearing || !clearTarget) return
     setClearing(true)
     try {
-      await clearAllBookCaches()
-      useBooksStore.getState().invalidate()
-      setConfirmClear(false)
-      showMessage(t('settings.cacheCleared'), 'success')
+      if (clearTarget === 'catalog') {
+        clearPersistedBookConfigs()
+        invalidateBookConfigsCache()
+        useBooksStore.getState().invalidate()
+        setClearTarget(null)
+        showMessage(t('settings.catalogCacheCleared'), 'success')
+      } else {
+        await clearAllBookCaches()
+        useBooksStore.getState().invalidate()
+        setClearTarget(null)
+        showMessage(t('settings.cacheCleared'), 'success')
+      }
     } catch {
-      showMessage(t('settings.clearCacheFailed'), 'error')
+      showMessage(
+        clearTarget === 'catalog'
+          ? t('settings.clearCatalogCacheFailed')
+          : t('settings.clearCacheFailed'),
+        'error',
+      )
     } finally {
       setClearing(false)
     }
   }
+
+  const confirmTitle =
+    clearTarget === 'catalog'
+      ? t('settings.clearCatalogCacheConfirmTitle')
+      : t('settings.clearCacheConfirmTitle')
+  const confirmBody =
+    clearTarget === 'catalog'
+      ? t('settings.clearCatalogCacheConfirmBody')
+      : t('settings.clearCacheConfirmBody')
 
   return (
     <>
@@ -130,27 +159,40 @@ export function SettingsPage() {
           {t('settings.cacheTitle')}
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+          {t('settings.catalogCacheDescription')}
+        </Typography>
+        <Button
+          color="error"
+          variant="outlined"
+          startIcon={<Inventory2OutlinedIcon />}
+          onClick={() => setClearTarget('catalog')}
+          sx={{ mb: 3 }}
+        >
+          {t('settings.clearCatalogCache')}
+        </Button>
+
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
           {t('settings.cacheDescription')}
         </Typography>
         <Button
           color="error"
           variant="outlined"
           startIcon={<CachedIcon />}
-          onClick={() => setConfirmClear(true)}
+          onClick={() => setClearTarget('books')}
         >
           {t('settings.clearCache')}
         </Button>
       </Container>
 
       <Dialog
-        open={confirmClear}
+        open={clearTarget !== null}
         onClose={closeClearConfirm}
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>{t('settings.clearCacheConfirmTitle')}</DialogTitle>
+        <DialogTitle>{confirmTitle}</DialogTitle>
         <DialogContent>
-          <Typography>{t('settings.clearCacheConfirmBody')}</Typography>
+          <Typography>{confirmBody}</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeClearConfirm} disabled={clearing}>
