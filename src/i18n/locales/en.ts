@@ -75,6 +75,15 @@ export default {
     saveFailed: 'Save failed.',
     restoreFailed: 'Restore failed.',
     cacheTitle: 'Cache',
+    catalogCacheDescription:
+      'A successful download of configs.json is kept in local storage so the book list can load when the network is unavailable.',
+    clearCatalogCache: 'Clear catalog cache',
+    clearCatalogCacheConfirmTitle: 'Clear catalog cache?',
+    clearCatalogCacheConfirmBody:
+      'This deletes the locally stored configs.json. The next book-list load will download it again (or show an empty list if offline).',
+    catalogCacheCleared:
+      'Catalog cache cleared. The next book-list load will download configs.json again.',
+    clearCatalogCacheFailed: 'Failed to clear catalog cache.',
     cacheDescription:
       'Clear all downloaded book files on this device. Opening any book again will require a fresh download.',
     clearCache: 'Clear all cache',

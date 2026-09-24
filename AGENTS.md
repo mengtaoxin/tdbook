@@ -43,7 +43,7 @@ src/
   stores/             Zustand (locale, settings, books list)
   hooks/              useBookSession (open book) + useBookReader (page view)
   lib/
-    catalog.ts        configs.json fetch + normalize (BookConfig); in-memory URL cache
+    catalog.ts        configs.json fetch + normalize (BookConfig); in-memory URL cache + localStorage durable cache
     configGuideMarkdown.ts  locale → guide .md URL + marked render
     navLayout.ts      shouldCollapseNav for compact header
     bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount

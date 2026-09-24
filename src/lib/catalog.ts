@@ -23,11 +23,50 @@ export type BookConfigsResult = {
   duplicateIds: string[]
 }
 
+export type PersistedBookConfigs = {
+  url: string
+  books: BookConfig[]
+}
+
+const CONFIGS_CACHE_KEY = 'books.configsCache'
+
 let catalogCache: { url: string; result: Promise<BookConfigsResult> } | null =
   null
 
 export function invalidateBookConfigsCache() {
   catalogCache = null
+}
+
+/** Last successfully downloaded catalog (any URL), or null if none / unreadable. */
+export function getPersistedBookConfigs(): PersistedBookConfigs | null {
+  try {
+    const raw = localStorage.getItem(CONFIGS_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<PersistedBookConfigs>
+    if (typeof parsed.url !== 'string' || !Array.isArray(parsed.books)) {
+      return null
+    }
+    return { url: parsed.url, books: parsed.books }
+  } catch {
+    return null
+  }
+}
+
+export function clearPersistedBookConfigs(): void {
+  try {
+    localStorage.removeItem(CONFIGS_CACHE_KEY)
+  } catch {
+    // ignore quota / private-mode failures on clear
+  }
+}
+
+function persistBookConfigs(url: string, books: BookConfig[]): void {
+  try {
+    const payload: PersistedBookConfigs = { url, books }
+    localStorage.setItem(CONFIGS_CACHE_KEY, JSON.stringify(payload))
+  } catch {
+    // Durable cache is best-effort; in-memory cache still applies.
+  }
 }
 
 /** Accept `http(s)://…` or same-origin `/…` cover paths; ignore anything else. */
@@ -76,14 +115,24 @@ export function normalizeBookConfigs(books: BookConfig[]): BookConfigsResult {
   return { books: deduped, duplicateIds }
 }
 
+function persistedResultFor(url: string): BookConfigsResult | null {
+  const persisted = getPersistedBookConfigs()
+  if (!persisted || persisted.url !== url) return null
+  return normalizeBookConfigs(persisted.books)
+}
+
 async function fetchBookConfigs(url: string): Promise<BookConfigsResult> {
   try {
     const response = await fetch(url)
-    if (!response.ok) return { books: [], duplicateIds: [] }
+    if (!response.ok) {
+      return persistedResultFor(url) ?? { books: [], duplicateIds: [] }
+    }
     const parsed = (await response.json()) as BookConfigsFile
-    return normalizeBookConfigs(parsed.books ?? [])
+    const books = parsed.books ?? []
+    persistBookConfigs(url, books)
+    return normalizeBookConfigs(books)
   } catch {
-    return { books: [], duplicateIds: [] }
+    return persistedResultFor(url) ?? { books: [], duplicateIds: [] }
   }
 }
 
