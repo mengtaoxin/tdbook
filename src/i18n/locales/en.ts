@@ -8,6 +8,7 @@ export default {
     logs: 'Logs',
     language: 'Language',
     openMenu: 'Open menu',
+    bookmarks: 'Bookmark management',
   },
   locale: {
     label: 'Language',
@@ -60,6 +61,13 @@ export default {
     prevPage: 'Previous page',
     nextPage: 'Next page',
     pageOf: 'Page {page} / {total}',
+  },
+  bookmarks: {
+    jumpDefault: 'Jump to default bookmark',
+    saveDefault: 'Save current position as default bookmark',
+    saved: 'Default bookmark saved.',
+    saveFailed: 'Could not save the default bookmark.',
+    defaultName: 'Default bookmark',
   },
   settings: {
     title: 'Settings',
@@ -114,6 +122,7 @@ export default {
   errors: {
     invalidConfigsUrl: 'Invalid config URL',
     localStorageWrite: 'Could not write to local storage',
+    invalidBookmark: 'Invalid bookmark',
     downloadFailed: 'Download failed (HTTP {status}).',
     epubExtractFailed:
       'Could not extract EPUB (file may be corrupt or not a valid zip).',

@@ -37,6 +37,7 @@ src/
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
+    bookmarks.ts      all-books bookmark JSON in localStorage (default bookmark per book)
     locale.ts         UI locale preference (en/zh, default en)
     reportFailure.ts  console.error for failures (TdLog is separate)
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa
