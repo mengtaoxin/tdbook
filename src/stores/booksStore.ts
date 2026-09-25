@@ -32,10 +32,10 @@ export const useBooksStore = create<BooksState>((set, get) => ({
   },
   load: async () => {
     if (get().loading) return
-    if (get().loaded) return
 
     const generation = ++loadGeneration
-    set({ loading: true, error: false })
+    const silent = get().loaded
+    if (!silent) set({ loading: true, error: false })
 
     try {
       const result = await listBooks()
@@ -49,6 +49,10 @@ export const useBooksStore = create<BooksState>((set, get) => ({
       })
     } catch {
       if (generation !== loadGeneration) return
+      if (silent) {
+        set({ loading: false })
+        return
+      }
       set({
         books: [],
         duplicateIds: [],
