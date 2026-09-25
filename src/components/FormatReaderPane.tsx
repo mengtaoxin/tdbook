@@ -1,7 +1,9 @@
+import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
 import { formatPanes, pagerWide } from '@/components/formatPanes'
 import { ReaderPager } from '@/components/ReaderPager'
+import { useReaderSwipe } from '@/hooks/useReaderSwipe'
 import type { PageContent } from '@/lib/formatAdapter'
 import '@/lib/pdfTextLayer.css'
 
@@ -30,10 +32,18 @@ export function FormatReaderPane({
 }: FormatReaderPaneProps) {
   const { t } = useTranslation()
   const Pane = formatPanes[content.type]
+  const { swipeBind } = useReaderSwipe({
+    onSwipe: (direction) => {
+      if (direction === 'prev' && prevPage != null) onGo(prevPage)
+      if (direction === 'next' && nextPage != null) onGo(nextPage)
+    },
+  })
 
   return (
     <>
-      <Pane content={content} hash={hash} onReady={onReady} />
+      <Box {...swipeBind}>
+        <Pane content={content} hash={hash} onReady={onReady} />
+      </Box>
       {awaitingPaint ? (
         <Typography align="center" color="text.secondary" sx={{ mt: 2 }}>
           {t('reader.rendering')}
