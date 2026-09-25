@@ -6,6 +6,11 @@ export default {
     configGuide: 'Config Guide',
     about: 'About',
     logs: 'Logs',
+    help: 'Help',
+    feedback: 'Feedback',
+    feedbackConfirmTitle: 'Open GitHub Issues?',
+    feedbackConfirmBody:
+      'You will leave this app and open the tdbook issues page on GitHub to report a problem or suggestion.',
     language: 'Language',
     openMenu: 'Open menu',
     bookmarks: 'Bookmark management',

@@ -2,8 +2,7 @@ import Container from '@mui/material/Container'
 import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'react-i18next'
-
-const PROJECT_URL = 'https://github.com/mengtaoxin/tdbook'
+import { PROJECT_URL } from '@/lib/projectLinks'
 
 export function AboutPage() {
   const { t } = useTranslation()
