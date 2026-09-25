@@ -102,4 +102,43 @@ test.describe('books reader', () => {
     await page.getByRole('button', { name: 'Clear', exact: true }).click()
     await expect(page.getByText('All book caches cleared')).toBeVisible()
   })
+
+  test('saves and restores the default bookmark while reading', async ({ page }) => {
+    await page.goto('/books')
+    await expect(page.getByTestId('nav-bookmarks')).toHaveCount(0)
+
+    await page.getByText('Sample EPUB').click()
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByTestId('nav-bookmarks')).toBeVisible()
+
+    await page.getByTestId('nav-bookmarks').click()
+    await expect(page.getByTestId('bookmark-jump-default')).toBeDisabled()
+    await page.keyboard.press('Escape')
+
+    await page.getByLabel('Next page').click()
+    await expect(page).toHaveURL(/page=2/)
+    await page.getByTestId('nav-bookmarks').click()
+    await page.getByTestId('bookmark-save-default').click()
+    await expect(page.getByText('Default bookmark saved.')).toBeVisible()
+
+    const stored = await page.evaluate(() => localStorage.getItem('books.bookmarks'))
+    expect(JSON.parse(stored ?? '')).toEqual({
+      bookmarks: [
+        {
+          'book-id': 'sample-epub',
+          isDefault: true,
+          location: '',
+          name: 'Default bookmark',
+          page: 2,
+        },
+      ],
+    })
+
+    await page.getByLabel('Previous page').click()
+    await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/)
+    await page.getByTestId('nav-bookmarks').click()
+    await page.getByTestId('bookmark-jump-default').click()
+    await expect(page).toHaveURL(/\/book\/sample-epub\?page=2/)
+    await expect(page.getByText('Page 2 / 2')).toBeVisible()
+  })
 })
