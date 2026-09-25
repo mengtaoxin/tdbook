@@ -13,7 +13,7 @@ export default {
       '将离开本应用，并在 GitHub 打开 tdbook 的 Issues 页面，以便反馈问题或建议。',
     language: '语言',
     openMenu: '打开菜单',
-    bookmarks: '书签管理',
+    bookmarks: '书签',
   },
   locale: {
     label: '语言',
@@ -65,8 +65,8 @@ export default {
     pageOf: '第 {page} / {total} 页',
   },
   bookmarks: {
-    jumpDefault: '跳转到默认书签',
-    saveDefault: '将当前位置保存为默认书签',
+    jumpDefault: '跳到默认',
+    saveDefault: '设为默认',
     saved: '已保存默认书签。',
     saveFailed: '无法保存默认书签。',
     defaultName: '默认书签',

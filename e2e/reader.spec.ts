@@ -110,9 +110,12 @@ test.describe('books reader', () => {
     await page.getByText('Sample EPUB').click()
     await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 })
     await expect(page.getByTestId('nav-bookmarks')).toBeVisible()
+    await expect(page.getByTestId('nav-bookmarks')).toHaveText('Bookmarks')
 
     await page.getByTestId('nav-bookmarks').click()
     await expect(page.getByTestId('bookmark-jump-default')).toBeDisabled()
+    await expect(page.getByTestId('bookmark-jump-default')).toHaveText('Jump to default')
+    await expect(page.getByTestId('bookmark-save-default')).toHaveText('Save as default')
     await page.keyboard.press('Escape')
 
     await page.getByLabel('Next page').click()
@@ -140,5 +143,24 @@ test.describe('books reader', () => {
     await page.getByTestId('bookmark-jump-default').click()
     await expect(page).toHaveURL(/\/book\/sample-epub\?page=2/)
     await expect(page.getByText('Page 2 / 2')).toBeVisible()
+  })
+
+  test('expands bookmarks in the reader drawer by default', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/books')
+    await page.getByText('Sample EPUB').click()
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 })
+
+    await page.getByLabel('Open menu').click()
+    const drawer = page.getByTestId('nav-drawer')
+    await expect(drawer.getByTestId('drawer-bookmarks')).toHaveText('Bookmarks')
+    await expect(drawer.getByTestId('drawer-bookmark-jump-default')).toBeVisible()
+    await expect(drawer.getByTestId('drawer-bookmark-save-default')).toBeVisible()
+    await expect(drawer.getByTestId('drawer-bookmark-jump-default')).toHaveText(
+      'Jump to default',
+    )
+    await expect(drawer.getByTestId('drawer-bookmark-save-default')).toHaveText(
+      'Save as default',
+    )
   })
 })

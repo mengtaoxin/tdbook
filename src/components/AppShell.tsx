@@ -35,6 +35,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { translateError } from '@/i18n'
 import {
+  DRAWER_BOOKMARKS_DEFAULT_OPEN,
   getDefaultBookmark,
   readerBookIdFromPath,
   saveDefaultBookmark,
@@ -83,7 +84,9 @@ export function AppShell() {
   const [compactNav, setCompactNav] = useState(true)
   const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false)
   const [drawerHelpOpen, setDrawerHelpOpen] = useState(false)
-  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(false)
+  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(
+    DRAWER_BOOKMARKS_DEFAULT_OPEN,
+  )
   const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false)
   const defaultBookmark = useMemo(() => {
     if (!bookId) return null

@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   DEFAULT_BOOKMARK_NAME,
+  DRAWER_BOOKMARKS_DEFAULT_OPEN,
   getDefaultBookmark,
   listBookmarks,
   readerBookIdFromPath,
   saveDefaultBookmark,
 } from '@/lib/bookmarks'
+import en from '@/i18n/locales/en'
+import zh from '@/i18n/locales/zh'
 
 const STORAGE_KEY = 'books.bookmarks'
 
@@ -20,6 +23,19 @@ describe('bookmarks', () => {
     expect(readerBookIdFromPath('/books')).toBeNull()
     expect(readerBookIdFromPath('/book')).toBeNull()
     expect(readerBookIdFromPath('/book/sample-epub/extra')).toBeNull()
+  })
+
+  it('keeps reader bookmark labels short', () => {
+    expect(en.nav.bookmarks).toBe('Bookmarks')
+    expect(zh.nav.bookmarks).toBe('书签')
+    expect(en.bookmarks.jumpDefault).toBe('Jump to default')
+    expect(zh.bookmarks.jumpDefault).toBe('跳到默认')
+    expect(en.bookmarks.saveDefault).toBe('Save as default')
+    expect(zh.bookmarks.saveDefault).toBe('设为默认')
+  })
+
+  it('expands the reader bookmarks drawer section by default', () => {
+    expect(DRAWER_BOOKMARKS_DEFAULT_OPEN).toBe(true)
   })
 
   it('starts with no default bookmark', () => {
