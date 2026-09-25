@@ -13,7 +13,7 @@ export default {
       'You will leave this app and open the tdbook issues page on GitHub to report a problem or suggestion.',
     language: 'Language',
     openMenu: 'Open menu',
-    bookmarks: 'Bookmark management',
+    bookmarks: 'Bookmarks',
   },
   locale: {
     label: 'Language',
@@ -68,8 +68,8 @@ export default {
     pageOf: 'Page {page} / {total}',
   },
   bookmarks: {
-    jumpDefault: 'Jump to default bookmark',
-    saveDefault: 'Save current position as default bookmark',
+    jumpDefault: 'Jump to default',
+    saveDefault: 'Save as default',
     saved: 'Default bookmark saved.',
     saveFailed: 'Could not save the default bookmark.',
     defaultName: 'Default bookmark',

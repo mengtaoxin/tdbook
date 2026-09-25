@@ -3,6 +3,9 @@ export const BOOKMARKS_STORAGE_KEY = 'books.bookmarks'
 /** Fixed label for a new default bookmark. Existing names are never rewritten. */
 export const DEFAULT_BOOKMARK_NAME = 'Default bookmark'
 
+/** Reader drawer bookmarks section starts expanded. */
+export const DRAWER_BOOKMARKS_DEFAULT_OPEN = true
+
 export type Bookmark = {
   'book-id': string
   isDefault: boolean
