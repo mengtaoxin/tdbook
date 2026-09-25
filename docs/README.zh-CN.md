@@ -70,7 +70,7 @@ src/views/       列表页、阅读页
 src/lib/         书目加载、IndexedDB 缓存、EPUB/PDF 解析
 ```
 
-更细的约定与数据模型见 [AGENTS.md](../AGENTS.md)。改代码时的步骤（TDD、结构检查、测试、format、check）见 [change-code-steps.md](./change-code-steps.md)，不要在其他文档里再写一遍。
+更细的约定见 [conventions.md](./conventions.md)，目录结构见 [file-structure.md](./file-structure.md)，数据模型见 [AGENTS.md](../AGENTS.md)。改代码时的步骤（TDD、结构检查、测试、format、check）见 [change-code-steps.md](./change-code-steps.md)，不要在其他文档里再写一遍。
 
 ## 许可证
 

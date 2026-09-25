@@ -1,6 +1,6 @@
 # 修改代码的步骤
 
-改行为、修 bug、补回归保护时，按下面顺序做。约定与数据模型见 [AGENTS.md](../AGENTS.md)；命令以仓库根目录 `package.json` 为准，不要新增 `scripts/*.sh`。
+改行为、修 bug、补回归保护时，按下面顺序做。约定见 [conventions.md](./conventions.md)，目录结构见 [file-structure.md](./file-structure.md)，数据模型见 [AGENTS.md](../AGENTS.md)；命令以仓库根目录 `package.json` 为准，不要新增 `scripts/*.sh`。
 
 ## 顺序
 
@@ -22,7 +22,7 @@
 
 ## 2. 检查代码结构
 
-动手前先对照 [AGENTS.md](../AGENTS.md) 的 Layout 与 Conventions，确认文件该放哪、该不该新建。
+动手前先对照 [file-structure.md](./file-structure.md) 与 [conventions.md](./conventions.md)，确认文件该放哪、该不该新建。
 
 | 职责 | 放哪里 |
 | ---- | ------ |

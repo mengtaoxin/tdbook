@@ -30,49 +30,7 @@ Stop the dev server with Ctrl+C.
 
 ## Layout
 
-```
-docs/change-code-steps.md  how to change code (TDD, structure, tests, format, check)
-configs.json          book catalog (id, title, author?, type, path, hover?) — source of truth
-public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
-public/icons/         PWA icons (192 / 512 / maskable)
-vite.config.ts        React + repoStaticPlugin (/configs.json, /pdfjs/**) + VitePWA
-src/
-  main.tsx            app bootstrap (router + MUI theme + i18n + SW register)
-  theme.ts            MUI theme (primary #3D5A80)
-  router/             TanStack code route tree
-  routes/             page components (Home, Books, Reader, Settings, Logs, …)
-  components/         AppShell, ReaderPager, FormatReaderPane, formatPanes, Epub/Pdf panes
-  stores/             Zustand (locale, settings, books list)
-  hooks/              useBookSession (open book) + useBookReader (page view)
-  lib/
-    catalog.ts        configs.json fetch + normalize (BookConfig); in-memory URL cache + localStorage durable cache
-    configGuideMarkdown.ts  locale → guide .md URL + marked render
-    navLayout.ts      shouldCollapseNav for compact header
-    bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount
-    bookService.ts    listBooks / getBook orchestration
-    formats.ts        typed FormatAdapter registry + getBookPage + cache-clear notify
-    formatAdapter.ts  adapter + PageContent + FormatSnapshot (ingest / snapshot / open / getPage)
-    epubFormat.ts     EPUB adapter
-    epubPackage.ts    OPF / spine / cover-href parse
-    epubIngest.ts     EPUB zip → cached files
-    pdfFormat.ts      PDF adapter (ingest + cover snapshot + pdf.js unload on cache clear)
-    bookCache.ts      public clear API (notifies format adapters)
-    cacheStore.ts     IndexedDB connection reuse + blob URL lifecycle
-    cacheIngest.ts    download-once + format ingest + snapshot meta
-    paths.ts          path safety, EPUB path normalize
-    rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
-    epubShadow.ts     EPUB shadow-DOM mounting helpers
-    pdfReader.ts      pdf.js document load + page/cover render
-    settings.ts       configs URL preference (localStorage)
-    locale.ts         UI locale preference (en/zh, default en)
-    reportFailure.ts  console.error for failures (TdLog is separate)
-    pwaManifest.ts    web app manifest fields for vite-plugin-pwa
-  i18n/               i18next setup + en/zh message catalogs
-  tests/unit/         Vitest
-  e2e/                Playwright
-  scripts/generate-testdata.mjs  Node helper for `npm run testdata` (not a shell wrapper)
-  public/testdata/    demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
-```
+See [docs/file-structure.md](docs/file-structure.md).
 
 Install notes: `tdkit` comes from GitHub Packages. Set `NODE_AUTH_TOKEN` (PAT with `read:packages`) so `.npmrc` can fetch `@mengtaoxin/tdkit`.
 
@@ -88,11 +46,7 @@ Install notes: `tdkit` comes from GitHub Packages. Set `NODE_AUTH_TOKEN` (PAT wi
 
 ## Conventions
 
-- React function components in `.tsx`; hooks for effects and reader orchestration. Import via `@/`. 2-space indent.
-- Keep book I/O and parsing in `src/lib/`; routes/components stay UI + routing. Zustand only for shared preferences and books-list cache; reader page stays in the URL.
-- When adding a book, append to `configs.json` with a distinct `id` when possible — do not hardcode titles in the app. Later duplicate ids are ignored at runtime.
-- UI copy goes through react-i18next (`src/i18n/locales/{en,zh}.ts`); default locale is English. Add both `en` and `zh` keys for new user-facing strings. Config Guide body lives in `public/how-to-write-config-file*.md`.
-- Do not commit `dist/`, `node_modules/`, or secrets.
+See [docs/conventions.md](docs/conventions.md).
 
 ## Changing code
 
