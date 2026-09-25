@@ -1,4 +1,6 @@
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined'
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -12,6 +14,10 @@ import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Collapse from '@mui/material/Collapse'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
@@ -36,6 +42,7 @@ import {
 import type { AppLocale } from '@/lib/locale'
 import { SUPPORTED_LOCALES } from '@/lib/locale'
 import { shouldCollapseNav } from '@/lib/navLayout'
+import { GITHUB_ISSUES_URL } from '@/lib/projectLinks'
 import { useLocaleStore } from '@/stores/localeStore'
 
 const NAV_ITEMS = [
@@ -65,6 +72,7 @@ export function AppShell() {
   const hash = useRouterState({ select: (s) => s.location.hash })
   const bookId = readerBookIdFromPath(pathname)
   const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null)
+  const [helpAnchor, setHelpAnchor] = useState<null | HTMLElement>(null)
   const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null)
   const [bookmarkRevision, setBookmarkRevision] = useState(0)
   const [bookmarkNotice, setBookmarkNotice] = useState('')
@@ -74,7 +82,9 @@ export function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [compactNav, setCompactNav] = useState(true)
   const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false)
+  const [drawerHelpOpen, setDrawerHelpOpen] = useState(false)
   const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(false)
+  const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false)
   const defaultBookmark = useMemo(() => {
     if (!bookId) return null
     return getDefaultBookmark(bookId)
@@ -118,6 +128,21 @@ export function AppShell() {
     setLocale(code)
     setLocaleAnchor(null)
     setDrawerOpen(false)
+  }
+
+  function openFeedbackConfirm() {
+    setHelpAnchor(null)
+    setDrawerOpen(false)
+    setFeedbackConfirmOpen(true)
+  }
+
+  function closeFeedbackConfirm() {
+    setFeedbackConfirmOpen(false)
+  }
+
+  function confirmFeedback() {
+    setFeedbackConfirmOpen(false)
+    window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer')
   }
 
   function jumpToDefaultBookmark() {
@@ -199,6 +224,16 @@ export function AppShell() {
       ) : null}
       <Button
         color="inherit"
+        startIcon={<HelpOutlineIcon />}
+        data-testid="nav-help-toggle"
+        aria-label={t('nav.help')}
+        tabIndex={compactNav ? -1 : undefined}
+        onClick={(event) => setHelpAnchor(event.currentTarget)}
+      >
+        {t('nav.help')}
+      </Button>
+      <Button
+        color="inherit"
         startIcon={<TranslateIcon />}
         data-testid="nav-locale-toggle"
         aria-label={t('locale.label')}
@@ -266,6 +301,29 @@ export function AppShell() {
                 </Collapse>
               </>
             ) : null}
+            <ListItemButton
+              data-testid="nav-drawer-help-toggle"
+              onClick={() => setDrawerHelpOpen((open) => !open)}
+            >
+              <ListItemIcon>
+                <HelpOutlineIcon />
+              </ListItemIcon>
+              <ListItemText primary={t('nav.help')} />
+            </ListItemButton>
+            <Collapse in={drawerHelpOpen} timeout="auto" unmountOnExit>
+              <List dense disablePadding>
+                <ListItemButton
+                  data-testid="nav-feedback"
+                  sx={{ pl: 4 }}
+                  onClick={openFeedbackConfirm}
+                >
+                  <ListItemIcon>
+                    <FeedbackOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t('nav.feedback')} />
+                </ListItemButton>
+              </List>
+            </Collapse>
             <ListItemButton
               onClick={() => setDrawerLocaleOpen((open) => !open)}
             >
@@ -340,6 +398,20 @@ export function AppShell() {
       </AppBar>
 
       <Menu
+        anchorEl={helpAnchor}
+        open={Boolean(helpAnchor)}
+        onClose={() => setHelpAnchor(null)}
+        data-testid="nav-help-menu"
+      >
+        <MenuItem data-testid="nav-feedback" onClick={openFeedbackConfirm}>
+          <ListItemIcon>
+            <FeedbackOutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          {t('nav.feedback')}
+        </MenuItem>
+      </Menu>
+
+      <Menu
         anchorEl={bookmarkAnchor}
         open={Boolean(bookmarkAnchor)}
         onClose={() => setBookmarkAnchor(null)}
@@ -392,6 +464,29 @@ export function AppShell() {
           </MenuItem>
         ))}
       </Menu>
+
+      <Dialog
+        open={feedbackConfirmOpen}
+        onClose={closeFeedbackConfirm}
+        maxWidth="xs"
+        fullWidth
+        data-testid="nav-feedback-confirm"
+      >
+        <DialogTitle>{t('nav.feedbackConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <Typography>{t('nav.feedbackConfirmBody')}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeFeedbackConfirm}>{t('settings.cancel')}</Button>
+          <Button
+            variant="contained"
+            data-testid="nav-feedback-confirm-ok"
+            onClick={confirmFeedback}
+          >
+            {t('settings.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Box component="main" sx={{ flex: 1 }}>
         <Outlet />

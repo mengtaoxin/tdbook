@@ -6,6 +6,11 @@ export default {
     configGuide: '配置说明',
     about: '关于',
     logs: '日志',
+    help: '帮助',
+    feedback: '反馈',
+    feedbackConfirmTitle: '打开 GitHub Issues？',
+    feedbackConfirmBody:
+      '将离开本应用，并在 GitHub 打开 tdbook 的 Issues 页面，以便反馈问题或建议。',
     language: '语言',
     openMenu: '打开菜单',
     bookmarks: '书签管理',
