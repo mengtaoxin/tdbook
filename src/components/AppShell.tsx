@@ -1,6 +1,6 @@
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined'
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -224,7 +224,7 @@ export function AppShell() {
       ) : null}
       <Button
         color="inherit"
-        startIcon={<HelpOutlineIcon />}
+        startIcon={<HelpOutlinedIcon />}
         data-testid="nav-help-toggle"
         aria-label={t('nav.help')}
         tabIndex={compactNav ? -1 : undefined}
@@ -306,7 +306,7 @@ export function AppShell() {
               onClick={() => setDrawerHelpOpen((open) => !open)}
             >
               <ListItemIcon>
-                <HelpOutlineIcon />
+                <HelpOutlinedIcon />
               </ListItemIcon>
               <ListItemText primary={t('nav.help')} />
             </ListItemButton>
