@@ -23,6 +23,9 @@ test.describe('books reader', () => {
     await expect(page.getByText('Sample EPUB')).toBeVisible()
     await expect(page.getByText('Sample PDF')).toBeVisible()
 
+    const epubCard = page.getByRole('button', { name: /Sample EPUB/ })
+    await expect(epubCard.getByText('Not downloaded')).toBeVisible()
+
     await page.getByText('Sample EPUB').click()
     await expect(page).toHaveURL(/\/book\/sample-epub/)
     await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 })
@@ -31,6 +34,11 @@ test.describe('books reader', () => {
     await page.getByLabel('Next page').click()
     await expect(page).toHaveURL(/page=2/)
     await expect(page.getByText('Page 2 / 2')).toBeVisible()
+
+    await page.goto('/books')
+    await expect(
+      page.getByRole('button', { name: /Sample EPUB/ }).getByText('Cached'),
+    ).toBeVisible()
   })
 
   test('turns EPUB page with a touch swipe', async ({ page }) => {

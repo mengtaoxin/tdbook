@@ -21,12 +21,11 @@ export function BooksPage() {
   const duplicateIds = useBooksStore((s) => s.duplicateIds)
   const loading = useBooksStore((s) => s.loading)
   const error = useBooksStore((s) => s.error)
-  const loaded = useBooksStore((s) => s.loaded)
   const load = useBooksStore((s) => s.load)
 
   useEffect(() => {
     void load()
-  }, [load, loaded])
+  }, [load])
 
   function goToBook(book: BookListItem) {
     void navigate({
