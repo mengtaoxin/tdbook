@@ -15,7 +15,7 @@ src/
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
   components/         AppShell, ReaderPager, FormatReaderPane, formatPanes, Epub/Pdf panes
   stores/             Zustand (locale, settings, books list)
-  hooks/              useBookSession (open book) + useBookReader (page view)
+  hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging)
   lib/
     catalog.ts        configs.json fetch + normalize (BookConfig); in-memory URL cache + localStorage durable cache
     configGuideMarkdown.ts  locale → guide .md URL + marked render
@@ -34,6 +34,7 @@ src/
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
     epubShadow.ts     EPUB shadow-DOM mounting helpers
+    readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
     locale.ts         UI locale preference (en/zh, default en)

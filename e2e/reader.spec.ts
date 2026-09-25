@@ -33,6 +33,49 @@ test.describe('books reader', () => {
     await expect(page.getByText('Page 2 / 2')).toBeVisible()
   })
 
+  test('turns EPUB page with a touch swipe', async ({ page }) => {
+    await page.goto('/books')
+    await page.getByText('Sample EPUB').click()
+    await expect(page.getByTestId('reader-swipe-host')).toBeVisible({
+      timeout: 60_000,
+    })
+    await expect(page.getByText('Page 1 / 2')).toBeVisible()
+
+    const host = page.getByTestId('reader-swipe-host')
+    const box = await host.boundingBox()
+    if (!box) throw new Error('reader-swipe-host has no bounding box')
+    const startX = box.x + box.width * 0.8
+    const endX = box.x + box.width * 0.2
+    const y = box.y + box.height * 0.4
+
+    await page.evaluate(
+      ({ startX, endX, y }) => {
+        const target = document.querySelector('[data-testid="reader-swipe-host"]')
+        if (!target) throw new Error('reader-swipe-host missing')
+        const fire = (type, x, yPos) => {
+          target.dispatchEvent(
+            new PointerEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              composed: true,
+              pointerType: 'touch',
+              pointerId: 1,
+              isPrimary: true,
+              clientX: x,
+              clientY: yPos,
+            }),
+          )
+        }
+        fire('pointerdown', startX, y)
+        fire('pointerup', endX, y)
+      },
+      { startX, endX, y },
+    )
+
+    await expect(page).toHaveURL(/page=2/)
+    await expect(page.getByText('Page 2 / 2')).toBeVisible()
+  })
+
   test('opens a PDF fixture', async ({ page }) => {
     await page.goto('/books')
     await page.getByText('Sample PDF').click()
