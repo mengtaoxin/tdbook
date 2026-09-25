@@ -8,6 +8,7 @@ export default {
     logs: '日志',
     language: '语言',
     openMenu: '打开菜单',
+    bookmarks: '书签管理',
   },
   locale: {
     label: '语言',
@@ -57,6 +58,13 @@ export default {
     prevPage: '上一页',
     nextPage: '下一页',
     pageOf: '第 {page} / {total} 页',
+  },
+  bookmarks: {
+    jumpDefault: '跳转到默认书签',
+    saveDefault: '将当前位置保存为默认书签',
+    saved: '已保存默认书签。',
+    saveFailed: '无法保存默认书签。',
+    defaultName: '默认书签',
   },
   settings: {
     title: '设置',
@@ -110,6 +118,7 @@ export default {
   errors: {
     invalidConfigsUrl: '无效的配置文件地址',
     localStorageWrite: '无法写入本地存储',
+    invalidBookmark: '书签无效',
     downloadFailed: '下载失败（HTTP {status}）。',
     epubExtractFailed:
       '无法解压 EPUB（文件可能已损坏或不是有效的 zip）。',

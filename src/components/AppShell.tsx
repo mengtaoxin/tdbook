@@ -1,3 +1,4 @@
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -6,6 +7,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import TranslateIcon from '@mui/icons-material/Translate'
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
+import Alert from '@mui/material/Alert'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -19,11 +21,18 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import Snackbar from '@mui/material/Snackbar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { translateError } from '@/i18n'
+import {
+  getDefaultBookmark,
+  readerBookIdFromPath,
+  saveDefaultBookmark,
+} from '@/lib/bookmarks'
 import type { AppLocale } from '@/lib/locale'
 import { SUPPORTED_LOCALES } from '@/lib/locale'
 import { shouldCollapseNav } from '@/lib/navLayout'
@@ -45,11 +54,31 @@ export function AppShell() {
   const { t } = useTranslation()
   const locale = useLocaleStore((s) => s.locale)
   const setLocale = useLocaleStore((s) => s.setLocale)
+  const navigate = useNavigate()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const page = useRouterState({
+    select: (s) => {
+      const search = s.location.search as { page?: number }
+      return search.page ?? 1
+    },
+  })
+  const hash = useRouterState({ select: (s) => s.location.hash })
+  const bookId = readerBookIdFromPath(pathname)
   const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null)
+  const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null)
+  const [bookmarkRevision, setBookmarkRevision] = useState(0)
+  const [bookmarkNotice, setBookmarkNotice] = useState('')
+  const [bookmarkNoticeType, setBookmarkNoticeType] = useState<'success' | 'error'>(
+    'success',
+  )
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [compactNav, setCompactNav] = useState(true)
   const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false)
+  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(false)
+  const defaultBookmark = useMemo(() => {
+    if (!bookId) return null
+    return getDefaultBookmark(bookId)
+  }, [bookId, bookmarkRevision])
   const toolbarRef = useRef<HTMLDivElement | null>(null)
   const brandRef = useRef<HTMLAnchorElement | null>(null)
   const desktopNavRef = useRef<HTMLElement | null>(null)
@@ -83,11 +112,43 @@ export function AppShell() {
     observer.observe(toolbar)
     observer.observe(nav)
     return () => observer.disconnect()
-  }, [locale, t])
+  }, [locale, t, bookId])
 
   function chooseLocale(code: AppLocale) {
     setLocale(code)
     setLocaleAnchor(null)
+    setDrawerOpen(false)
+  }
+
+  function jumpToDefaultBookmark() {
+    if (!bookId || !defaultBookmark) return
+    void navigate({
+      to: '/book/$id',
+      params: { id: bookId },
+      search: { page: defaultBookmark.page },
+      hash: defaultBookmark.location,
+    })
+    setBookmarkAnchor(null)
+    setDrawerOpen(false)
+  }
+
+  function saveCurrentAsDefaultBookmark() {
+    if (!bookId) return
+    try {
+      saveDefaultBookmark({
+        bookId,
+        page,
+        location: hash,
+        name: t('bookmarks.defaultName'),
+      })
+      setBookmarkRevision((value) => value + 1)
+      setBookmarkNoticeType('success')
+      setBookmarkNotice(t('bookmarks.saved'))
+    } catch (err) {
+      setBookmarkNoticeType('error')
+      setBookmarkNotice(translateError(err, 'bookmarks.saveFailed'))
+    }
+    setBookmarkAnchor(null)
     setDrawerOpen(false)
   }
 
@@ -125,6 +186,17 @@ export function AppShell() {
           {t(item.labelKey)}
         </Button>
       ))}
+      {bookId ? (
+        <Button
+          color="inherit"
+          startIcon={<BookmarkBorderOutlinedIcon />}
+          data-testid="nav-bookmarks"
+          tabIndex={compactNav ? -1 : undefined}
+          onClick={(event) => setBookmarkAnchor(event.currentTarget)}
+        >
+          {t('nav.bookmarks')}
+        </Button>
+      ) : null}
       <Button
         color="inherit"
         startIcon={<TranslateIcon />}
@@ -162,6 +234,38 @@ export function AppShell() {
                 <ListItemText primary={t(item.labelKey)} />
               </ListItemButton>
             ))}
+            {bookId ? (
+              <>
+                <ListItemButton
+                  data-testid="drawer-bookmarks"
+                  onClick={() => setDrawerBookmarksOpen((open) => !open)}
+                >
+                  <ListItemIcon>
+                    <BookmarkBorderOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={t('nav.bookmarks')} />
+                </ListItemButton>
+                <Collapse in={drawerBookmarksOpen} timeout="auto" unmountOnExit>
+                  <List dense disablePadding>
+                    <ListItemButton
+                      data-testid="drawer-bookmark-jump-default"
+                      disabled={!defaultBookmark}
+                      sx={{ pl: 4 }}
+                      onClick={jumpToDefaultBookmark}
+                    >
+                      <ListItemText primary={t('bookmarks.jumpDefault')} />
+                    </ListItemButton>
+                    <ListItemButton
+                      data-testid="drawer-bookmark-save-default"
+                      sx={{ pl: 4 }}
+                      onClick={saveCurrentAsDefaultBookmark}
+                    >
+                      <ListItemText primary={t('bookmarks.saveDefault')} />
+                    </ListItemButton>
+                  </List>
+                </Collapse>
+              </>
+            ) : null}
             <ListItemButton
               onClick={() => setDrawerLocaleOpen((open) => !open)}
             >
@@ -234,6 +338,42 @@ export function AppShell() {
           {desktopNav}
         </Toolbar>
       </AppBar>
+
+      <Menu
+        anchorEl={bookmarkAnchor}
+        open={Boolean(bookmarkAnchor)}
+        onClose={() => setBookmarkAnchor(null)}
+        data-testid="nav-bookmarks-menu"
+      >
+        <MenuItem
+          data-testid="bookmark-jump-default"
+          disabled={!defaultBookmark}
+          onClick={jumpToDefaultBookmark}
+        >
+          {t('bookmarks.jumpDefault')}
+        </MenuItem>
+        <MenuItem
+          data-testid="bookmark-save-default"
+          onClick={saveCurrentAsDefaultBookmark}
+        >
+          {t('bookmarks.saveDefault')}
+        </MenuItem>
+      </Menu>
+
+      <Snackbar
+        open={Boolean(bookmarkNotice)}
+        autoHideDuration={4000}
+        onClose={() => setBookmarkNotice('')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity={bookmarkNoticeType}
+          variant="filled"
+          onClose={() => setBookmarkNotice('')}
+        >
+          {bookmarkNotice}
+        </Alert>
+      </Snackbar>
 
       <Menu
         anchorEl={localeAnchor}
