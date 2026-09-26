@@ -47,13 +47,13 @@ describe('bookmarks', () => {
     const saved = saveDefaultBookmark({
       bookId: 'sample-epub',
       page: 2,
-      location: '#chapter',
+      location: '#char:120',
     });
 
     expect(saved).toEqual({
       'book-id': 'sample-epub',
       isDefault: true,
-      location: '#chapter',
+      location: '#char:120',
       name: DEFAULT_BOOKMARK_NAME,
       page: 2,
     });

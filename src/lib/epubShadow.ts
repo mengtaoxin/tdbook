@@ -1,3 +1,4 @@
+import { scrollEpubAnchor } from './epubAnchor';
 import type { RewrittenPage } from './rewriteHtml';
 
 /**
@@ -88,7 +89,5 @@ export function renderEpubShadow(shadow: ShadowRoot, page: RewrittenPage, host?:
 }
 
 export function scrollEpubHash(shadow: ShadowRoot, hash: string) {
-  const id = hash.startsWith('#') ? hash.slice(1) : hash;
-  if (!id) return;
-  shadow.getElementById(id)?.scrollIntoView();
+  scrollEpubAnchor(shadow, hash);
 }

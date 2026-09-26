@@ -41,6 +41,7 @@ import {
   readerBookIdFromPath,
   saveDefaultBookmark,
 } from '@/lib/bookmarks';
+import { captureReaderLocation } from '@/lib/epubAnchor';
 import type { AppLocale } from '@/lib/locale';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { shouldCollapseNav, toolbarNavAvailableWidth } from '@/lib/navLayout';
@@ -170,10 +171,13 @@ export function AppShell() {
   function saveCurrentAsDefaultBookmark() {
     if (!bookId) return;
     try {
+      // Prefer content-stable EPUB anchors (#char:N) over URL hash / scroll ratios
+      // so resize of the browser window does not drift the restored position.
+      const location = captureReaderLocation() || hash;
       saveDefaultBookmark({
         bookId,
         page,
-        location: hash,
+        location,
         name: t('bookmarks.defaultName'),
       });
       setBookmarkRevision((value) => value + 1);

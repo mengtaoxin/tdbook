@@ -34,6 +34,7 @@ src/
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
     epubShadow.ts     EPUB shadow-DOM mounting helpers
+    epubAnchor.ts     content-stable EPUB in-page anchors (#char:N) for bookmarks
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
