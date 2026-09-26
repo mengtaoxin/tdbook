@@ -9,6 +9,7 @@ export const DRAWER_BOOKMARKS_DEFAULT_OPEN = true;
 export type Bookmark = {
   'book-id': string;
   isDefault: boolean;
+  /** In-page anchor: `#char:N` (EPUB content offset) or legacy `#elementId`. */
   location: string;
   name: string;
   page: number;

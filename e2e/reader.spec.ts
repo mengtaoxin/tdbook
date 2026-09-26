@@ -125,17 +125,23 @@ test.describe('books reader', () => {
     await expect(page.getByText('Default bookmark saved.')).toBeVisible();
 
     const stored = await page.evaluate(() => localStorage.getItem('books.bookmarks'));
-    expect(JSON.parse(stored ?? '')).toEqual({
-      bookmarks: [
-        {
-          'book-id': 'sample-epub',
-          isDefault: true,
-          location: '',
-          name: 'Default bookmark',
-          page: 2,
-        },
-      ],
+    const parsed = JSON.parse(stored ?? '') as {
+      bookmarks: Array<{
+        'book-id': string;
+        isDefault: boolean;
+        location: string;
+        name: string;
+        page: number;
+      }>;
+    };
+    expect(parsed.bookmarks).toHaveLength(1);
+    expect(parsed.bookmarks[0]).toMatchObject({
+      'book-id': 'sample-epub',
+      isDefault: true,
+      name: 'Default bookmark',
+      page: 2,
     });
+    expect(parsed.bookmarks[0]?.location).toMatch(/^#char:\d+$/);
 
     await page.getByLabel('Previous page').click();
     await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/);
@@ -143,6 +149,58 @@ test.describe('books reader', () => {
     await page.getByTestId('bookmark-jump-default').click();
     await expect(page).toHaveURL(/\/book\/sample-epub\?page=2/);
     await expect(page.getByText('Page 2 / 2')).toBeVisible();
+  });
+
+  test('bookmark restores in-page position after the window is resized', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 700 });
+    await page.goto('/books');
+    await page.getByText('Sample EPUB').click();
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
+
+    // Scroll the marker near the top of the viewport, then save.
+    await page.evaluate(() => {
+      const host = document.querySelector('[data-testid="epub-content"]');
+      const marker = host?.shadowRoot?.getElementById('bookmark-target');
+      marker?.scrollIntoView({ block: 'start' });
+    });
+
+    await page.getByTestId('nav-bookmarks').click();
+    await page.getByTestId('bookmark-save-default').click();
+    await expect(page.getByText('Default bookmark saved.')).toBeVisible();
+
+    const saved = await page.evaluate(() => {
+      const raw = localStorage.getItem('books.bookmarks');
+      return raw ? (JSON.parse(raw) as { bookmarks: Array<{ location: string; page: number }> }) : null;
+    });
+    expect(saved?.bookmarks[0]?.page).toBe(1);
+    expect(saved?.bookmarks[0]?.location).toMatch(/^#char:\d+$/);
+    const charOffset = Number(/^#char:(\d+)$/.exec(saved?.bookmarks[0]?.location ?? '')?.[1]);
+    expect(charOffset).toBeGreaterThan(100);
+
+    await page.getByLabel('Next page').click();
+    await expect(page).toHaveURL(/page=2/);
+
+    // Narrow/short viewport would break a scroll-ratio bookmark; content anchors stay put.
+    // Compact nav hides the desktop Bookmarks button — jump from the drawer instead.
+    await page.setViewportSize({ width: 500, height: 480 });
+    await page.getByLabel('Open menu').click();
+    const drawer = page.getByTestId('nav-drawer');
+    await drawer.getByTestId('drawer-bookmark-jump-default').click();
+    await expect(page).toHaveURL(/page=1/);
+
+    await expect
+      .poll(async () =>
+        page.evaluate(() => {
+          const host = document.querySelector('[data-testid="epub-content"]');
+          const marker = host?.shadowRoot?.getElementById('bookmark-target');
+          if (!marker) return null;
+          const top = marker.getBoundingClientRect().top;
+          const barBottom =
+            document.querySelector('.MuiAppBar-root')?.getBoundingClientRect().bottom ?? 0;
+          return top >= barBottom - 40 && top <= barBottom + 160;
+        }),
+      )
+      .toBe(true);
   });
 
   test('expands bookmarks in the reader drawer by default', async ({ page }) => {
