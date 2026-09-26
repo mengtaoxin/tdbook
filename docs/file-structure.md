@@ -19,7 +19,7 @@ src/
   lib/
     catalog.ts        configs.json fetch + normalize (BookConfig); in-memory URL cache + localStorage durable cache
     configGuideMarkdown.ts  locale → guide .md URL + marked render
-    navLayout.ts      shouldCollapseNav for compact header
+    navLayout.ts      shouldCollapseNav + toolbarNavAvailableWidth for compact header
     bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount
     bookService.ts    listBooks / getBook orchestration
     formats.ts        typed FormatAdapter registry + getBookPage + cache-clear notify

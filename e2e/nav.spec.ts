@@ -20,6 +20,27 @@ test.describe('app shell navigation', () => {
     await expect(page.getByText(/personal ebook reader/i)).toBeVisible();
   });
 
+  test('collapses header actions into a hamburger when the toolbar is too narrow', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+
+    await expect(page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' })).toBeVisible();
+    await expect(page.getByTestId('nav-menu-toggle')).toHaveCount(0);
+
+    // Mid widths used to clip "More" instead of collapsing (padding/gap ignored).
+    await page.setViewportSize({ width: 420, height: 800 });
+    await expect(page.getByTestId('nav-menu-toggle')).toBeVisible();
+    await expect(page.getByTestId('desktop-nav')).toBeHidden();
+
+    await page.getByTestId('nav-menu-toggle').click();
+    const drawer = page.getByTestId('nav-drawer');
+    await expect(drawer.getByRole('link', { name: 'Books' })).toBeVisible();
+    await drawer.getByTestId('nav-drawer-more-toggle').click();
+    await expect(drawer.getByRole('link', { name: 'Settings' })).toBeVisible();
+  });
+
   test('Logs, Settings, About, Config Guide, and Feedback live under More after Language', async ({
     page,
   }) => {
