@@ -3,6 +3,8 @@ import {
   captureEpubAnchor,
   captureReaderLocation,
   formatCharLocation,
+  locationToRouterHash,
+  normalizeAnchorLocation,
   parseCharLocation,
   scrollEpubAnchor,
   textPositionAtCharOffset,
@@ -58,9 +60,13 @@ describe('epubAnchor', () => {
     expect(formatCharLocation(42.9)).toBe('#char:42');
     expect(formatCharLocation(-3)).toBe('#char:0');
     expect(parseCharLocation('#char:12')).toBe(12);
+    expect(parseCharLocation('##char:12')).toBe(12);
+    expect(parseCharLocation('char:12')).toBe(12);
     expect(parseCharLocation('#top')).toBeNull();
     expect(parseCharLocation('')).toBeNull();
     expect(parseCharLocation('#char:')).toBeNull();
+    expect(normalizeAnchorLocation('##char:3')).toBe('#char:3');
+    expect(locationToRouterHash('#char:3')).toBe('char:3');
   });
 
   it('maps a char offset back to the matching text node', () => {
@@ -109,7 +115,7 @@ describe('epubAnchor', () => {
     });
 
     // Visible top is y=0. "AAAA" is above; first "BBBB" char with top >= 0 is index 1 → #char:5
-    expect(captureEpubAnchor(shadow)).toBe('#char:5');
+    expect(captureEpubAnchor(shadow, { viewportTop: 0 })).toBe('#char:5');
   });
 
   it('restores a char location by scrolling that text into view', () => {
@@ -117,7 +123,7 @@ describe('epubAnchor', () => {
     const scrollIntoView = vi.fn();
     Element.prototype.scrollIntoView = scrollIntoView;
 
-    scrollEpubAnchor(shadow, '#char:5');
+    scrollEpubAnchor(shadow, '##char:5');
     expect(scrollIntoView).toHaveBeenCalled();
   });
 
@@ -136,6 +142,7 @@ describe('epubAnchor', () => {
     vi.spyOn(host, 'getBoundingClientRect').mockReturnValue(
       mockZeroSizeRect({ width: 400, height: 200, right: 400, bottom: 200 }),
     );
+    // No app bar in the unit test document → visible top is the host top (0).
     vi.spyOn(Range.prototype, 'getBoundingClientRect').mockImplementation(function (this: Range) {
       const nodeText = this.startContainer.textContent ?? '';
       if (nodeText === 'Hello') {

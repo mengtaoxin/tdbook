@@ -181,9 +181,11 @@ test.describe('books reader', () => {
     await expect(page).toHaveURL(/page=2/);
 
     // Narrow/short viewport would break a scroll-ratio bookmark; content anchors stay put.
+    // Compact nav hides the desktop Bookmarks button — jump from the drawer instead.
     await page.setViewportSize({ width: 500, height: 480 });
-    await page.getByTestId('nav-bookmarks').click();
-    await page.getByTestId('bookmark-jump-default').click();
+    await page.getByLabel('Open menu').click();
+    const drawer = page.getByTestId('nav-drawer');
+    await drawer.getByTestId('drawer-bookmark-jump-default').click();
     await expect(page).toHaveURL(/page=1/);
 
     await expect
@@ -193,7 +195,9 @@ test.describe('books reader', () => {
           const marker = host?.shadowRoot?.getElementById('bookmark-target');
           if (!marker) return null;
           const top = marker.getBoundingClientRect().top;
-          return top >= -40 && top <= 160;
+          const barBottom =
+            document.querySelector('.MuiAppBar-root')?.getBoundingClientRect().bottom ?? 0;
+          return top >= barBottom - 40 && top <= barBottom + 160;
         }),
       )
       .toBe(true);
