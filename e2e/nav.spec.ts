@@ -8,21 +8,57 @@ test.describe('app shell navigation', () => {
     await expect(page.getByTestId('desktop-nav').getByRole('link', { name: 'Home' })).toHaveCount(0)
     await expect(page.getByTestId('nav-drawer').getByRole('link', { name: 'Home' })).toHaveCount(0)
 
-    await page.getByTestId('brand-title').click()
+    const brand = page.getByTestId('brand-title')
+    const beta = brand.getByTestId('brand-beta')
+    await expect(beta).toBeVisible()
+    await expect(beta).toHaveText(/beta/i)
+
+    await brand.click()
     await expect(page).toHaveURL('/')
     await expect(page.getByText(/personal ebook reader/i)).toBeVisible()
   })
 
-  test('Help > Feedback confirms before opening GitHub issues', async ({
+  test('Settings, About, Config Guide, and Help live under More', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/')
+
+    const desktopNav = page.getByTestId('desktop-nav')
+    await expect(desktopNav.getByRole('link', { name: 'Books' })).toBeVisible()
+    await expect(desktopNav.getByRole('link', { name: 'Logs' })).toBeVisible()
+    await expect(desktopNav.getByRole('link', { name: 'Settings' })).toHaveCount(0)
+    await expect(desktopNav.getByRole('link', { name: 'About' })).toHaveCount(0)
+    await expect(
+      desktopNav.getByRole('link', { name: 'Config Guide' }),
+    ).toHaveCount(0)
+    await expect(desktopNav.getByTestId('nav-help-toggle')).toHaveCount(0)
+
+    const moreToggle = page.getByTestId('nav-more-toggle')
+    await expect(moreToggle).toBeVisible()
+    await moreToggle.click()
+
+    const moreMenu = page.getByTestId('nav-more-menu')
+    await expect(moreMenu.getByRole('menuitem', { name: 'Settings' })).toBeVisible()
+    await expect(moreMenu.getByRole('menuitem', { name: 'About' })).toBeVisible()
+    await expect(
+      moreMenu.getByRole('menuitem', { name: 'Config Guide' }),
+    ).toBeVisible()
+    await expect(moreMenu.getByTestId('nav-help-toggle')).toBeVisible()
+
+    await moreMenu.getByRole('menuitem', { name: 'Settings' }).click()
+    await expect(page).toHaveURL('/settings')
+  })
+
+  test('More > Help > Feedback confirms before opening GitHub issues', async ({
     page,
     context,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/')
 
-    const helpToggle = page.getByTestId('nav-help-toggle')
-    await expect(helpToggle).toBeVisible()
-    await helpToggle.click()
+    await page.getByTestId('nav-more-toggle').click()
+    await page.getByTestId('nav-more-menu').getByTestId('nav-help-toggle').click()
     await page.getByTestId('nav-help-menu').getByTestId('nav-feedback').click()
 
     const confirm = page.getByTestId('nav-feedback-confirm')
@@ -32,7 +68,8 @@ test.describe('app shell navigation', () => {
     await confirm.getByRole('button', { name: 'Cancel' }).click()
     await expect(confirm).toBeHidden()
 
-    await helpToggle.click()
+    await page.getByTestId('nav-more-toggle').click()
+    await page.getByTestId('nav-more-menu').getByTestId('nav-help-toggle').click()
     await page.getByTestId('nav-help-menu').getByTestId('nav-feedback').click()
     await expect(confirm).toBeVisible()
 

@@ -1,0 +1,23 @@
+---
+description: Route to project agent-kit skills when context matches; read SKILL.md before acting
+alwaysApply: true
+---
+
+# Agent-kit skills (when to use)
+
+When a task matches a row below, **read that skill’s `SKILL.md` first** (under `.agents/skills/<name>/`) and follow it. Prefer project conventions (`AGENTS.md`, `docs/`) when they conflict. Do not load unrelated skills.
+
+| Skill | Use when |
+| ----- | -------- |
+| `test-driven-development` | Product behavior change (feature, bug fix, domain/API logic, regression). Align with `docs/change-code-steps.md`. Skip for docs-only / mechanical edits. |
+| `react-best-practices` | Writing/reviewing React UI: `.tsx`/`.jsx`, components, hooks, effects, composition. |
+| `javascript-typescript-best-practices` | JS/TS that is **not** React UI: `.ts`/`.js`, types, modules, async, APIs. Prefer `react-best-practices` for UI. |
+| `material-design-best-practices` | MUI / Material Design 3 UI (theme tokens, components, layout, a11y). Not for non-Material UI. |
+| `cursor-local-best-practices` | Local ports: start/stop server, `EADDRINUSE`, or ending a chat that opened ports. |
+| `cursor-cloud-best-practices` | Cursor Cloud Agent / cloud VM, walkthrough artifacts, or computer-use / screen recording — **not** local chats. |
+
+## How
+
+1. Match intent (and open files) to the table; multiple skills may apply (e.g. TDD + React).
+2. Read each matching skill before implementing.
+3. Existing project skills (`refactor`, `harness-engineering`) still apply when their own descriptions match.

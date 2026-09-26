@@ -6,6 +6,7 @@ export default {
     configGuide: '配置说明',
     about: '关于',
     logs: '日志',
+    more: '更多',
     help: '帮助',
     feedback: '反馈',
     feedbackConfirmTitle: '打开 GitHub Issues？',
@@ -14,6 +15,7 @@ export default {
     language: '语言',
     openMenu: '打开菜单',
     bookmarks: '书签',
+    beta: 'Beta',
   },
   locale: {
     label: '语言',

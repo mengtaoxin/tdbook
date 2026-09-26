@@ -4,6 +4,7 @@ import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined'
 import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import TranslateIcon from '@mui/icons-material/Translate'
@@ -13,6 +14,7 @@ import Alert from '@mui/material/Alert'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import Collapse from '@mui/material/Collapse'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -48,6 +50,10 @@ import { useLocaleStore } from '@/stores/localeStore'
 
 const NAV_ITEMS = [
   { labelKey: 'nav.books', to: '/books' as const, Icon: AutoStoriesOutlinedIcon },
+  { labelKey: 'nav.logs', to: '/logs' as const, Icon: NotesOutlinedIcon },
+]
+
+const MORE_NAV_ITEMS = [
   { labelKey: 'nav.settings', to: '/settings' as const, Icon: SettingsOutlinedIcon },
   {
     labelKey: 'nav.configGuide',
@@ -55,7 +61,6 @@ const NAV_ITEMS = [
     Icon: DescriptionOutlinedIcon,
   },
   { labelKey: 'nav.about', to: '/about' as const, Icon: InfoOutlinedIcon },
-  { labelKey: 'nav.logs', to: '/logs' as const, Icon: NotesOutlinedIcon },
 ]
 
 export function AppShell() {
@@ -73,6 +78,7 @@ export function AppShell() {
   const hash = useRouterState({ select: (s) => s.location.hash })
   const bookId = readerBookIdFromPath(pathname)
   const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null)
+  const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null)
   const [helpAnchor, setHelpAnchor] = useState<null | HTMLElement>(null)
   const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null)
   const [bookmarkRevision, setBookmarkRevision] = useState(0)
@@ -83,6 +89,7 @@ export function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [compactNav, setCompactNav] = useState(true)
   const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false)
+  const [drawerMoreOpen, setDrawerMoreOpen] = useState(false)
   const [drawerHelpOpen, setDrawerHelpOpen] = useState(false)
   const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(
     DRAWER_BOOKMARKS_DEFAULT_OPEN,
@@ -135,6 +142,7 @@ export function AppShell() {
 
   function openFeedbackConfirm() {
     setHelpAnchor(null)
+    setMoreAnchor(null)
     setDrawerOpen(false)
     setFeedbackConfirmOpen(true)
   }
@@ -227,13 +235,16 @@ export function AppShell() {
       ) : null}
       <Button
         color="inherit"
-        startIcon={<HelpOutlinedIcon />}
-        data-testid="nav-help-toggle"
-        aria-label={t('nav.help')}
+        startIcon={<MoreHorizOutlinedIcon />}
+        data-testid="nav-more-toggle"
+        aria-label={t('nav.more')}
         tabIndex={compactNav ? -1 : undefined}
-        onClick={(event) => setHelpAnchor(event.currentTarget)}
+        onClick={(event) => setMoreAnchor(event.currentTarget)}
+        sx={{
+          opacity: MORE_NAV_ITEMS.some((item) => pathname === item.to) ? 1 : 0.85,
+        }}
       >
-        {t('nav.help')}
+        {t('nav.more')}
       </Button>
       <Button
         color="inherit"
@@ -305,26 +316,55 @@ export function AppShell() {
               </>
             ) : null}
             <ListItemButton
-              data-testid="nav-drawer-help-toggle"
-              onClick={() => setDrawerHelpOpen((open) => !open)}
+              data-testid="nav-drawer-more-toggle"
+              onClick={() => setDrawerMoreOpen((open) => !open)}
             >
               <ListItemIcon>
-                <HelpOutlinedIcon />
+                <MoreHorizOutlinedIcon />
               </ListItemIcon>
-              <ListItemText primary={t('nav.help')} />
+              <ListItemText primary={t('nav.more')} />
             </ListItemButton>
-            <Collapse in={drawerHelpOpen} timeout="auto" unmountOnExit>
+            <Collapse in={drawerMoreOpen} timeout="auto" unmountOnExit>
               <List dense disablePadding>
+                {MORE_NAV_ITEMS.map((item) => (
+                  <ListItemButton
+                    key={item.to}
+                    component={Link}
+                    to={item.to}
+                    selected={pathname === item.to}
+                    sx={{ pl: 4 }}
+                    onClick={() => setDrawerOpen(false)}
+                  >
+                    <ListItemIcon>
+                      <item.Icon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t(item.labelKey)} />
+                  </ListItemButton>
+                ))}
                 <ListItemButton
-                  data-testid="nav-feedback"
+                  data-testid="nav-drawer-help-toggle"
                   sx={{ pl: 4 }}
-                  onClick={openFeedbackConfirm}
+                  onClick={() => setDrawerHelpOpen((open) => !open)}
                 >
                   <ListItemIcon>
-                    <FeedbackOutlinedIcon fontSize="small" />
+                    <HelpOutlinedIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={t('nav.feedback')} />
+                  <ListItemText primary={t('nav.help')} />
                 </ListItemButton>
+                <Collapse in={drawerHelpOpen} timeout="auto" unmountOnExit>
+                  <List dense disablePadding>
+                    <ListItemButton
+                      data-testid="nav-feedback"
+                      sx={{ pl: 6 }}
+                      onClick={openFeedbackConfirm}
+                    >
+                      <ListItemIcon>
+                        <FeedbackOutlinedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary={t('nav.feedback')} />
+                    </ListItemButton>
+                  </List>
+                </Collapse>
               </List>
             </Collapse>
             <ListItemButton
@@ -382,6 +422,22 @@ export function AppShell() {
           >
             <MenuBookRoundedIcon />
             tdbook
+            <Chip
+              data-testid="brand-beta"
+              label={t('nav.beta')}
+              size="small"
+              variant="outlined"
+              sx={{
+                height: 20,
+                fontSize: '0.65rem',
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                color: 'inherit',
+                borderColor: 'currentColor',
+                opacity: 0.85,
+                '& .MuiChip-label': { px: 0.75 },
+              }}
+            />
           </Typography>
 
           {compactNav ? (
@@ -401,9 +457,45 @@ export function AppShell() {
       </AppBar>
 
       <Menu
+        anchorEl={moreAnchor}
+        open={Boolean(moreAnchor)}
+        onClose={() => {
+          setMoreAnchor(null)
+          setHelpAnchor(null)
+        }}
+        data-testid="nav-more-menu"
+      >
+        {MORE_NAV_ITEMS.map((item) => (
+          <MenuItem
+            key={item.to}
+            component={Link}
+            to={item.to}
+            selected={pathname === item.to}
+            onClick={() => setMoreAnchor(null)}
+          >
+            <ListItemIcon>
+              <item.Icon fontSize="small" />
+            </ListItemIcon>
+            {t(item.labelKey)}
+          </MenuItem>
+        ))}
+        <MenuItem
+          data-testid="nav-help-toggle"
+          onClick={(event) => setHelpAnchor(event.currentTarget)}
+        >
+          <ListItemIcon>
+            <HelpOutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          {t('nav.help')}
+        </MenuItem>
+      </Menu>
+
+      <Menu
         anchorEl={helpAnchor}
         open={Boolean(helpAnchor)}
         onClose={() => setHelpAnchor(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         data-testid="nav-help-menu"
       >
         <MenuItem data-testid="nav-feedback" onClick={openFeedbackConfirm}>

@@ -6,6 +6,7 @@ export default {
     configGuide: 'Config Guide',
     about: 'About',
     logs: 'Logs',
+    more: 'More',
     help: 'Help',
     feedback: 'Feedback',
     feedbackConfirmTitle: 'Open GitHub Issues?',
@@ -14,6 +15,7 @@ export default {
     language: 'Language',
     openMenu: 'Open menu',
     bookmarks: 'Bookmarks',
+    beta: 'Beta',
   },
   locale: {
     label: 'Language',

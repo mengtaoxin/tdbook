@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "cursor-cloud-best-practices": {
+      "source": "mengtaoxin/agent-kit",
+      "sourceType": "github",
+      "skillPath": "skills/cursor-cloud-best-practices/SKILL.md",
+      "computedHash": "2e89a750d50f2d1fe0a525945add3530a8119728e7f76494f40a8b93c99ad81f"
+    },
+    "cursor-local-best-practices": {
+      "source": "mengtaoxin/agent-kit",
+      "sourceType": "github",
+      "skillPath": "skills/cursor-local-best-practices/SKILL.md",
+      "computedHash": "2ae0b63696b9822c911d2b1899092e75dac14c680caf074c94198e651b90352b"
+    },
+    "javascript-typescript-best-practices": {
+      "source": "mengtaoxin/agent-kit",
+      "sourceType": "github",
+      "skillPath": "skills/javascript-typescript-best-practices/SKILL.md",
+      "computedHash": "cb0bee32b04f91a276e25b85d63571c498db6b84fb6828f38e43fce9f7cf4e03"
+    },
+    "material-design-best-practices": {
+      "source": "mengtaoxin/agent-kit",
+      "sourceType": "github",
+      "skillPath": "skills/material-design-best-practices/SKILL.md",
+      "computedHash": "e604ff6c1fa9ac3aea592d561567ab11ef5640e1c359b17607d4307519848850"
+    },
+    "react-best-practices": {
+      "source": "mengtaoxin/agent-kit",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "c0e194abe4341fcebcf04cfba414b65f802158507ccf6b21f73a08bebf6558b1"
+    },
+    "test-driven-development": {
+      "source": "mengtaoxin/agent-kit",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "computedHash": "94d7c068e99053b1a2ec2a9883af3532a01b22407e623d40c2f6cc4437a7e8a0"
+    }
+  }
+}

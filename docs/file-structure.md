@@ -42,8 +42,9 @@ src/
     reportFailure.ts  console.error for failures (TdLog is separate)
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa
   i18n/               i18next setup + en/zh message catalogs
-  tests/unit/         Vitest
-  e2e/                Playwright
-  scripts/generate-testdata.mjs  Node helper for `npm run testdata` (not a shell wrapper)
-  public/testdata/    demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
+  test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)
+  **/*.test.ts        unit tests colocated next to the module under test
+e2e/                  Playwright
+scripts/generate-testdata.mjs  Node helper for `npm run testdata` (not a shell wrapper)
+public/testdata/      demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
 ```

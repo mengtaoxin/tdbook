@@ -33,7 +33,7 @@
 | 阅读会话 / 当前页 | `src/hooks/`；页码留在 URL `?page=` |
 | 界面文案 | `src/i18n/locales/en.ts` 与 `zh.ts` 同时改 |
 | Config Guide 正文 | `public/how-to-write-config-file*.md` |
-| 单元测试 | `tests/unit/*.test.ts` |
+| 单元测试 | 与被测模块同目录的 `*.test.ts`（如 `src/lib/paths.test.ts`） |
 | 端到端测试 | `e2e/*.spec.ts` |
 | 书目条目 | `configs.json`（独立 `id`，不要把书名写死在应用里） |
 
@@ -56,7 +56,7 @@
 
 层选择：
 
-- 纯函数、规范化、缓存契约 → `tests/unit/`（Vitest）。
+- 纯函数、规范化、缓存契约 → 与源文件同目录的 `*.test.ts`（Vitest）。
 - 用户可见的打开书籍、翻页、清缓存等集成路径 → 在单元覆盖之上，用 `e2e/`（Playwright）做冒烟，不要用 e2e 替代对纯辅助函数的单元测试。
 - 不要在 e2e 里重复单元测试已经锁死的断言，除非需要一条集成冒烟。
 
@@ -70,7 +70,7 @@
 
 ```sh
 npm run test                         # 全部单元测试（Vitest）
-npm run test -- tests/unit/foo.test.ts   # 单个文件（Red/Green 时用）
+npm run test -- src/lib/foo.test.ts  # 单个文件（Red/Green 时用）
 npm run test:coverage                # 单元测试 + V8 覆盖率（终端摘要 + coverage/）
 npm run test:e2e                     # 夹具 + Playwright Chromium
 ```
@@ -78,7 +78,7 @@ npm run test:e2e                     # 夹具 + Playwright Chromium
 - 每个 Red / Green 步骤都跑当前相关测试。
 - 结束前必须 `npm run test` 全绿；只跑单个文件不算完成。
 - 改了阅读器、缓存、格式适配器时，再跑 `npm run test:e2e`。若本机没有浏览器：`npx playwright install chromium`。
-- 新单元测试放在 `tests/unit/`，命名 `*.test.ts`，风格对齐邻近用例。
+- 新单元测试与被测模块同目录，命名 `*.test.ts`（如 `src/lib/paths.test.ts`），风格对齐邻近用例；共享 setup 在 `src/test/setup.ts`。
 - e2e 需要书目夹具时走 `npm run testdata`（`test:e2e` 已包含）。
 
 ## 5. Format
