@@ -42,6 +42,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^5.0.1",
     "fake-indexeddb": "^6.2.5",
+    "@mengtaoxin/oxc-config": "file:../oxc-config",
     "happy-dom": "^20.14.5",
     "oxfmt": "^0.70.0",
     "oxlint": "^1.85.0",
