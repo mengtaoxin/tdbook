@@ -43,7 +43,7 @@ import {
 } from '@/lib/bookmarks';
 import type { AppLocale } from '@/lib/locale';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
-import { shouldCollapseNav } from '@/lib/navLayout';
+import { shouldCollapseNav, toolbarNavAvailableWidth } from '@/lib/navLayout';
 import { GITHUB_ISSUES_URL } from '@/lib/projectLinks';
 import { useLocaleStore } from '@/stores/localeStore';
 
@@ -110,7 +110,16 @@ export function AppShell() {
 
     function updateCompactNav() {
       if (!toolbar || !brand || !nav) return;
-      const availableWidth = toolbar.clientWidth - brand.offsetWidth;
+      const toolbarStyle = getComputedStyle(toolbar);
+      const brandStyle = getComputedStyle(brand);
+      const availableWidth = toolbarNavAvailableWidth({
+        toolbarClientWidth: toolbar.clientWidth,
+        toolbarPaddingLeft: parseFloat(toolbarStyle.paddingLeft) || 0,
+        toolbarPaddingRight: parseFloat(toolbarStyle.paddingRight) || 0,
+        toolbarGap: parseFloat(toolbarStyle.columnGap || toolbarStyle.gap) || 0,
+        brandWidth: brand.offsetWidth,
+        brandMarginEnd: parseFloat(brandStyle.marginInlineEnd || brandStyle.marginRight) || 0,
+      });
       setCompactNav(shouldCollapseNav(nav.scrollWidth, availableWidth));
     }
 
