@@ -1,6 +1,5 @@
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined'
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
-import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -79,7 +78,6 @@ export function AppShell() {
   const bookId = readerBookIdFromPath(pathname)
   const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null)
   const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null)
-  const [helpAnchor, setHelpAnchor] = useState<null | HTMLElement>(null)
   const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null)
   const [bookmarkRevision, setBookmarkRevision] = useState(0)
   const [bookmarkNotice, setBookmarkNotice] = useState('')
@@ -90,7 +88,6 @@ export function AppShell() {
   const [compactNav, setCompactNav] = useState(true)
   const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false)
   const [drawerMoreOpen, setDrawerMoreOpen] = useState(false)
-  const [drawerHelpOpen, setDrawerHelpOpen] = useState(false)
   const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(
     DRAWER_BOOKMARKS_DEFAULT_OPEN,
   )
@@ -141,7 +138,6 @@ export function AppShell() {
   }
 
   function openFeedbackConfirm() {
-    setHelpAnchor(null)
     setMoreAnchor(null)
     setDrawerOpen(false)
     setFeedbackConfirmOpen(true)
@@ -368,29 +364,15 @@ export function AppShell() {
                   </ListItemButton>
                 ))}
                 <ListItemButton
-                  data-testid="nav-drawer-help-toggle"
+                  data-testid="nav-feedback"
                   sx={{ pl: 4 }}
-                  onClick={() => setDrawerHelpOpen((open) => !open)}
+                  onClick={openFeedbackConfirm}
                 >
                   <ListItemIcon>
-                    <HelpOutlinedIcon fontSize="small" />
+                    <FeedbackOutlinedIcon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={t('nav.help')} />
+                  <ListItemText primary={t('nav.feedback')} />
                 </ListItemButton>
-                <Collapse in={drawerHelpOpen} timeout="auto" unmountOnExit>
-                  <List dense disablePadding>
-                    <ListItemButton
-                      data-testid="nav-feedback"
-                      sx={{ pl: 6 }}
-                      onClick={openFeedbackConfirm}
-                    >
-                      <ListItemIcon>
-                        <FeedbackOutlinedIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary={t('nav.feedback')} />
-                    </ListItemButton>
-                  </List>
-                </Collapse>
               </List>
             </Collapse>
           </List>
@@ -459,10 +441,7 @@ export function AppShell() {
       <Menu
         anchorEl={moreAnchor}
         open={Boolean(moreAnchor)}
-        onClose={() => {
-          setMoreAnchor(null)
-          setHelpAnchor(null)
-        }}
+        onClose={() => setMoreAnchor(null)}
         data-testid="nav-more-menu"
       >
         {MORE_NAV_ITEMS.map((item) => (
@@ -479,25 +458,6 @@ export function AppShell() {
             {t(item.labelKey)}
           </MenuItem>
         ))}
-        <MenuItem
-          data-testid="nav-help-toggle"
-          onClick={(event) => setHelpAnchor(event.currentTarget)}
-        >
-          <ListItemIcon>
-            <HelpOutlinedIcon fontSize="small" />
-          </ListItemIcon>
-          {t('nav.help')}
-        </MenuItem>
-      </Menu>
-
-      <Menu
-        anchorEl={helpAnchor}
-        open={Boolean(helpAnchor)}
-        onClose={() => setHelpAnchor(null)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        data-testid="nav-help-menu"
-      >
         <MenuItem data-testid="nav-feedback" onClick={openFeedbackConfirm}>
           <ListItemIcon>
             <FeedbackOutlinedIcon fontSize="small" />

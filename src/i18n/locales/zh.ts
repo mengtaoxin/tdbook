@@ -7,7 +7,6 @@ export default {
     about: '关于',
     logs: '日志',
     more: '更多',
-    help: '帮助',
     feedback: '反馈',
     feedbackConfirmTitle: '打开 GitHub Issues？',
     feedbackConfirmBody:

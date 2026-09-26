@@ -7,7 +7,6 @@ export default {
     about: 'About',
     logs: 'Logs',
     more: 'More',
-    help: 'Help',
     feedback: 'Feedback',
     feedbackConfirmTitle: 'Open GitHub Issues?',
     feedbackConfirmBody:

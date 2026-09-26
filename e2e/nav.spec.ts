@@ -18,7 +18,7 @@ test.describe('app shell navigation', () => {
     await expect(page.getByText(/personal ebook reader/i)).toBeVisible()
   })
 
-  test('Logs, Settings, About, Config Guide, and Help live under More after Language', async ({
+  test('Logs, Settings, About, Config Guide, and Feedback live under More after Language', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
@@ -32,7 +32,7 @@ test.describe('app shell navigation', () => {
     await expect(
       desktopNav.getByRole('link', { name: 'Config Guide' }),
     ).toHaveCount(0)
-    await expect(desktopNav.getByTestId('nav-help-toggle')).toHaveCount(0)
+    await expect(desktopNav.getByTestId('nav-feedback')).toHaveCount(0)
 
     const localeToggle = page.getByTestId('nav-locale-toggle')
     const moreToggle = page.getByTestId('nav-more-toggle')
@@ -53,13 +53,14 @@ test.describe('app shell navigation', () => {
     await expect(
       moreMenu.getByRole('menuitem', { name: 'Config Guide' }),
     ).toBeVisible()
-    await expect(moreMenu.getByTestId('nav-help-toggle')).toBeVisible()
+    await expect(moreMenu.getByTestId('nav-feedback')).toBeVisible()
+    await expect(moreMenu.getByRole('menuitem', { name: 'Help' })).toHaveCount(0)
 
     await moreMenu.getByRole('menuitem', { name: 'Logs' }).click()
     await expect(page).toHaveURL('/logs')
   })
 
-  test('More > Help > Feedback confirms before opening GitHub issues', async ({
+  test('More > Feedback confirms before opening GitHub issues', async ({
     page,
     context,
   }) => {
@@ -67,8 +68,7 @@ test.describe('app shell navigation', () => {
     await page.goto('/')
 
     await page.getByTestId('nav-more-toggle').click()
-    await page.getByTestId('nav-more-menu').getByTestId('nav-help-toggle').click()
-    await page.getByTestId('nav-help-menu').getByTestId('nav-feedback').click()
+    await page.getByTestId('nav-more-menu').getByTestId('nav-feedback').click()
 
     const confirm = page.getByTestId('nav-feedback-confirm')
     await expect(confirm).toBeVisible()
@@ -78,8 +78,7 @@ test.describe('app shell navigation', () => {
     await expect(confirm).toBeHidden()
 
     await page.getByTestId('nav-more-toggle').click()
-    await page.getByTestId('nav-more-menu').getByTestId('nav-help-toggle').click()
-    await page.getByTestId('nav-help-menu').getByTestId('nav-feedback').click()
+    await page.getByTestId('nav-more-menu').getByTestId('nav-feedback').click()
     await expect(confirm).toBeVisible()
 
     const popupPromise = context.waitForEvent('page')
