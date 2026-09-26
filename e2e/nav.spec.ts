@@ -60,6 +60,29 @@ test.describe('app shell navigation', () => {
     await expect(page).toHaveURL('/logs')
   })
 
+  test('Language and More menus do not lock page scroll (scrollbar stays)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/')
+
+    async function bodyOverflow() {
+      return page.evaluate(() => document.body.style.overflow)
+    }
+
+    expect(await bodyOverflow()).not.toBe('hidden')
+
+    await page.getByTestId('nav-locale-toggle').click()
+    await expect(page.getByTestId('nav-locale-menu')).toBeVisible()
+    expect(await bodyOverflow()).not.toBe('hidden')
+    await page.keyboard.press('Escape')
+    await expect(page.getByTestId('nav-locale-menu')).toBeHidden()
+
+    await page.getByTestId('nav-more-toggle').click()
+    await expect(page.getByTestId('nav-more-menu')).toBeVisible()
+    expect(await bodyOverflow()).not.toBe('hidden')
+  })
+
   test('More > Feedback confirms before opening GitHub issues', async ({
     page,
     context,

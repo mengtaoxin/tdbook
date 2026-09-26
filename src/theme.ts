@@ -30,5 +30,11 @@ export const theme = createTheme({
         size: 'small',
       },
     },
+    // Nav dropdowns must not hide the page scrollbar (Modal scroll lock).
+    MuiMenu: {
+      defaultProps: {
+        disableScrollLock: true,
+      },
+    },
   },
 })
