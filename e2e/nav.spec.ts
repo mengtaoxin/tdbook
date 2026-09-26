@@ -26,7 +26,9 @@ test.describe('app shell navigation', () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
-    await expect(page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' })).toBeVisible();
+    await expect(
+      page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' }),
+    ).toBeVisible();
     await expect(page.getByTestId('nav-menu-toggle')).toHaveCount(0);
 
     // Mid widths used to clip "More" instead of collapsing (padding/gap ignored).
