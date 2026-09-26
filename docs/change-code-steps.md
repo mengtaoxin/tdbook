@@ -72,14 +72,14 @@
 npm run test                         # 全部单元测试（Vitest）
 npm run test -- src/lib/foo.test.ts  # 单个文件（Red/Green 时用）
 npm run test:coverage                # 单元测试 + V8 覆盖率（终端摘要 + coverage/）
-npm run test:e2e                     # 夹具 + Playwright Chromium
+npm run test:e2e                     # Playwright Chromium（使用 public/testdata 夹具）
 ```
 
 - 每个 Red / Green 步骤都跑当前相关测试。
 - 结束前必须 `npm run test` 全绿；只跑单个文件不算完成。
 - 改了阅读器、缓存、格式适配器时，再跑 `npm run test:e2e`。若本机没有浏览器：`npx playwright install chromium`。
 - 新单元测试与被测模块同目录，命名 `*.test.ts`（如 `src/lib/paths.test.ts`），风格对齐邻近用例；共享 setup 在 `src/test/setup.ts`。
-- e2e 需要书目夹具时走 `npm run testdata`（`test:e2e` 已包含）。
+- e2e 夹具在 `public/testdata/`（已提交）；需要时就地改文件，不要新增生成脚本。
 
 ## 5. Format
 

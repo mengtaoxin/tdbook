@@ -22,8 +22,7 @@ npm run build     # tsc -b && vite build (copies configs.json + pdfjs assets int
 npm run preview   # preview production build
 npm run test      # Vitest unit tests (happy-dom + fake-indexeddb)
 npm run test:coverage  # unit tests + V8 coverage (text + coverage/html)
-npm run testdata  # generate public/testdata sample.epub / sample.pdf / configs.json
-npm run test:e2e  # npm run testdata + Playwright (Chromium)
+npm run test:e2e  # Playwright (Chromium); uses committed public/testdata fixtures
 ```
 
 Stop the dev server with Ctrl+C.

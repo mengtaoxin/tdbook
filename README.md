@@ -36,8 +36,7 @@ Use `npm run` scripts from `package.json`. Do not add `scripts/*.sh` wrappers.
 | `npm run preview` | Preview production build |
 | `npm run test` | Vitest unit tests |
 | `npm run test:coverage` | Unit tests + V8 coverage (`coverage/` HTML report) |
-| `npm run testdata` | Generate `public/testdata` EPUB/PDF fixtures |
-| `npm run test:e2e` | Generate fixtures + Playwright (Chromium) |
+| `npm run test:e2e` | Playwright (Chromium); uses `public/testdata` fixtures |
 
 ## Adding a book
 

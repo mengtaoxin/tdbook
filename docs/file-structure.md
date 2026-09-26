@@ -45,6 +45,5 @@ src/
   test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)
   **/*.test.ts        unit tests colocated next to the module under test
 e2e/                  Playwright
-scripts/generate-testdata.mjs  Node helper for `npm run testdata` (not a shell wrapper)
-public/testdata/      demo + e2e fixtures (Alice EPUB, covers, generated sample.epub / sample.pdf / configs.json)
+public/testdata/      demo + e2e fixtures (Alice EPUB, covers, sample.epub / sample.pdf / configs.json; edit in place when needed)
 ```
