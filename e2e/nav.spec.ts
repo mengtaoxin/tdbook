@@ -18,7 +18,7 @@ test.describe('app shell navigation', () => {
     await expect(page.getByText(/personal ebook reader/i)).toBeVisible()
   })
 
-  test('Settings, About, Config Guide, and Help live under More', async ({
+  test('Logs, Settings, About, Config Guide, and Help live under More after Language', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
@@ -26,7 +26,7 @@ test.describe('app shell navigation', () => {
 
     const desktopNav = page.getByTestId('desktop-nav')
     await expect(desktopNav.getByRole('link', { name: 'Books' })).toBeVisible()
-    await expect(desktopNav.getByRole('link', { name: 'Logs' })).toBeVisible()
+    await expect(desktopNav.getByRole('link', { name: 'Logs' })).toHaveCount(0)
     await expect(desktopNav.getByRole('link', { name: 'Settings' })).toHaveCount(0)
     await expect(desktopNav.getByRole('link', { name: 'About' })).toHaveCount(0)
     await expect(
@@ -34,11 +34,20 @@ test.describe('app shell navigation', () => {
     ).toHaveCount(0)
     await expect(desktopNav.getByTestId('nav-help-toggle')).toHaveCount(0)
 
+    const localeToggle = page.getByTestId('nav-locale-toggle')
     const moreToggle = page.getByTestId('nav-more-toggle')
+    await expect(localeToggle).toBeVisible()
     await expect(moreToggle).toBeVisible()
+    const localeBox = await localeToggle.boundingBox()
+    const moreBox = await moreToggle.boundingBox()
+    expect(localeBox).toBeTruthy()
+    expect(moreBox).toBeTruthy()
+    expect(moreBox!.x).toBeGreaterThan(localeBox!.x)
+
     await moreToggle.click()
 
     const moreMenu = page.getByTestId('nav-more-menu')
+    await expect(moreMenu.getByRole('menuitem', { name: 'Logs' })).toBeVisible()
     await expect(moreMenu.getByRole('menuitem', { name: 'Settings' })).toBeVisible()
     await expect(moreMenu.getByRole('menuitem', { name: 'About' })).toBeVisible()
     await expect(
@@ -46,8 +55,8 @@ test.describe('app shell navigation', () => {
     ).toBeVisible()
     await expect(moreMenu.getByTestId('nav-help-toggle')).toBeVisible()
 
-    await moreMenu.getByRole('menuitem', { name: 'Settings' }).click()
-    await expect(page).toHaveURL('/settings')
+    await moreMenu.getByRole('menuitem', { name: 'Logs' }).click()
+    await expect(page).toHaveURL('/logs')
   })
 
   test('More > Help > Feedback confirms before opening GitHub issues', async ({

@@ -50,10 +50,10 @@ import { useLocaleStore } from '@/stores/localeStore'
 
 const NAV_ITEMS = [
   { labelKey: 'nav.books', to: '/books' as const, Icon: AutoStoriesOutlinedIcon },
-  { labelKey: 'nav.logs', to: '/logs' as const, Icon: NotesOutlinedIcon },
 ]
 
 const MORE_NAV_ITEMS = [
+  { labelKey: 'nav.logs', to: '/logs' as const, Icon: NotesOutlinedIcon },
   { labelKey: 'nav.settings', to: '/settings' as const, Icon: SettingsOutlinedIcon },
   {
     labelKey: 'nav.configGuide',
@@ -235,6 +235,16 @@ export function AppShell() {
       ) : null}
       <Button
         color="inherit"
+        startIcon={<TranslateIcon />}
+        data-testid="nav-locale-toggle"
+        aria-label={t('locale.label')}
+        tabIndex={compactNav ? -1 : undefined}
+        onClick={(event) => setLocaleAnchor(event.currentTarget)}
+      >
+        {t(`locale.${locale}`)}
+      </Button>
+      <Button
+        color="inherit"
         startIcon={<MoreHorizOutlinedIcon />}
         data-testid="nav-more-toggle"
         aria-label={t('nav.more')}
@@ -245,16 +255,6 @@ export function AppShell() {
         }}
       >
         {t('nav.more')}
-      </Button>
-      <Button
-        color="inherit"
-        startIcon={<TranslateIcon />}
-        data-testid="nav-locale-toggle"
-        aria-label={t('locale.label')}
-        tabIndex={compactNav ? -1 : undefined}
-        onClick={(event) => setLocaleAnchor(event.currentTarget)}
-      >
-        {t(`locale.${locale}`)}
       </Button>
     </Box>
   )
@@ -316,6 +316,32 @@ export function AppShell() {
               </>
             ) : null}
             <ListItemButton
+              onClick={() => setDrawerLocaleOpen((open) => !open)}
+            >
+              <ListItemIcon>
+                <TranslateIcon />
+              </ListItemIcon>
+              <ListItemText primary={t('nav.language')} />
+            </ListItemButton>
+            <Collapse in={drawerLocaleOpen} timeout="auto" unmountOnExit>
+              <List dense disablePadding>
+                {SUPPORTED_LOCALES.map((code) => (
+                  <ListItemButton
+                    key={code}
+                    data-testid={`locale-option-${code}`}
+                    selected={locale === code}
+                    sx={{ pl: 4 }}
+                    onClick={() => chooseLocale(code)}
+                  >
+                    <ListItemIcon>
+                      <TranslateIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t(`locale.${code}`)} />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
+            <ListItemButton
               data-testid="nav-drawer-more-toggle"
               onClick={() => setDrawerMoreOpen((open) => !open)}
             >
@@ -365,32 +391,6 @@ export function AppShell() {
                     </ListItemButton>
                   </List>
                 </Collapse>
-              </List>
-            </Collapse>
-            <ListItemButton
-              onClick={() => setDrawerLocaleOpen((open) => !open)}
-            >
-              <ListItemIcon>
-                <TranslateIcon />
-              </ListItemIcon>
-              <ListItemText primary={t('nav.language')} />
-            </ListItemButton>
-            <Collapse in={drawerLocaleOpen} timeout="auto" unmountOnExit>
-              <List dense disablePadding>
-                {SUPPORTED_LOCALES.map((code) => (
-                  <ListItemButton
-                    key={code}
-                    data-testid={`locale-option-${code}`}
-                    selected={locale === code}
-                    sx={{ pl: 4 }}
-                    onClick={() => chooseLocale(code)}
-                  >
-                    <ListItemIcon>
-                      <TranslateIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={t(`locale.${code}`)} />
-                  </ListItemButton>
-                ))}
               </List>
             </Collapse>
           </List>
