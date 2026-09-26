@@ -1,96 +1,88 @@
-import CachedIcon from '@mui/icons-material/Cached'
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
-import Alert from '@mui/material/Alert'
-import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import Link from '@mui/material/Link'
-import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import { Link as RouterLink } from '@tanstack/react-router'
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { translateError } from '@/i18n'
-import { clearAllBookCaches } from '@/lib/bookCache'
-import {
-  clearPersistedBookConfigs,
-  invalidateBookConfigsCache,
-} from '@/lib/catalog'
-import { DEFAULT_CONFIGS_URL } from '@/lib/settings'
-import { useBooksStore } from '@/stores/booksStore'
-import { useSettingsStore } from '@/stores/settingsStore'
+import CachedIcon from '@mui/icons-material/Cached';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { Link as RouterLink } from '@tanstack/react-router';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { translateError } from '@/i18n';
+import { clearAllBookCaches } from '@/lib/bookCache';
+import { clearPersistedBookConfigs, invalidateBookConfigsCache } from '@/lib/catalog';
+import { DEFAULT_CONFIGS_URL } from '@/lib/settings';
+import { useBooksStore } from '@/stores/booksStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 
-type ClearTarget = 'catalog' | 'books' | null
+type ClearTarget = 'catalog' | 'books' | null;
 
 export function SettingsPage() {
-  const { t } = useTranslation()
-  const configsUrl = useSettingsStore((s) => s.configsUrl)
-  const setConfigsUrl = useSettingsStore((s) => s.setConfigsUrl)
-  const restoreDefault = useSettingsStore((s) => s.restoreDefault)
-  const [draft, setDraft] = useState(configsUrl)
-  const [message, setMessage] = useState('')
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success')
-  const [clearTarget, setClearTarget] = useState<ClearTarget>(null)
-  const [clearing, setClearing] = useState(false)
+  const { t } = useTranslation();
+  const configsUrl = useSettingsStore((s) => s.configsUrl);
+  const setConfigsUrl = useSettingsStore((s) => s.setConfigsUrl);
+  const restoreDefault = useSettingsStore((s) => s.restoreDefault);
+  const [draft, setDraft] = useState(configsUrl);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [clearTarget, setClearTarget] = useState<ClearTarget>(null);
+  const [clearing, setClearing] = useState(false);
 
   function showMessage(text: string, type: 'success' | 'error') {
-    setMessage(text)
-    setMessageType(type)
+    setMessage(text);
+    setMessageType(type);
   }
 
   function save() {
     try {
-      setConfigsUrl(draft)
-      const stored = useSettingsStore.getState().configsUrl
-      setDraft(stored)
+      setConfigsUrl(draft);
+      const stored = useSettingsStore.getState().configsUrl;
+      setDraft(stored);
       showMessage(
-        stored
-          ? t('settings.saved')
-          : t('settings.usingDefault', { url: DEFAULT_CONFIGS_URL }),
+        stored ? t('settings.saved') : t('settings.usingDefault', { url: DEFAULT_CONFIGS_URL }),
         'success',
-      )
+      );
     } catch (err) {
-      showMessage(translateError(err, 'settings.saveFailed'), 'error')
+      showMessage(translateError(err, 'settings.saveFailed'), 'error');
     }
   }
 
   function onRestoreDefault() {
     try {
-      restoreDefault()
-      setDraft('')
-      showMessage(
-        t('settings.restoredDefault', { url: DEFAULT_CONFIGS_URL }),
-        'success',
-      )
+      restoreDefault();
+      setDraft('');
+      showMessage(t('settings.restoredDefault', { url: DEFAULT_CONFIGS_URL }), 'success');
     } catch (err) {
-      showMessage(translateError(err, 'settings.restoreFailed'), 'error')
+      showMessage(translateError(err, 'settings.restoreFailed'), 'error');
     }
   }
 
   function closeClearConfirm() {
-    if (clearing) return
-    setClearTarget(null)
+    if (clearing) return;
+    setClearTarget(null);
   }
 
   async function confirmClearCache() {
-    if (clearing || !clearTarget) return
-    setClearing(true)
+    if (clearing || !clearTarget) return;
+    setClearing(true);
     try {
       if (clearTarget === 'catalog') {
-        clearPersistedBookConfigs()
-        invalidateBookConfigsCache()
-        useBooksStore.getState().invalidate()
-        setClearTarget(null)
-        showMessage(t('settings.catalogCacheCleared'), 'success')
+        clearPersistedBookConfigs();
+        invalidateBookConfigsCache();
+        useBooksStore.getState().invalidate();
+        setClearTarget(null);
+        showMessage(t('settings.catalogCacheCleared'), 'success');
       } else {
-        await clearAllBookCaches()
-        useBooksStore.getState().invalidate()
-        setClearTarget(null)
-        showMessage(t('settings.cacheCleared'), 'success')
+        await clearAllBookCaches();
+        useBooksStore.getState().invalidate();
+        setClearTarget(null);
+        showMessage(t('settings.cacheCleared'), 'success');
       }
     } catch {
       showMessage(
@@ -98,20 +90,20 @@ export function SettingsPage() {
           ? t('settings.clearCatalogCacheFailed')
           : t('settings.clearCacheFailed'),
         'error',
-      )
+      );
     } finally {
-      setClearing(false)
+      setClearing(false);
     }
   }
 
   const confirmTitle =
     clearTarget === 'catalog'
       ? t('settings.clearCatalogCacheConfirmTitle')
-      : t('settings.clearCacheConfirmTitle')
+      : t('settings.clearCacheConfirmTitle');
   const confirmBody =
     clearTarget === 'catalog'
       ? t('settings.clearCatalogCacheConfirmBody')
-      : t('settings.clearCacheConfirmBody')
+      : t('settings.clearCacheConfirmBody');
 
   return (
     <>
@@ -121,11 +113,7 @@ export function SettingsPage() {
         </Typography>
 
         {message ? (
-          <Alert
-            severity={messageType}
-            onClose={() => setMessage('')}
-            sx={{ mb: 2 }}
-          >
+          <Alert severity={messageType} onClose={() => setMessage('')} sx={{ mb: 2 }}>
             {message}
           </Alert>
         ) : null}
@@ -184,12 +172,7 @@ export function SettingsPage() {
         </Button>
       </Container>
 
-      <Dialog
-        open={clearTarget !== null}
-        onClose={closeClearConfirm}
-        maxWidth="xs"
-        fullWidth
-      >
+      <Dialog open={clearTarget !== null} onClose={closeClearConfirm} maxWidth="xs" fullWidth>
         <DialogTitle>{confirmTitle}</DialogTitle>
         <DialogContent>
           <Typography>{confirmBody}</Typography>
@@ -209,5 +192,5 @@ export function SettingsPage() {
         </DialogActions>
       </Dialog>
     </>
-  )
+  );
 }

@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   author: mengtaoxin
-  version: "1.3.0"
+  version: '1.3.0'
   docs: https://react.dev/
 ---
 

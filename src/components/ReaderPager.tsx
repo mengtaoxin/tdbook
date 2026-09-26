@@ -1,18 +1,18 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
 
 type ReaderPagerProps = {
-  page: number
-  totalPages: number
-  prevPage: number | null
-  nextPage: number | null
-  wide?: boolean
-  onGo: (target: number) => void
-}
+  page: number;
+  totalPages: number;
+  prevPage: number | null;
+  nextPage: number | null;
+  wide?: boolean;
+  onGo: (target: number) => void;
+};
 
 export function ReaderPager({
   page,
@@ -22,7 +22,7 @@ export function ReaderPager({
   wide = false,
   onGo,
 }: ReaderPagerProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -57,5 +57,5 @@ export function ReaderPager({
         <ChevronRightIcon />
       </IconButton>
     </Box>
-  )
+  );
 }

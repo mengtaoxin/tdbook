@@ -24,18 +24,18 @@
 
 动手前先对照 [file-structure.md](./file-structure.md) 与 [conventions.md](./conventions.md)，确认文件该放哪、该不该新建。
 
-| 职责 | 放哪里 |
-| ---- | ------ |
-| 书目、缓存、EPUB/PDF 解析与 I/O | `src/lib/` |
-| 页面与路由 | `src/routes/` |
-| 可复用 UI | `src/components/` |
-| 跨页偏好、书目列表缓存 | `src/stores/`（Zustand） |
-| 阅读会话 / 当前页 | `src/hooks/`；页码留在 URL `?page=` |
-| 界面文案 | `src/i18n/locales/en.ts` 与 `zh.ts` 同时改 |
-| Config Guide 正文 | `public/how-to-write-config-file*.md` |
-| 单元测试 | 与被测模块同目录的 `*.test.ts`（如 `src/lib/paths.test.ts`） |
-| 端到端测试 | `e2e/*.spec.ts` |
-| 书目条目 | `configs.json`（独立 `id`，不要把书名写死在应用里） |
+| 职责                            | 放哪里                                                       |
+| ------------------------------- | ------------------------------------------------------------ |
+| 书目、缓存、EPUB/PDF 解析与 I/O | `src/lib/`                                                   |
+| 页面与路由                      | `src/routes/`                                                |
+| 可复用 UI                       | `src/components/`                                            |
+| 跨页偏好、书目列表缓存          | `src/stores/`（Zustand）                                     |
+| 阅读会话 / 当前页               | `src/hooks/`；页码留在 URL `?page=`                          |
+| 界面文案                        | `src/i18n/locales/en.ts` 与 `zh.ts` 同时改                   |
+| Config Guide 正文               | `public/how-to-write-config-file*.md`                        |
+| 单元测试                        | 与被测模块同目录的 `*.test.ts`（如 `src/lib/paths.test.ts`） |
+| 端到端测试                      | `e2e/*.spec.ts`                                              |
+| 书目条目                        | `configs.json`（独立 `id`，不要把书名写死在应用里）          |
 
 检查问题：
 
@@ -83,21 +83,21 @@ npm run test:e2e                     # Playwright Chromium（使用 public/testd
 
 ## 5. Format
 
-本仓库目前没有独立的 `format` / Prettier / ESLint 脚本。不要为了格式化去加 `scripts/*.sh`。
+使用 `npm run fmt`（oxfmt，`semi: true`）写盘格式化；检查用 `npm run fmt:check`。不要另加 `scripts/*.sh`。
 
 - 与邻近文件保持一致：2 空格缩进、TypeScript、React 函数组件、`@/` 导入。
 - 优先 MUI 组件与 `sx` / theme tokens；不要引入 Vue、Vuetify、Pinia、Tailwind。
 - 新的界面字符串必须同时有 en / zh。
 
-若日后在 `package.json` 增加了 `format`，把「写盘格式化」写进本小节，并在 Check 里加上对应的 check-only 命令。
-
 ## 6. Check
 
 ```sh
+npm run fmt:check
+npm run lint
 npm run build    # tsc -b 类型检查 + Vite 生产构建
 ```
 
-TypeScript 或 React 有改动时，结束前必须 `npm run build` 通过。本仓库没有单独的 `lint` / `check` 脚本；类型与打包门禁就是 `build`。
+TypeScript 或 React 有改动时，结束前必须 `npm run lint`、`npm run fmt:check`、`npm run build` 通过。
 
 不要把 `build` 失败理解成「测试红了」：TDD 的 Red 必须是断言失败，而不是 `tsc` 挂掉。
 

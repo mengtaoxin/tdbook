@@ -1,38 +1,38 @@
-import Paper from '@mui/material/Paper'
-import { useEffect, useRef } from 'react'
+import Paper from '@mui/material/Paper';
+import { useEffect, useRef } from 'react';
 import {
   attachEpubShadow,
   clearEpubShadow,
   renderEpubShadow,
   scrollEpubHash,
-} from '@/lib/epubShadow'
-import type { RewrittenPage } from '@/lib/rewriteHtml'
+} from '@/lib/epubShadow';
+import type { RewrittenPage } from '@/lib/rewriteHtml';
 
 type EpubReaderPaneProps = {
-  rewritten: RewrittenPage
-  hash?: string
-}
+  rewritten: RewrittenPage;
+  hash?: string;
+};
 
 export function EpubReaderPane({ rewritten, hash = '' }: EpubReaderPaneProps) {
-  const hostRef = useRef<HTMLDivElement | null>(null)
-  const shadowRef = useRef<ShadowRoot | null>(null)
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const shadowRef = useRef<ShadowRoot | null>(null);
 
   useEffect(() => {
-    const host = hostRef.current
-    if (!host) return
+    const host = hostRef.current;
+    if (!host) return;
 
-    const shadow = attachEpubShadow(host)
-    shadowRef.current = shadow
-    renderEpubShadow(shadow, rewritten, host)
+    const shadow = attachEpubShadow(host);
+    shadowRef.current = shadow;
+    renderEpubShadow(shadow, rewritten, host);
     if (hash) {
-      scrollEpubHash(shadow, hash)
+      scrollEpubHash(shadow, hash);
     }
 
     return () => {
-      clearEpubShadow(shadowRef.current)
-      shadowRef.current = null
-    }
-  }, [rewritten, hash])
+      clearEpubShadow(shadowRef.current);
+      shadowRef.current = null;
+    };
+  }, [rewritten, hash]);
 
   return (
     <Paper
@@ -47,5 +47,5 @@ export function EpubReaderPane({ rewritten, hash = '' }: EpubReaderPaneProps) {
     >
       <div ref={hostRef} className="epub-content" data-testid="epub-content" />
     </Paper>
-  )
+  );
 }

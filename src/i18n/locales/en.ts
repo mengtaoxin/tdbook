@@ -30,8 +30,7 @@ export default {
     features: {
       formats: {
         title: 'Multiple formats',
-        description:
-          'Open common ebooks and PDFs and read them in the browser.',
+        description: 'Open common ebooks and PDFs and read them in the browser.',
       },
       local: {
         title: 'Saved locally',
@@ -40,8 +39,7 @@ export default {
       },
       offline: {
         title: 'Offline reading',
-        description:
-          'After a book is downloaded, you can keep turning pages without a network.',
+        description: 'After a book is downloaded, you can keep turning pages without a network.',
       },
     },
   },
@@ -78,8 +76,7 @@ export default {
   settings: {
     title: 'Settings',
     configsUrlLabel: 'Book config URL',
-    configsUrlHint:
-      'Leave empty to use the default /configs.json; or enter https://…/configs.json',
+    configsUrlHint: 'Leave empty to use the default /configs.json; or enter https://…/configs.json',
     viewConfigGuide: 'View config guide',
     save: 'Save',
     restoreDefault: 'Restore default',
@@ -107,8 +104,7 @@ export default {
     cancel: 'Cancel',
     confirm: 'Confirm',
     clear: 'Clear',
-    cacheCleared:
-      'All book caches cleared. Opening a book again will require a download.',
+    cacheCleared: 'All book caches cleared. Opening a book again will require a download.',
     clearCacheFailed: 'Failed to clear cache.',
   },
   about: {
@@ -130,9 +126,8 @@ export default {
     localStorageWrite: 'Could not write to local storage',
     invalidBookmark: 'Invalid bookmark',
     downloadFailed: 'Download failed (HTTP {status}).',
-    epubExtractFailed:
-      'Could not extract EPUB (file may be corrupt or not a valid zip).',
+    epubExtractFailed: 'Could not extract EPUB (file may be corrupt or not a valid zip).',
     cacheBookFailed: 'Failed to download or cache the book.',
     canvasCreateFailed: 'Could not create canvas.',
   },
-}
+};

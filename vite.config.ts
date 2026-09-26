@@ -1,109 +1,95 @@
-import fs from 'node:fs'
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import react from '@vitejs/plugin-react'
-import { defineConfig, type Plugin } from 'vite'
-import { VitePWA } from 'vite-plugin-pwa'
-import { pwaManifest } from './src/lib/pwaManifest.ts'
+import fs from 'node:fs';
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import react from '@vitejs/plugin-react';
+import { defineConfig, type Plugin } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
+import { pwaManifest } from './src/lib/pwaManifest.ts';
 
-const webRoot = path.dirname(fileURLToPath(import.meta.url))
-const repoRoot = webRoot
+const webRoot = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = webRoot;
 
 const MIME: Record<string, string> = {
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.wasm': 'application/wasm',
-}
+};
 
-const PDFJS_ASSETS = ['cmaps', 'standard_fonts', 'wasm', 'iccs'] as const
-const pdfjsRoot = path.join(webRoot, 'node_modules', 'pdfjs-dist')
+const PDFJS_ASSETS = ['cmaps', 'standard_fonts', 'wasm', 'iccs'] as const;
+const pdfjsRoot = path.join(webRoot, 'node_modules', 'pdfjs-dist');
 
 function isInsideDir(root: string, target: string) {
-  const relative = path.relative(root, target)
-  return (
-    relative === '' ||
-    (!relative.startsWith('..') && !path.isAbsolute(relative))
-  )
+  const relative = path.relative(root, target);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function resolveRepoStatic(urlPath: string): string | null {
-  const pathname = decodeURIComponent(urlPath.split('?')[0] ?? '')
+  const pathname = decodeURIComponent(urlPath.split('?')[0] ?? '');
   if (pathname === '/configs.json') {
-    return path.join(repoRoot, 'configs.json')
+    return path.join(repoRoot, 'configs.json');
   }
   if (pathname.startsWith('/pdfjs/')) {
-    const rest = pathname.slice('/pdfjs/'.length)
-    const kind = rest.split('/')[0] ?? ''
+    const rest = pathname.slice('/pdfjs/'.length);
+    const kind = rest.split('/')[0] ?? '';
     if (!PDFJS_ASSETS.includes(kind as (typeof PDFJS_ASSETS)[number])) {
-      return null
+      return null;
     }
-    const target = path.resolve(pdfjsRoot, rest)
+    const target = path.resolve(pdfjsRoot, rest);
     if (!isInsideDir(path.join(pdfjsRoot, kind), target)) {
-      return null
+      return null;
     }
-    return target
+    return target;
   }
-  return null
+  return null;
 }
 
-function sendFile(
-  filePath: string,
-  res: ServerResponse,
-  next: (err?: unknown) => void,
-) {
+function sendFile(filePath: string, res: ServerResponse, next: (err?: unknown) => void) {
   fs.stat(filePath, (statErr, stats) => {
     if (statErr || !stats.isFile()) {
-      next()
-      return
+      next();
+      return;
     }
-    const ext = path.extname(filePath).toLowerCase()
-    res.setHeader('Content-Type', MIME[ext] ?? 'application/octet-stream')
-    res.setHeader('Cache-Control', 'no-cache')
-    fs.createReadStream(filePath).pipe(res)
-  })
+    const ext = path.extname(filePath).toLowerCase();
+    res.setHeader('Content-Type', MIME[ext] ?? 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    fs.createReadStream(filePath).pipe(res);
+  });
 }
 
 function repoStaticPlugin(): Plugin {
-  const middleware = (
-    req: IncomingMessage,
-    res: ServerResponse,
-    next: (err?: unknown) => void,
-  ) => {
+  const middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => {
     if (!req.url || req.method !== 'GET') {
-      next()
-      return
+      next();
+      return;
     }
-    const filePath = resolveRepoStatic(req.url)
+    const filePath = resolveRepoStatic(req.url);
     if (!filePath) {
-      next()
-      return
+      next();
+      return;
     }
-    sendFile(filePath, res, next)
-  }
+    sendFile(filePath, res, next);
+  };
 
   return {
     name: 'repo-static',
     configureServer(server) {
-      server.middlewares.use(middleware)
+      server.middlewares.use(middleware);
     },
     configurePreviewServer(server) {
-      server.middlewares.use(middleware)
+      server.middlewares.use(middleware);
     },
     writeBundle(options) {
-      const outDir = options.dir ?? path.join(webRoot, 'dist')
-      fs.copyFileSync(
-        path.join(repoRoot, 'configs.json'),
-        path.join(outDir, 'configs.json'),
-      )
+      const outDir = options.dir ?? path.join(webRoot, 'dist');
+      fs.copyFileSync(path.join(repoRoot, 'configs.json'), path.join(outDir, 'configs.json'));
       for (const asset of PDFJS_ASSETS) {
-        const src = path.join(pdfjsRoot, asset)
-        if (!fs.existsSync(src)) continue
-        fs.cpSync(src, path.join(outDir, 'pdfjs', asset), { recursive: true })
+        const src = path.join(pdfjsRoot, asset);
+        if (!fs.existsSync(src)) continue;
+        fs.cpSync(src, path.join(outDir, 'pdfjs', asset), { recursive: true });
       }
     },
-  }
+  };
 }
 
 export default defineConfig({
@@ -122,9 +108,7 @@ export default defineConfig({
       ],
       manifest: pwaManifest,
       workbox: {
-        globPatterns: [
-          '**/*.{js,css,html,ico,svg,png,woff2,webmanifest}',
-        ],
+        globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2,webmanifest}'],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
@@ -165,4 +149,4 @@ export default defineConfig({
       allow: [webRoot],
     },
   },
-})
+});

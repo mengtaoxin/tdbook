@@ -1,49 +1,46 @@
-import Alert from '@mui/material/Alert'
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-  configGuideMarkdownUrl,
-  renderMarkdown,
-} from '@/lib/configGuideMarkdown'
-import { useLocaleStore } from '@/stores/localeStore'
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { configGuideMarkdownUrl, renderMarkdown } from '@/lib/configGuideMarkdown';
+import { useLocaleStore } from '@/stores/localeStore';
 
 export function ConfigGuidePage() {
-  const { t } = useTranslation()
-  const locale = useLocaleStore((s) => s.locale)
-  const [html, setHtml] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState(false)
+  const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
+  const [html, setHtml] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
 
     async function loadGuide() {
-      setLoading(true)
-      setLoadError(false)
-      setHtml('')
+      setLoading(true);
+      setLoadError(false);
+      setHtml('');
       try {
-        const response = await fetch(configGuideMarkdownUrl(locale))
+        const response = await fetch(configGuideMarkdownUrl(locale));
         if (!response.ok) {
-          if (!cancelled) setLoadError(true)
-          return
+          if (!cancelled) setLoadError(true);
+          return;
         }
-        const source = await response.text()
-        if (!cancelled) setHtml(renderMarkdown(source))
+        const source = await response.text();
+        if (!cancelled) setHtml(renderMarkdown(source));
       } catch {
-        if (!cancelled) setLoadError(true)
+        if (!cancelled) setLoadError(true);
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) setLoading(false);
       }
     }
 
-    void loadGuide()
+    void loadGuide();
     return () => {
-      cancelled = true
-    }
-  }, [locale])
+      cancelled = true;
+    };
+  }, [locale]);
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
@@ -52,9 +49,7 @@ export function ConfigGuidePage() {
           {t('configGuide.loading')}
         </Typography>
       ) : null}
-      {loadError ? (
-        <Alert severity="error">{t('configGuide.loadError')}</Alert>
-      ) : null}
+      {loadError ? <Alert severity="error">{t('configGuide.loadError')}</Alert> : null}
       {!loading && !loadError ? (
         <Box
           className="guide-md"
@@ -86,8 +81,7 @@ export function ConfigGuidePage() {
             },
             '& li': { mb: 0.5 },
             '& code': {
-              fontFamily:
-                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
               fontSize: '0.85em',
             },
             '& pre': {
@@ -110,5 +104,5 @@ export function ConfigGuidePage() {
         />
       ) : null}
     </Container>
-  )
+  );
 }

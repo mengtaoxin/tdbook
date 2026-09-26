@@ -1,8 +1,8 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
-import { getStoredLocale, type AppLocale } from '@/lib/locale'
-import en from './locales/en'
-import zh from './locales/zh'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import { getStoredLocale, type AppLocale } from '@/lib/locale';
+import en from './locales/en';
+import zh from './locales/zh';
 
 void i18n.use(initReactI18next).init({
   resources: {
@@ -17,29 +17,29 @@ void i18n.use(initReactI18next).init({
     prefix: '{',
     suffix: '}',
   },
-})
+});
 
 export function setAppLocale(locale: AppLocale) {
-  void i18n.changeLanguage(locale)
-  document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en'
+  void i18n.changeLanguage(locale);
+  document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en';
 }
 
 /** Translate message keys used as Error.message from lib code. */
 export function translateError(err: unknown, fallbackKey: string): string {
   if (!(err instanceof Error)) {
-    return i18n.t(fallbackKey)
+    return i18n.t(fallbackKey);
   }
-  const message = err.message
-  const downloadMatch = /^errors\.downloadFailed:(\d+)$/.exec(message)
+  const message = err.message;
+  const downloadMatch = /^errors\.downloadFailed:(\d+)$/.exec(message);
   if (downloadMatch) {
-    return i18n.t('errors.downloadFailed', { status: downloadMatch[1] })
+    return i18n.t('errors.downloadFailed', { status: downloadMatch[1] });
   }
   if (message.startsWith('errors.')) {
-    return i18n.t(message)
+    return i18n.t(message);
   }
-  return message
+  return message;
 }
 
-setAppLocale(getStoredLocale())
+setAppLocale(getStoredLocale());
 
-export default i18n
+export default i18n;

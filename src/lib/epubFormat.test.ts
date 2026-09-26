@@ -1,16 +1,16 @@
-import { beforeEach, describe, expect, it } from 'vitest'
-import JSZip from 'jszip'
+import { beforeEach, describe, expect, it } from 'vitest';
+import JSZip from 'jszip';
 import {
   clearAllCacheRecords,
   getCachedBlobUrl,
   putFiles,
   putMeta,
   resetBlobUrlCacheForTests,
-} from '@/lib/cacheStore'
-import { epubAdapter } from '@/lib/epubFormat'
+} from '@/lib/cacheStore';
+import { epubAdapter } from '@/lib/epubFormat';
 
 async function seedSampleEpub(sourceUrl: string) {
-  const zip = new JSZip()
+  const zip = new JSZip();
   zip.file(
     'META-INF/container.xml',
     `<?xml version="1.0"?>
@@ -19,7 +19,7 @@ async function seedSampleEpub(sourceUrl: string) {
     <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
   </rootfiles>
 </container>`,
-  )
+  );
   zip.file(
     'OEBPS/content.opf',
     `<?xml version="1.0"?>
@@ -36,13 +36,13 @@ async function seedSampleEpub(sourceUrl: string) {
   </manifest>
   <spine><itemref idref="c1"/></spine>
 </package>`,
-  )
+  );
   zip.file(
     'OEBPS/c1.xhtml',
     `<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><body><p>Hi</p></body></html>`,
-  )
-  zip.file('OEBPS/style.css', 'p{}')
-  zip.file('OEBPS/cover.png', new Uint8Array([137, 80, 78, 71]))
+  );
+  zip.file('OEBPS/style.css', 'p{}');
+  zip.file('OEBPS/cover.png', new Uint8Array([137, 80, 78, 71]));
 
   const entries = await Promise.all(
     Object.values(zip.files)
@@ -51,25 +51,25 @@ async function seedSampleEpub(sourceUrl: string) {
         relativePath: entry.name,
         blob: new Blob([await entry.async('uint8array')]),
       })),
-  )
-  await putFiles(sourceUrl, entries)
+  );
+  await putFiles(sourceUrl, entries);
   await putMeta({
     sourceUrl,
     type: 'epub',
     id: 'sample-epub',
     status: 'ready',
     downloadedAt: Date.now(),
-  })
+  });
 }
 
 describe('epubAdapter', () => {
-  const sourceUrl = 'https://example.com/sample.epub'
+  const sourceUrl = 'https://example.com/sample.epub';
 
   beforeEach(async () => {
-    resetBlobUrlCacheForTests()
-    await clearAllCacheRecords()
-    await seedSampleEpub(sourceUrl)
-  })
+    resetBlobUrlCacheForTests();
+    await clearAllCacheRecords();
+    await seedSampleEpub(sourceUrl);
+  });
 
   it('opens a cached EPUB into a typed EpubBookRecord', async () => {
     const book = await epubAdapter.open('sample-epub', {
@@ -77,22 +77,22 @@ describe('epubAdapter', () => {
       title: 'Fallback',
       path: sourceUrl,
       type: 'epub',
-    })
+    });
 
-    expect(book?.type).toBe('epub')
-    expect(book?.title).toBe('From OPF')
-    expect(book?.author).toBe('OPF Author')
-    expect(book?.pages).toHaveLength(1)
-    expect(book?.pages[0]?.href).toBe('OEBPS/c1.xhtml')
+    expect(book?.type).toBe('epub');
+    expect(book?.title).toBe('From OPF');
+    expect(book?.author).toBe('OPF Author');
+    expect(book?.pages).toHaveLength(1);
+    expect(book?.pages[0]?.href).toBe('OEBPS/c1.xhtml');
     if (book?.type === 'epub') {
-      expect(book.opfDir).toBe('OEBPS')
-      expect(book.stylesheetHrefs).toContain('OEBPS/style.css')
-      expect(book.coverHref).toBe('OEBPS/cover.png')
-      expect(book.coverUrl).toMatch(/^blob:/)
-      expect('pdfUrl' in book).toBe(false)
-      expect(epubAdapter.pageCount(book)).toBe(1)
+      expect(book.opfDir).toBe('OEBPS');
+      expect(book.stylesheetHrefs).toContain('OEBPS/style.css');
+      expect(book.coverHref).toBe('OEBPS/cover.png');
+      expect(book.coverUrl).toMatch(/^blob:/);
+      expect('pdfUrl' in book).toBe(false);
+      expect(epubAdapter.pageCount(book)).toBe(1);
     }
-  })
+  });
 
   it('returns epub page content via getPage', async () => {
     const book = await epubAdapter.open('sample-epub', {
@@ -100,21 +100,21 @@ describe('epubAdapter', () => {
       title: 'Fallback',
       path: sourceUrl,
       type: 'epub',
-    })
-    expect(book).not.toBeNull()
-    const page = await epubAdapter.getPage(book!, 0)
-    expect(page?.type).toBe('epub')
+    });
+    expect(book).not.toBeNull();
+    const page = await epubAdapter.getPage(book!, 0);
+    expect(page?.type).toBe('epub');
     if (page?.type === 'epub') {
-      expect(page.rewritten.html).toContain('Hi')
+      expect(page.rewritten.html).toContain('Hi');
     }
-  })
+  });
 
   it('snapshots cover path and page count from the cached package', async () => {
-    const snap = await epubAdapter.snapshot(sourceUrl)
+    const snap = await epubAdapter.snapshot(sourceUrl);
     expect(snap).toEqual({
       pageCount: 1,
       coverPath: 'OEBPS/cover.png',
-    })
-    expect(await getCachedBlobUrl(sourceUrl, snap!.coverPath!)).toMatch(/^blob:/)
-  })
-})
+    });
+    expect(await getCachedBlobUrl(sourceUrl, snap!.coverPath!)).toMatch(/^blob:/);
+  });
+});

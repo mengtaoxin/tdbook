@@ -1,11 +1,11 @@
-import Container from '@mui/material/Container'
-import Link from '@mui/material/Link'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
-import { PROJECT_URL } from '@/lib/projectLinks'
+import Container from '@mui/material/Container';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
+import { PROJECT_URL } from '@/lib/projectLinks';
 
 export function AboutPage() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
@@ -22,5 +22,5 @@ export function AboutPage() {
         {PROJECT_URL}
       </Link>
     </Container>
-  )
+  );
 }

@@ -1,44 +1,44 @@
-import { useEffect, useState } from 'react'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import Typography from '@mui/material/Typography'
-import { useTranslation } from 'react-i18next'
-import { TdLog, type TdLogRecord } from 'tdkit'
+import { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
+import { TdLog, type TdLogRecord } from 'tdkit';
 
 export function LogsPage() {
-  const { t } = useTranslation()
-  const [logs, setLogs] = useState<TdLogRecord[]>([])
-  const [clearing, setClearing] = useState(false)
-  const [confirmClearOpen, setConfirmClearOpen] = useState(false)
+  const { t } = useTranslation();
+  const [logs, setLogs] = useState<TdLogRecord[]>([]);
+  const [clearing, setClearing] = useState(false);
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
   async function refresh() {
-    const page = await TdLog.query({ page: 1, pageSize: 100 })
-    setLogs(page.records)
+    const page = await TdLog.query({ page: 1, pageSize: 100 });
+    setLogs(page.records);
   }
 
   async function confirmClearLogs() {
-    setConfirmClearOpen(false)
-    setClearing(true)
+    setConfirmClearOpen(false);
+    setClearing(true);
     try {
-      await TdLog.clean()
-      setLogs([])
+      await TdLog.clean();
+      setLogs([]);
     } finally {
-      setClearing(false)
+      setClearing(false);
     }
   }
 
   function formatTime(createdAt: number) {
-    return new Date(createdAt).toLocaleString()
+    return new Date(createdAt).toLocaleString();
   }
 
   useEffect(() => {
-    void refresh()
-  }, [])
+    void refresh();
+  }, []);
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }} data-testid="logs-page">
@@ -75,14 +75,8 @@ export function LogsPage() {
         <DialogTitle>{t('logs.clear')}</DialogTitle>
         <DialogContent>{t('logs.clearConfirm')}</DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmClearOpen(false)}>
-            {t('settings.cancel')}
-          </Button>
-          <Button
-            color="error"
-            variant="outlined"
-            onClick={() => void confirmClearLogs()}
-          >
+          <Button onClick={() => setConfirmClearOpen(false)}>{t('settings.cancel')}</Button>
+          <Button color="error" variant="outlined" onClick={() => void confirmClearLogs()}>
             {t('settings.confirm')}
           </Button>
         </DialogActions>
@@ -116,10 +110,7 @@ export function LogsPage() {
               >
                 {formatTime(entry.createdAt)}
               </Box>
-              <Box
-                component="span"
-                sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-              >
+              <Box component="span" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {entry.message}
               </Box>
             </Box>
@@ -127,5 +118,5 @@ export function LogsPage() {
         </Box>
       )}
     </Container>
-  )
+  );
 }

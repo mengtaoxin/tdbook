@@ -29,4 +29,4 @@ export const pwaManifest = {
       purpose: 'maskable' as const,
     },
   ],
-}
+};

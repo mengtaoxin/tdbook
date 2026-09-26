@@ -10,7 +10,7 @@ description: >-
 license: MIT
 metadata:
   author: mengtaoxin
-  version: "1.2.0"
+  version: '1.2.0'
 ---
 
 # Cursor local best practices

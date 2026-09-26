@@ -1,38 +1,38 @@
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined'
-import Alert from '@mui/material/Alert'
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import CircularProgress from '@mui/material/CircularProgress'
-import Container from '@mui/material/Container'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import { useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
-import type { BookListItem } from '@/lib/bookTypes'
-import { useBooksStore } from '@/stores/booksStore'
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { BookListItem } from '@/lib/bookTypes';
+import { useBooksStore } from '@/stores/booksStore';
 
-const COVER_ASPECT_RATIO = '5 / 7'
+const COVER_ASPECT_RATIO = '5 / 7';
 
 export function BooksPage() {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const books = useBooksStore((s) => s.books)
-  const duplicateIds = useBooksStore((s) => s.duplicateIds)
-  const loading = useBooksStore((s) => s.loading)
-  const error = useBooksStore((s) => s.error)
-  const load = useBooksStore((s) => s.load)
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const books = useBooksStore((s) => s.books);
+  const duplicateIds = useBooksStore((s) => s.duplicateIds);
+  const loading = useBooksStore((s) => s.loading);
+  const error = useBooksStore((s) => s.error);
+  const load = useBooksStore((s) => s.load);
 
   useEffect(() => {
-    void load()
-  }, [load])
+    void load();
+  }, [load]);
 
   function goToBook(book: BookListItem) {
     void navigate({
       to: '/book/$id',
       params: { id: book.id },
       search: { page: 1 },
-    })
+    });
   }
 
   return (
@@ -77,12 +77,7 @@ export function BooksPage() {
             ))}
 
             {books.length === 0 ? (
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                align="center"
-                sx={{ py: 8 }}
-              >
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ py: 8 }}>
                 {t('books.empty')}
               </Typography>
             ) : (
@@ -95,7 +90,7 @@ export function BooksPage() {
                       tabIndex={0}
                       onClick={() => goToBook(book)}
                       onKeyDown={(event) => {
-                        if (event.key === 'Enter') goToBook(book)
+                        if (event.key === 'Enter') goToBook(book);
                       }}
                       sx={{
                         width: '100%',
@@ -121,8 +116,7 @@ export function BooksPage() {
                           bgcolor: 'action.hover',
                           boxShadow: (theme) =>
                             `0 1px 2px ${theme.palette.common.black}0F, 0 4px 12px ${theme.palette.common.black}0F`,
-                          transition:
-                            'box-shadow 180ms cubic-bezier(0.2, 0, 0, 1)',
+                          transition: 'box-shadow 180ms cubic-bezier(0.2, 0, 0, 1)',
                           '.MuiBox-root:hover > &': {
                             boxShadow: (theme) =>
                               `0 2px 4px ${theme.palette.common.black}14, 0 8px 24px ${theme.palette.common.black}1A`,
@@ -153,9 +147,7 @@ export function BooksPage() {
                                 `linear-gradient(160deg, ${theme.palette.primary.main}14 0%, ${theme.palette.action.hover} 100%)`,
                             }}
                           >
-                            <MenuBookOutlinedIcon
-                              sx={{ fontSize: 36, color: 'text.disabled' }}
-                            />
+                            <MenuBookOutlinedIcon sx={{ fontSize: 36, color: 'text.disabled' }} />
                           </Box>
                         )}
                       </Box>
@@ -198,11 +190,7 @@ export function BooksPage() {
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                           <Chip
                             size="small"
-                            label={
-                              book.cached
-                                ? t('books.cached')
-                                : t('books.notDownloaded')
-                            }
+                            label={book.cached ? t('books.cached') : t('books.notDownloaded')}
                             color={book.cached ? 'primary' : 'default'}
                             variant="outlined"
                           />
@@ -223,5 +211,5 @@ export function BooksPage() {
         )}
       </Container>
     </Box>
-  )
+  );
 }

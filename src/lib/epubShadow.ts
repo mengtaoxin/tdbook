@@ -1,4 +1,4 @@
-import type { RewrittenPage } from './rewriteHtml'
+import type { RewrittenPage } from './rewriteHtml';
 
 /**
  * Defaults that override host/theme inheritance (Vuetify font, UI `lang`, etc.).
@@ -45,54 +45,50 @@ svg {
 a {
   color: #1565c0;
 }
-`
+`;
 
 export function attachEpubShadow(host: HTMLElement): ShadowRoot {
-  return host.shadowRoot ?? host.attachShadow({ mode: 'open' })
+  return host.shadowRoot ?? host.attachShadow({ mode: 'open' });
 }
 
 export function clearEpubShadow(shadow: ShadowRoot | null | undefined) {
-  if (shadow) shadow.innerHTML = ''
+  if (shadow) shadow.innerHTML = '';
 }
 
 /** Render EPUB HTML + CSS inside a shadow root so book styles stay isolated. */
-export function renderEpubShadow(
-  shadow: ShadowRoot,
-  page: RewrittenPage,
-  host?: HTMLElement,
-) {
-  shadow.innerHTML = ''
+export function renderEpubShadow(shadow: ShadowRoot, page: RewrittenPage, host?: HTMLElement) {
+  shadow.innerHTML = '';
 
-  const base = document.createElement('style')
-  base.textContent = BASE_CSS
-  shadow.appendChild(base)
+  const base = document.createElement('style');
+  base.textContent = BASE_CSS;
+  shadow.appendChild(base);
 
   for (const href of page.stylesheetUrls) {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = href
-    shadow.appendChild(link)
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    shadow.appendChild(link);
   }
 
   for (const css of page.inlineStyles) {
-    const style = document.createElement('style')
-    style.textContent = css
-    shadow.appendChild(style)
+    const style = document.createElement('style');
+    style.textContent = css;
+    shadow.appendChild(style);
   }
 
   // Book language (not UI locale) so font shaping / -webkit-locale stay stable.
-  if (host) host.lang = page.lang
+  if (host) host.lang = page.lang;
 
   // Fake <body> so EPUB rules targeting `body` still apply inside the shadow tree.
-  const body = document.createElement('body')
-  body.lang = page.lang
-  if (page.bodyClass) body.className = page.bodyClass
-  body.innerHTML = page.html
-  shadow.appendChild(body)
+  const body = document.createElement('body');
+  body.lang = page.lang;
+  if (page.bodyClass) body.className = page.bodyClass;
+  body.innerHTML = page.html;
+  shadow.appendChild(body);
 }
 
 export function scrollEpubHash(shadow: ShadowRoot, hash: string) {
-  const id = hash.startsWith('#') ? hash.slice(1) : hash
-  if (!id) return
-  shadow.getElementById(id)?.scrollIntoView()
+  const id = hash.startsWith('#') ? hash.slice(1) : hash;
+  if (!id) return;
+  shadow.getElementById(id)?.scrollIntoView();
 }

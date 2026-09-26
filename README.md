@@ -29,14 +29,14 @@ Open [http://localhost:3000](http://localhost:3000). Stop with Ctrl+C.
 
 Use `npm run` scripts from `package.json`. Do not add `scripts/*.sh` wrappers.
 
-| Command | Purpose |
-| ------- | ------- |
-| `npm run dev` | Vite dev server (port 3000) |
-| `npm run build` | Typecheck + production build |
-| `npm run preview` | Preview production build |
-| `npm run test` | Vitest unit tests |
-| `npm run test:coverage` | Unit tests + V8 coverage (`coverage/` HTML report) |
-| `npm run test:e2e` | Playwright (Chromium); uses `public/testdata` fixtures |
+| Command                 | Purpose                                                |
+| ----------------------- | ------------------------------------------------------ |
+| `npm run dev`           | Vite dev server (port 3000)                            |
+| `npm run build`         | Typecheck + production build                           |
+| `npm run preview`       | Preview production build                               |
+| `npm run test`          | Vitest unit tests                                      |
+| `npm run test:coverage` | Unit tests + V8 coverage (`coverage/` HTML report)     |
+| `npm run test:e2e`      | Playwright (Chromium); uses `public/testdata` fixtures |
 
 ## Adding a book
 
@@ -52,14 +52,14 @@ Append an entry to the `books` array in `configs.json`:
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `id` | Route identity for `/book/:id`; must not contain `/`, `\`, or `..`. On duplicates, the first entry is kept and the list shows an error |
-| `title` | Display title; may repeat |
-| `author` | Optional |
-| `type` | `epub` or `pdf` (optional; inferred from the file extension) |
-| `path` | Remote `http(s)://…`, or a same-origin absolute path `/…` (e.g. a file under `public/`) |
-| `hover` | Optional cover image URL with the same rules as `path`; when set, overrides covers extracted from the book |
+| Field    | Description                                                                                                                            |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`     | Route identity for `/book/:id`; must not contain `/`, `\`, or `..`. On duplicates, the first entry is kept and the list shows an error |
+| `title`  | Display title; may repeat                                                                                                              |
+| `author` | Optional                                                                                                                               |
+| `type`   | `epub` or `pdf` (optional; inferred from the file extension)                                                                           |
+| `path`   | Remote `http(s)://…`, or a same-origin absolute path `/…` (e.g. a file under `public/`)                                                |
+| `hover`  | Optional cover image URL with the same rules as `path`; when set, overrides covers extracted from the book                             |
 
 ## Layout (brief)
 

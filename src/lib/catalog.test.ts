@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clearPersistedBookConfigs,
   getBookConfigs,
   getPersistedBookConfigs,
   invalidateBookConfigsCache,
-} from '@/lib/catalog'
-import { setConfigsUrl } from '@/lib/settings'
+} from '@/lib/catalog';
+import { setConfigsUrl } from '@/lib/settings';
 
 const remoteCatalog = {
   books: [
@@ -16,20 +16,20 @@ const remoteCatalog = {
       path: 'https://example.com/remote.epub',
     },
   ],
-}
+};
 
 describe('getBookConfigs localStorage cache', () => {
   beforeEach(() => {
-    localStorage.clear()
-    invalidateBookConfigsCache()
-    setConfigsUrl('https://cdn.example.com/configs.json')
-  })
+    localStorage.clear();
+    invalidateBookConfigsCache();
+    setConfigsUrl('https://cdn.example.com/configs.json');
+  });
 
   afterEach(() => {
-    invalidateBookConfigsCache()
-    vi.unstubAllGlobals()
-    vi.restoreAllMocks()
-  })
+    invalidateBookConfigsCache();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
 
   it('persists a successful fetch and reuses it when the network fails', async () => {
     vi.stubGlobal(
@@ -41,25 +41,23 @@ describe('getBookConfigs localStorage cache', () => {
             headers: { 'Content-Type': 'application/json' },
           }),
       ),
-    )
+    );
 
-    const first = await getBookConfigs()
-    expect(first.books.map((b) => b.id)).toEqual(['remote-book'])
-    expect(getPersistedBookConfigs()?.url).toBe(
-      'https://cdn.example.com/configs.json',
-    )
+    const first = await getBookConfigs();
+    expect(first.books.map((b) => b.id)).toEqual(['remote-book']);
+    expect(getPersistedBookConfigs()?.url).toBe('https://cdn.example.com/configs.json');
 
-    invalidateBookConfigsCache()
+    invalidateBookConfigsCache();
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => {
-        throw new Error('offline')
+        throw new Error('offline');
       }),
-    )
+    );
 
-    const second = await getBookConfigs()
-    expect(second.books.map((b) => b.id)).toEqual(['remote-book'])
-  })
+    const second = await getBookConfigs();
+    expect(second.books.map((b) => b.id)).toEqual(['remote-book']);
+  });
 
   it('does not return a persisted catalog for a different URL', async () => {
     localStorage.setItem(
@@ -68,18 +66,18 @@ describe('getBookConfigs localStorage cache', () => {
         url: 'https://other.example/configs.json',
         books: remoteCatalog.books,
       }),
-    )
+    );
 
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => {
-        throw new Error('offline')
+        throw new Error('offline');
       }),
-    )
+    );
 
-    const result = await getBookConfigs()
-    expect(result.books).toEqual([])
-  })
+    const result = await getBookConfigs();
+    expect(result.books).toEqual([]);
+  });
 
   it('clearPersistedBookConfigs removes the durable cache', async () => {
     vi.stubGlobal(
@@ -91,22 +89,22 @@ describe('getBookConfigs localStorage cache', () => {
             headers: { 'Content-Type': 'application/json' },
           }),
       ),
-    )
+    );
 
-    await getBookConfigs()
-    expect(getPersistedBookConfigs()).not.toBeNull()
+    await getBookConfigs();
+    expect(getPersistedBookConfigs()).not.toBeNull();
 
-    clearPersistedBookConfigs()
-    invalidateBookConfigsCache()
-    expect(getPersistedBookConfigs()).toBeNull()
+    clearPersistedBookConfigs();
+    invalidateBookConfigsCache();
+    expect(getPersistedBookConfigs()).toBeNull();
 
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => {
-        throw new Error('offline')
+        throw new Error('offline');
       }),
-    )
-    const result = await getBookConfigs()
-    expect(result.books).toEqual([])
-  })
-})
+    );
+    const result = await getBookConfigs();
+    expect(result.books).toEqual([]);
+  });
+});

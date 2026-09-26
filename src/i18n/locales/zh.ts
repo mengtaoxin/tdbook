@@ -24,8 +24,7 @@ export default {
   home: {
     tagline:
       '个人电子书阅读器：在浏览器里浏览书目、打开电子书或 PDF，第一次阅读时会下载到本机，之后即使没有网络也能继续读。',
-    catalogHint:
-      '书目由配置文件提供，如需更换书单来源，可在设置中修改配置地址。',
+    catalogHint: '书目由配置文件提供，如需更换书单来源，可在设置中修改配置地址。',
     browseBooks: '浏览图书列表',
     features: {
       formats: {
@@ -75,8 +74,7 @@ export default {
   settings: {
     title: '设置',
     configsUrlLabel: '图书配置文件地址',
-    configsUrlHint:
-      '留空使用默认 /configs.json；也可填写 https://…/configs.json',
+    configsUrlHint: '留空使用默认 /configs.json；也可填写 https://…/configs.json',
     viewConfigGuide: '查看配置说明',
     save: '保存',
     restoreDefault: '恢复默认',
@@ -92,15 +90,12 @@ export default {
     clearCatalogCacheConfirmTitle: '清除目录缓存？',
     clearCatalogCacheConfirmBody:
       '将删除本机保存的 configs.json。下次加载书目时会重新下载（离线时可能显示空列表）。',
-    catalogCacheCleared:
-      '已清除目录缓存。下次加载书目时会重新下载 configs.json。',
+    catalogCacheCleared: '已清除目录缓存。下次加载书目时会重新下载 configs.json。',
     clearCatalogCacheFailed: '清除目录缓存失败。',
-    cacheDescription:
-      '清除本机已下载的全部图书文件。下次打开任意图书时需重新下载。',
+    cacheDescription: '清除本机已下载的全部图书文件。下次打开任意图书时需重新下载。',
     clearCache: '清除全部缓存',
     clearCacheConfirmTitle: '清除全部缓存？',
-    clearCacheConfirmBody:
-      '将删除本机所有图书的本地缓存，下次打开需重新下载。',
+    clearCacheConfirmBody: '将删除本机所有图书的本地缓存，下次打开需重新下载。',
     cancel: '取消',
     confirm: '确认',
     clear: '清除',
@@ -126,9 +121,8 @@ export default {
     localStorageWrite: '无法写入本地存储',
     invalidBookmark: '书签无效',
     downloadFailed: '下载失败（HTTP {status}）。',
-    epubExtractFailed:
-      '无法解压 EPUB（文件可能已损坏或不是有效的 zip）。',
+    epubExtractFailed: '无法解压 EPUB（文件可能已损坏或不是有效的 zip）。',
     cacheBookFailed: '下载或缓存图书失败。',
     canvasCreateFailed: '无法创建画布。',
   },
-}
+};

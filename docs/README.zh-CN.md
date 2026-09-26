@@ -29,14 +29,14 @@ npm run dev      # 开发：http://localhost:3000
 
 日常命令用 `package.json` 里的 `npm run`，不要新增 `scripts/*.sh` 包装脚本。
 
-| 命令 | 用途 |
-| ---- | ---- |
-| `npm run dev` | Vite 开发服务器（端口 3000） |
-| `npm run build` | 类型检查 + 生产构建 |
-| `npm run preview` | 预览生产构建 |
-| `npm run test` | Vitest 单元测试 |
-| `npm run test:coverage` | 单元测试 + V8 覆盖率（`coverage/` HTML 报告） |
-| `npm run test:e2e` | Playwright（Chromium）；使用 `public/testdata` 夹具 |
+| 命令                    | 用途                                                |
+| ----------------------- | --------------------------------------------------- |
+| `npm run dev`           | Vite 开发服务器（端口 3000）                        |
+| `npm run build`         | 类型检查 + 生产构建                                 |
+| `npm run preview`       | 预览生产构建                                        |
+| `npm run test`          | Vitest 单元测试                                     |
+| `npm run test:coverage` | 单元测试 + V8 覆盖率（`coverage/` HTML 报告）       |
+| `npm run test:e2e`      | Playwright（Chromium）；使用 `public/testdata` 夹具 |
 
 ## 添加书籍
 
@@ -52,14 +52,14 @@ npm run dev      # 开发：http://localhost:3000
 }
 ```
 
-| 字段 | 说明 |
-|------|------|
-| `id` | 路由标识，对应 `/book/:id`；不可含 `/`、`\`、`..`。若重复，保留首次出现的条目，列表会提示错误 |
-| `title` | 展示标题，可重复 |
-| `author` | 可选 |
-| `type` | `epub` 或 `pdf`（可省略，由扩展名推断） |
-| `path` | 远程 `http(s)://…`，或同源静态路径 `/…`（如 `public/` 下的文件） |
-| `hover` | 可选封面图，规则同 `path`；有则优先于从书内提取的封面 |
+| 字段     | 说明                                                                                          |
+| -------- | --------------------------------------------------------------------------------------------- |
+| `id`     | 路由标识，对应 `/book/:id`；不可含 `/`、`\`、`..`。若重复，保留首次出现的条目，列表会提示错误 |
+| `title`  | 展示标题，可重复                                                                              |
+| `author` | 可选                                                                                          |
+| `type`   | `epub` 或 `pdf`（可省略，由扩展名推断）                                                       |
+| `path`   | 远程 `http(s)://…`，或同源静态路径 `/…`（如 `public/` 下的文件）                              |
+| `hover`  | 可选封面图，规则同 `path`；有则优先于从书内提取的封面                                         |
 
 ## 目录结构（简要）
 

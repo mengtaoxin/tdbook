@@ -1,19 +1,19 @@
-import type { SvgIconComponent } from '@mui/icons-material'
-import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
-import CloudOffOutlinedIcon from '@mui/icons-material/CloudOffOutlined'
-import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import { Link } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
+import type { SvgIconComponent } from '@mui/icons-material';
+import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
+import CloudOffOutlinedIcon from '@mui/icons-material/CloudOffOutlined';
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import { Link } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 
 const FEATURES: {
-  icon: SvgIconComponent
-  titleKey: string
-  descriptionKey: string
+  icon: SvgIconComponent;
+  titleKey: string;
+  descriptionKey: string;
 }[] = [
   {
     icon: AutoStoriesOutlinedIcon,
@@ -30,10 +30,10 @@ const FEATURES: {
     titleKey: 'home.features.offline.title',
     descriptionKey: 'home.features.offline.description',
   },
-]
+];
 
 export function HomePage() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
@@ -51,7 +51,7 @@ export function HomePage() {
 
       <Grid container spacing={3} sx={{ mb: 8 }}>
         {FEATURES.map((feature) => {
-          const Icon = feature.icon
+          const Icon = feature.icon;
           return (
             <Grid key={feature.titleKey} size={{ xs: 12, sm: 4 }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -62,7 +62,7 @@ export function HomePage() {
                 </Typography>
               </Box>
             </Grid>
-          )
+          );
         })}
       </Grid>
 
@@ -70,5 +70,5 @@ export function HomePage() {
         {t('home.browseBooks')}
       </Button>
     </Container>
-  )
+  );
 }

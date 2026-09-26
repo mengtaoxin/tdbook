@@ -1,55 +1,53 @@
-import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined'
-import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded'
-import MenuIcon from '@mui/icons-material/Menu'
-import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined'
-import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import TranslateIcon from '@mui/icons-material/Translate'
-import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined'
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined'
-import Alert from '@mui/material/Alert'
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
-import Collapse from '@mui/material/Collapse'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import Divider from '@mui/material/Divider'
-import Drawer from '@mui/material/Drawer'
-import IconButton from '@mui/material/IconButton'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Snackbar from '@mui/material/Snackbar'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { translateError } from '@/i18n'
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
+import MenuIcon from '@mui/icons-material/Menu';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import TranslateIcon from '@mui/icons-material/Translate';
+import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import Alert from '@mui/material/Alert';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
+import Collapse from '@mui/material/Collapse';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Snackbar from '@mui/material/Snackbar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { translateError } from '@/i18n';
 import {
   DRAWER_BOOKMARKS_DEFAULT_OPEN,
   getDefaultBookmark,
   readerBookIdFromPath,
   saveDefaultBookmark,
-} from '@/lib/bookmarks'
-import type { AppLocale } from '@/lib/locale'
-import { SUPPORTED_LOCALES } from '@/lib/locale'
-import { shouldCollapseNav } from '@/lib/navLayout'
-import { GITHUB_ISSUES_URL } from '@/lib/projectLinks'
-import { useLocaleStore } from '@/stores/localeStore'
+} from '@/lib/bookmarks';
+import type { AppLocale } from '@/lib/locale';
+import { SUPPORTED_LOCALES } from '@/lib/locale';
+import { shouldCollapseNav } from '@/lib/navLayout';
+import { GITHUB_ISSUES_URL } from '@/lib/projectLinks';
+import { useLocaleStore } from '@/stores/localeStore';
 
-const NAV_ITEMS = [
-  { labelKey: 'nav.books', to: '/books' as const, Icon: AutoStoriesOutlinedIcon },
-]
+const NAV_ITEMS = [{ labelKey: 'nav.books', to: '/books' as const, Icon: AutoStoriesOutlinedIcon }];
 
 const MORE_NAV_ITEMS = [
   { labelKey: 'nav.logs', to: '/logs' as const, Icon: NotesOutlinedIcon },
@@ -60,128 +58,124 @@ const MORE_NAV_ITEMS = [
     Icon: DescriptionOutlinedIcon,
   },
   { labelKey: 'nav.about', to: '/about' as const, Icon: InfoOutlinedIcon },
-]
+];
 
 export function AppShell() {
-  const { t } = useTranslation()
-  const locale = useLocaleStore((s) => s.locale)
-  const setLocale = useLocaleStore((s) => s.setLocale)
-  const navigate = useNavigate()
-  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const { t } = useTranslation();
+  const locale = useLocaleStore((s) => s.locale);
+  const setLocale = useLocaleStore((s) => s.setLocale);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const page = useRouterState({
     select: (s) => {
-      const search = s.location.search as { page?: number }
-      return search.page ?? 1
+      const search = s.location.search as { page?: number };
+      return search.page ?? 1;
     },
-  })
-  const hash = useRouterState({ select: (s) => s.location.hash })
-  const bookId = readerBookIdFromPath(pathname)
-  const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null)
-  const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null)
-  const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null)
-  const [bookmarkRevision, setBookmarkRevision] = useState(0)
-  const [bookmarkNotice, setBookmarkNotice] = useState('')
-  const [bookmarkNoticeType, setBookmarkNoticeType] = useState<'success' | 'error'>(
-    'success',
-  )
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [compactNav, setCompactNav] = useState(true)
-  const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false)
-  const [drawerMoreOpen, setDrawerMoreOpen] = useState(false)
-  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(
-    DRAWER_BOOKMARKS_DEFAULT_OPEN,
-  )
-  const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false)
+  });
+  const hash = useRouterState({ select: (s) => s.location.hash });
+  const bookId = readerBookIdFromPath(pathname);
+  const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null);
+  const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null);
+  const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null);
+  const [bookmarkRevision, setBookmarkRevision] = useState(0);
+  const [bookmarkNotice, setBookmarkNotice] = useState('');
+  const [bookmarkNoticeType, setBookmarkNoticeType] = useState<'success' | 'error'>('success');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [compactNav, setCompactNav] = useState(true);
+  const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false);
+  const [drawerMoreOpen, setDrawerMoreOpen] = useState(false);
+  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(DRAWER_BOOKMARKS_DEFAULT_OPEN);
+  const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false);
   const defaultBookmark = useMemo(() => {
-    if (!bookId) return null
-    return getDefaultBookmark(bookId)
-  }, [bookId, bookmarkRevision])
-  const toolbarRef = useRef<HTMLDivElement | null>(null)
-  const brandRef = useRef<HTMLAnchorElement | null>(null)
-  const desktopNavRef = useRef<HTMLElement | null>(null)
+    if (!bookId) return null;
+    return getDefaultBookmark(bookId);
+  }, [bookId, bookmarkRevision]);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+  const brandRef = useRef<HTMLAnchorElement | null>(null);
+  const desktopNavRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
-    setDrawerOpen(false)
-  }, [pathname])
+    setDrawerOpen(false);
+  }, [pathname]);
 
   useLayoutEffect(() => {
-    const toolbar = toolbarRef.current
-    const brand = brandRef.current
-    const nav = desktopNavRef.current
-    if (!toolbar || !brand || !nav) return
+    const toolbar = toolbarRef.current;
+    const brand = brandRef.current;
+    const nav = desktopNavRef.current;
+    if (!toolbar || !brand || !nav) return;
 
     function updateCompactNav() {
-      if (!toolbar || !brand || !nav) return
-      const availableWidth = toolbar.clientWidth - brand.offsetWidth
-      setCompactNav(shouldCollapseNav(nav.scrollWidth, availableWidth))
+      if (!toolbar || !brand || !nav) return;
+      const availableWidth = toolbar.clientWidth - brand.offsetWidth;
+      setCompactNav(shouldCollapseNav(nav.scrollWidth, availableWidth));
     }
 
-    updateCompactNav()
-    if (typeof ResizeObserver === 'undefined') return
+    updateCompactNav();
+    if (typeof ResizeObserver === 'undefined') return;
 
     const observer = new ResizeObserver(() => {
-      updateCompactNav()
-    })
-    observer.observe(toolbar)
-    observer.observe(nav)
-    return () => observer.disconnect()
-  }, [locale, t, bookId])
+      updateCompactNav();
+    });
+    observer.observe(toolbar);
+    observer.observe(nav);
+    return () => observer.disconnect();
+  }, [locale, t, bookId]);
 
   function chooseLocale(code: AppLocale) {
-    setLocale(code)
-    setLocaleAnchor(null)
-    setDrawerOpen(false)
+    setLocale(code);
+    setLocaleAnchor(null);
+    setDrawerOpen(false);
   }
 
   function openFeedbackConfirm() {
-    setMoreAnchor(null)
-    setDrawerOpen(false)
-    setFeedbackConfirmOpen(true)
+    setMoreAnchor(null);
+    setDrawerOpen(false);
+    setFeedbackConfirmOpen(true);
   }
 
   function closeFeedbackConfirm() {
-    setFeedbackConfirmOpen(false)
+    setFeedbackConfirmOpen(false);
   }
 
   function confirmFeedback() {
-    setFeedbackConfirmOpen(false)
-    window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer')
+    setFeedbackConfirmOpen(false);
+    window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer');
   }
 
   function jumpToDefaultBookmark() {
-    if (!bookId || !defaultBookmark) return
+    if (!bookId || !defaultBookmark) return;
     void navigate({
       to: '/book/$id',
       params: { id: bookId },
       search: { page: defaultBookmark.page },
       hash: defaultBookmark.location,
-    })
-    setBookmarkAnchor(null)
-    setDrawerOpen(false)
+    });
+    setBookmarkAnchor(null);
+    setDrawerOpen(false);
   }
 
   function saveCurrentAsDefaultBookmark() {
-    if (!bookId) return
+    if (!bookId) return;
     try {
       saveDefaultBookmark({
         bookId,
         page,
         location: hash,
         name: t('bookmarks.defaultName'),
-      })
-      setBookmarkRevision((value) => value + 1)
-      setBookmarkNoticeType('success')
-      setBookmarkNotice(t('bookmarks.saved'))
+      });
+      setBookmarkRevision((value) => value + 1);
+      setBookmarkNoticeType('success');
+      setBookmarkNotice(t('bookmarks.saved'));
     } catch (err) {
-      setBookmarkNoticeType('error')
-      setBookmarkNotice(translateError(err, 'bookmarks.saveFailed'))
+      setBookmarkNoticeType('error');
+      setBookmarkNotice(translateError(err, 'bookmarks.saveFailed'));
     }
-    setBookmarkAnchor(null)
-    setDrawerOpen(false)
+    setBookmarkAnchor(null);
+    setDrawerOpen(false);
   }
 
   const desktopNav = (
@@ -253,7 +247,7 @@ export function AppShell() {
         {t('nav.more')}
       </Button>
     </Box>
-  )
+  );
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -311,9 +305,7 @@ export function AppShell() {
                 </Collapse>
               </>
             ) : null}
-            <ListItemButton
-              onClick={() => setDrawerLocaleOpen((open) => !open)}
-            >
+            <ListItemButton onClick={() => setDrawerLocaleOpen((open) => !open)}>
               <ListItemIcon>
                 <TranslateIcon />
               </ListItemIcon>
@@ -381,10 +373,7 @@ export function AppShell() {
       </Drawer>
 
       <AppBar position="sticky" elevation={1}>
-        <Toolbar
-          ref={toolbarRef}
-          sx={{ gap: 1, position: 'relative', overflow: 'hidden' }}
-        >
+        <Toolbar ref={toolbarRef} sx={{ gap: 1, position: 'relative', overflow: 'hidden' }}>
           <Typography
             component={Link}
             ref={brandRef}
@@ -479,10 +468,7 @@ export function AppShell() {
         >
           {t('bookmarks.jumpDefault')}
         </MenuItem>
-        <MenuItem
-          data-testid="bookmark-save-default"
-          onClick={saveCurrentAsDefaultBookmark}
-        >
+        <MenuItem data-testid="bookmark-save-default" onClick={saveCurrentAsDefaultBookmark}>
           {t('bookmarks.saveDefault')}
         </MenuItem>
       </Menu>
@@ -493,11 +479,7 @@ export function AppShell() {
         onClose={() => setBookmarkNotice('')}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert
-          severity={bookmarkNoticeType}
-          variant="filled"
-          onClose={() => setBookmarkNotice('')}
-        >
+        <Alert severity={bookmarkNoticeType} variant="filled" onClose={() => setBookmarkNotice('')}>
           {bookmarkNotice}
         </Alert>
       </Snackbar>
@@ -547,5 +529,5 @@ export function AppShell() {
         <Outlet />
       </Box>
     </Box>
-  )
+  );
 }
