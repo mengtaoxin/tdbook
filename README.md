@@ -34,7 +34,7 @@ All commands: [docs/commands.md](./docs/commands.md). Testing: [docs/testing.md]
 
 ## Adding a book
 
-Append an entry to the `books` array in `public/configs.json`:
+Append an entry to the `books` array in `public/sample/configs.json` (the default catalog), or point Settings at your own `configs.json`:
 
 ```json
 {
@@ -58,7 +58,7 @@ Append an entry to the `books` array in `public/configs.json`:
 ## Layout (brief)
 
 ```
-public/configs.json  Book catalog
+public/sample/   Default catalog (configs.json) + sample books
 src/views/       List and reader pages
 src/lib/         Catalog load, IndexedDB cache, EPUB/PDF parsing
 ```

@@ -2,7 +2,7 @@
 
 This page explains how to write a `configs.json` catalog file for tdbook.
 
-tdbook loads its catalog from a JSON config file (default `/configs.json`). Host the file somewhere reachable, then set that URL in Settings to use your own book list.
+tdbook loads its catalog from a JSON config file (default `/sample/configs.json`, the bundled sample books). Host the file somewhere reachable, then set that URL in Settings to use your own book list.
 
 ## Steps
 
@@ -31,15 +31,15 @@ The root object contains a `books` array; each item describes one book.
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/testdata/alices-adventures-in-wonderland.epub",
-      "hover": "/testdata/sample.jpg"
+      "path": "/sample/alices-adventures-in-wonderland.epub",
+      "hover": "/sample/sample.jpg"
     },
     {
       "id": "sample-pdf",
       "title": "Sample PDF",
       "type": "pdf",
       "path": "https://example.com/books/sample.pdf",
-      "hover": "/testdata/example-hover.webp"
+      "hover": "/sample/example-hover.webp"
     }
   ]
 }

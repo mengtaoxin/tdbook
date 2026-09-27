@@ -121,7 +121,7 @@ export function SettingsPage() {
           fullWidth
           label={t('settings.configsUrlLabel')}
           placeholder={DEFAULT_CONFIGS_URL}
-          helperText={t('settings.configsUrlHint')}
+          helperText={t('settings.configsUrlHint', { url: DEFAULT_CONFIGS_URL })}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           autoComplete="off"

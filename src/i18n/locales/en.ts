@@ -76,7 +76,7 @@ export default {
   settings: {
     title: 'Settings',
     configsUrlLabel: 'Book config URL',
-    configsUrlHint: 'Leave empty to use the default /configs.json; or enter https://…/configs.json',
+    configsUrlHint: 'Leave empty to use the default {url}; or enter https://…/configs.json',
     viewConfigGuide: 'View config guide',
     save: 'Save',
     restoreDefault: 'Restore default',

@@ -74,7 +74,7 @@ export default {
   settings: {
     title: '设置',
     configsUrlLabel: '图书配置文件地址',
-    configsUrlHint: '留空使用默认 /configs.json；也可填写 https://…/configs.json',
+    configsUrlHint: '留空使用默认 {url}；也可填写 https://…/configs.json',
     viewConfigGuide: '查看配置说明',
     save: '保存',
     restoreDefault: '恢复默认',

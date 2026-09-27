@@ -24,7 +24,7 @@ describe('paths', () => {
 
   it('accepts catalog resource paths (remote or site-absolute)', () => {
     expect(isCatalogResourcePath('https://example.com/a.epub')).toBe(true);
-    expect(isCatalogResourcePath('/testdata/sample.epub')).toBe(true);
+    expect(isCatalogResourcePath('/sample/sample.epub')).toBe(true);
     expect(isCatalogResourcePath('relative.epub')).toBe(false);
   });
 

@@ -13,17 +13,20 @@ describe('settings', () => {
 
   it('validates configs URL shapes', () => {
     expect(isValidConfigsUrl('')).toBe(true);
-    expect(isValidConfigsUrl('/testdata/configs.json')).toBe(true);
+    expect(isValidConfigsUrl('/my/configs.json')).toBe(true);
     expect(isValidConfigsUrl('https://example.com/c.json')).toBe(true);
     expect(isValidConfigsUrl('ftp://x')).toBe(false);
   });
 
+  it('defaults to the bundled sample catalog', () => {
+    expect(getConfigsUrl()).toBe('/sample/configs.json');
+  });
+
   it('stores and clears the configs URL override', () => {
-    expect(getConfigsUrl()).toBe('/configs.json');
-    setConfigsUrl('/testdata/configs.json');
-    expect(getStoredConfigsUrl()).toBe('/testdata/configs.json');
-    expect(getConfigsUrl()).toBe('/testdata/configs.json');
+    setConfigsUrl('https://example.com/configs.json');
+    expect(getStoredConfigsUrl()).toBe('https://example.com/configs.json');
+    expect(getConfigsUrl()).toBe('https://example.com/configs.json');
     setConfigsUrl('');
-    expect(getConfigsUrl()).toBe('/configs.json');
+    expect(getConfigsUrl()).toBe('/sample/configs.json');
   });
 });

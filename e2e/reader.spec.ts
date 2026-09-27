@@ -1,12 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-async function useTestCatalog(page: import('@playwright/test').Page) {
-  await page.goto('/settings');
-  await page.getByRole('textbox', { name: 'Book config URL' }).fill('/testdata/configs.json');
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Book config URL saved')).toBeVisible();
-}
-
 test.describe('books reader', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -14,12 +7,12 @@ test.describe('books reader', () => {
       localStorage.clear();
       return indexedDB.deleteDatabase('tdbook-cache');
     });
-    await useTestCatalog(page);
   });
 
-  test('lists fixture books and opens an EPUB', async ({ page }) => {
+  test('lists sample books and opens an EPUB', async ({ page }) => {
     await page.goto('/books');
     await expect(page.getByRole('heading', { name: 'Books' })).toBeVisible();
+    await expect(page.getByText("Alice's Adventures in Wonderland")).toBeVisible();
     await expect(page.getByText('Sample EPUB')).toBeVisible();
     await expect(page.getByText('Sample PDF')).toBeVisible();
 
@@ -84,7 +77,7 @@ test.describe('books reader', () => {
     await expect(page.getByText('Page 2 / 2')).toBeVisible();
   });
 
-  test('opens a PDF fixture', async ({ page }) => {
+  test('opens a sample PDF', async ({ page }) => {
     await page.goto('/books');
     await page.getByText('Sample PDF').click();
     await expect(page).toHaveURL(/\/book\/sample-pdf/);

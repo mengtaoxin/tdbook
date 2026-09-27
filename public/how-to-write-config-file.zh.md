@@ -2,7 +2,7 @@
 
 本页说明如何为 tdbook 编写 `configs.json` 书目配置文件。
 
-tdbook 的书目来自一份 JSON 配置文件（默认 `/configs.json`）。把文件放到可访问的地址后，在「设置」里填写该地址即可使用自己的书单。
+tdbook 的书目来自一份 JSON 配置文件（默认 `/sample/configs.json`，即内置的示例书目）。把文件放到可访问的地址后，在「设置」里填写该地址即可使用自己的书单。
 
 ## 使用步骤
 
@@ -31,15 +31,15 @@ tdbook 的书目来自一份 JSON 配置文件（默认 `/configs.json`）。把
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/testdata/alices-adventures-in-wonderland.epub",
-      "hover": "/testdata/sample.jpg"
+      "path": "/sample/alices-adventures-in-wonderland.epub",
+      "hover": "/sample/sample.jpg"
     },
     {
       "id": "sample-pdf",
       "title": "Sample PDF",
       "type": "pdf",
       "path": "https://example.com/books/sample.pdf",
-      "hover": "/testdata/example-hover.webp"
+      "hover": "/sample/example-hover.webp"
     }
   ]
 }

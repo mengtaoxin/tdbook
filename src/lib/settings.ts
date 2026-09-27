@@ -1,4 +1,4 @@
-export const DEFAULT_CONFIGS_URL = '/configs.json';
+export const DEFAULT_CONFIGS_URL = '/sample/configs.json';
 
 const CONFIGS_URL_KEY = 'books.configsUrl';
 
@@ -9,7 +9,7 @@ export function isValidConfigsUrl(value: string): boolean {
   return /^https?:\/\//i.test(trimmed);
 }
 
-/** Effective catalog URL: stored override, or default `/configs.json`. */
+/** Effective catalog URL: stored override, or `DEFAULT_CONFIGS_URL`. */
 export function getConfigsUrl(): string {
   try {
     const stored = localStorage.getItem(CONFIGS_URL_KEY)?.trim() ?? '';

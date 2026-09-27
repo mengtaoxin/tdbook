@@ -38,10 +38,9 @@ npm run test:e2e -- --ui                   # Playwright UI mode
 
 - Config: `playwright.config.ts`. Playwright starts `npm run dev` on `127.0.0.1:3000`. Locally it reuses a server already on port 3000; in CI (`CI` set) it always starts its own, retries once, and records a trace on the retry.
 - Specs run serially (`workers: 1`) because they share one origin's `localStorage` and IndexedDB.
-- Fixtures live in `public/testdata/` and are served at `/testdata/…`. `public/testdata/configs.json` is the e2e-only catalog (`sample.epub`, `sample.pdf`, …), separate from the default `public/configs.json`.
-- Reader specs reset state in `beforeEach` (clear `localStorage`, delete the `tdbook-cache` IndexedDB) and then point Settings at `/testdata/configs.json`. Do the same in new specs that touch books or cache.
+- E2E uses the default catalog, `public/sample/configs.json` (served at `/sample/configs.json`); there is no separate test catalog. Reader specs rely on `Sample EPUB` (2 pages, `#bookmark-target` on page 1) and `Sample PDF` (1 page), so keep those entries and files intact. Add new sample books to the same catalog.
+- Reader specs reset state in `beforeEach` (clear `localStorage`, delete the `tdbook-cache` IndexedDB). Do the same in new specs that touch books or cache.
 - Prefer `getByRole` / `getByText`, and `getByTestId` for elements without an accessible name.
-- Fixture filenames are matched by `.gitignore`; stage new fixtures with `git add -f public/testdata/<file>`.
 - Failure output lands in `test-results/` (gitignored).
 
 ## Choosing a layer

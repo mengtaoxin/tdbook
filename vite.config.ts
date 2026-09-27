@@ -102,7 +102,7 @@ export default defineConfig({
       ],
       manifest: pwaManifest,
       workbox: {
-        // Include mjs (pdf.js worker) and json (public/configs.json)
+        // Include mjs (pdf.js worker) and json (public/sample/configs.json)
         // so a production install can boot offline and reopen cached books.
         globPatterns: ['**/*.{js,mjs,css,html,ico,svg,png,woff2,webmanifest,json}'],
         navigateFallback: '/index.html',

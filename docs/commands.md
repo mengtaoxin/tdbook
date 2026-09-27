@@ -18,7 +18,7 @@ npx playwright install chromium                          # only if you run e2e t
 npm run dev       # Vite dev server on http://localhost:3000 (Ctrl+C to stop)
 ```
 
-The dev server serves `public/` (including `/configs.json` and `/testdata/**`) and `/pdfjs/**` from `pdfjs-dist`. The service worker is disabled in dev, so test PWA behavior with `build` + `preview`. If port 3000 is taken (`EADDRINUSE`), stop the other process first; Playwright also expects port 3000.
+The dev server serves `public/` (including the default catalog `/sample/configs.json`) and `/pdfjs/**` from `pdfjs-dist`. The service worker is disabled in dev, so test PWA behavior with `build` + `preview`. If port 3000 is taken (`EADDRINUSE`), stop the other process first; Playwright also expects port 3000.
 
 ## Build and preview
 

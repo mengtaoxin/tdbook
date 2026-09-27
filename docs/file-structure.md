@@ -6,7 +6,7 @@ docs/conventions.md        coding conventions
 docs/commands.md           npm scripts and setup
 docs/testing.md            unit (Vitest) + e2e (Playwright) testing
 docs/tech-stacks.md        libraries, build/PWA, tooling, deploy
-public/configs.json   default book catalog served at /configs.json (id, title, author?, type, path, hover?) — source of truth
+public/sample/        bundled sample books: configs.json (default catalog at /sample/configs.json, also used by e2e), Alice EPUB, sample.epub / sample.pdf, covers
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
 public/icons/         PWA icons (192 / 512 / maskable)
 vite.config.ts        React + pdfjsAssetsPlugin (/pdfjs/**) + VitePWA
@@ -48,5 +48,4 @@ src/
   test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)
   **/*.test.ts        unit tests colocated next to the module under test
 e2e/                  Playwright
-public/testdata/      demo + e2e fixtures (Alice EPUB, covers, sample.epub / sample.pdf; configs.json here is the e2e-only catalog, separate from public/configs.json)
 ```

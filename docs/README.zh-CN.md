@@ -34,7 +34,7 @@ npm run dev      # 开发：http://localhost:3000
 
 ## 添加书籍
 
-在 `public/configs.json` 的 `books` 数组中追加条目：
+在 `public/sample/configs.json`（默认书目）的 `books` 数组中追加条目，或在设置里改用你自己的 `configs.json`：
 
 ```json
 {
@@ -58,7 +58,7 @@ npm run dev      # 开发：http://localhost:3000
 ## 目录结构（简要）
 
 ```
-public/configs.json  书目配置
+public/sample/   默认书目（configs.json）+ 示例书籍
 src/views/       列表页、阅读页
 src/lib/         书目加载、IndexedDB 缓存、EPUB/PDF 解析
 ```
