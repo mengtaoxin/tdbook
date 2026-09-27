@@ -19,6 +19,8 @@ A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, d
 - PDF: `pdfjs-dist`
 - Book cache: `dexie` (IndexedDB)
 
+Details: [docs/tech-stacks.md](./docs/tech-stacks.md).
+
 ## Quick start
 
 ```sh

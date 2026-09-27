@@ -5,6 +5,7 @@ docs/file-structure.md     this file
 docs/conventions.md        coding conventions
 docs/commands.md           npm scripts and setup
 docs/testing.md            unit (Vitest) + e2e (Playwright) testing
+docs/tech-stacks.md        libraries, build/PWA, tooling, deploy
 public/configs.json   default book catalog served at /configs.json (id, title, author?, type, path, hover?) — source of truth
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
 public/icons/         PWA icons (192 / 512 / maskable)

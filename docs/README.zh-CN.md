@@ -19,6 +19,8 @@
 - PDF：`pdfjs-dist`
 - 书籍缓存：`dexie`（IndexedDB）
 
+详见 [tech-stacks.md](./tech-stacks.md)。
+
 ## 快速开始
 
 ```sh
