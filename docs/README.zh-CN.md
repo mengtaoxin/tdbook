@@ -28,16 +28,7 @@ npm run dev      # 开发：http://localhost:3000
 
 打开 [http://localhost:3000](http://localhost:3000)。停止：Ctrl+C。
 
-日常命令用 `package.json` 里的 `npm run`，不要新增 `scripts/*.sh` 包装脚本。
-
-| 命令                    | 用途                                                |
-| ----------------------- | --------------------------------------------------- |
-| `npm run dev`           | Vite 开发服务器（端口 3000）                        |
-| `npm run build`         | 类型检查 + 生产构建                                 |
-| `npm run preview`       | 预览生产构建                                        |
-| `npm run test`          | Vitest 单元测试                                     |
-| `npm run test:coverage` | 单元测试 + V8 覆盖率（`coverage/` HTML 报告）       |
-| `npm run test:e2e`      | Playwright（Chromium）；使用 `public/testdata` 夹具 |
+全部命令见 [commands.md](./commands.md)，测试说明见 [testing.md](./testing.md)。
 
 ## 添加书籍
 

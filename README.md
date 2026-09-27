@@ -28,16 +28,7 @@ npm run dev      # Dev server: http://localhost:3000
 
 Open [http://localhost:3000](http://localhost:3000). Stop with Ctrl+C.
 
-Use `npm run` scripts from `package.json`. Do not add `scripts/*.sh` wrappers.
-
-| Command                 | Purpose                                                |
-| ----------------------- | ------------------------------------------------------ |
-| `npm run dev`           | Vite dev server (port 3000)                            |
-| `npm run build`         | Typecheck + production build                           |
-| `npm run preview`       | Preview production build                               |
-| `npm run test`          | Vitest unit tests                                      |
-| `npm run test:coverage` | Unit tests + V8 coverage (`coverage/` HTML report)     |
-| `npm run test:e2e`      | Playwright (Chromium); uses `public/testdata` fixtures |
+All commands: [docs/commands.md](./docs/commands.md). Testing: [docs/testing.md](./docs/testing.md).
 
 ## Adding a book
 

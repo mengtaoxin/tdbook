@@ -16,17 +16,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 
 Run from the repo root (this app is not under `web/`). Use `package.json` scripts for day-to-day work. Do not add `scripts/*.sh` wrappers.
 
-```sh
-npm install
-npm run dev       # Vite on port 3000; serves public/ (incl. /configs.json) and /pdfjs/** via vite.config.ts plugin
-npm run build     # tsc -b && vite build (copies public/ + pdfjs assets into dist/)
-npm run preview   # preview production build
-npm run test      # Vitest unit tests (happy-dom + fake-indexeddb)
-npm run test:coverage  # unit tests + V8 coverage (text + coverage/html)
-npm run test:e2e  # Playwright (Chromium); uses committed public/testdata fixtures
-```
-
-Stop the dev server with Ctrl+C.
+See [docs/commands.md](docs/commands.md) for all commands and [docs/testing.md](docs/testing.md) for how to run and write tests.
 
 ## Layout
 
