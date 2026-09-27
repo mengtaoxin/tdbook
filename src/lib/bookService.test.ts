@@ -130,4 +130,71 @@ describe('listBooks / getBook cache snapshot', () => {
   it('returns null from getBook for an unknown id', async () => {
     expect(await getBook('missing-id')).toBeNull();
   });
+
+  it('lists and opens a cached book when the network is unavailable', async () => {
+    const sourceUrl = 'https://example.com/sample.epub';
+    await putFiles(sourceUrl, [
+      {
+        relativePath: 'META-INF/container.xml',
+        blob: new Blob([
+          `<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>`,
+        ]),
+      },
+      {
+        relativePath: 'content.opf',
+        blob: new Blob([
+          `<?xml version="1.0"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>Sample EPUB</dc:title>
+  </metadata>
+  <manifest>
+    <item id="c1" href="c1.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine><itemref idref="c1"/></spine>
+</package>`,
+        ]),
+      },
+      {
+        relativePath: 'c1.xhtml',
+        blob: new Blob(['<html><body>Cached page</body></html>']),
+      },
+    ]);
+    await putMeta({
+      sourceUrl,
+      type: 'epub',
+      id: 'sample-epub',
+      status: 'ready',
+      downloadedAt: Date.now(),
+      pageCount: 1,
+      coverPath: null,
+    });
+
+    // Warm the durable catalog cache, then go offline with a fresh in-memory cache.
+    await listBooks();
+    invalidateBookConfigsCache();
+    vi.stubGlobal('navigator', { onLine: false });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('offline');
+      }),
+    );
+
+    const listed = await listBooks();
+    expect(listed.books.map((b) => b.id)).toEqual(['sample-epub']);
+    expect(listed.books[0]?.cached).toBe(true);
+
+    const book = await getBook('sample-epub');
+    expect(book?.id).toBe('sample-epub');
+    expect(book?.type).toBe('epub');
+    if (book?.type === 'epub') {
+      expect(book.pages).toHaveLength(1);
+    }
+  });
 });

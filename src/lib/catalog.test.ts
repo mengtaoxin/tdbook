@@ -107,4 +107,24 @@ describe('getBookConfigs localStorage cache', () => {
     const result = await getBookConfigs();
     expect(result.books).toEqual([]);
   });
+
+  it('serves the persisted catalog without fetching when navigator.onLine is false', async () => {
+    localStorage.setItem(
+      'books.configsCache',
+      JSON.stringify({
+        url: 'https://cdn.example.com/configs.json',
+        books: remoteCatalog.books,
+      }),
+    );
+
+    const fetchMock = vi.fn(async () => {
+      throw new Error('should not fetch while offline');
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    vi.stubGlobal('navigator', { onLine: false });
+
+    const result = await getBookConfigs();
+    expect(result.books.map((b) => b.id)).toEqual(['remote-book']);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

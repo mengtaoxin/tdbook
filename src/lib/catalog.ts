@@ -120,6 +120,14 @@ function persistedResultFor(url: string): BookConfigsResult | null {
   return normalizeBookConfigs(persisted.books);
 }
 
+function isNavigatorOffline(): boolean {
+  try {
+    return typeof navigator !== 'undefined' && navigator.onLine === false;
+  } catch {
+    return false;
+  }
+}
+
 async function fetchBookConfigs(url: string): Promise<BookConfigsResult> {
   try {
     const response = await fetch(url);
@@ -138,6 +146,16 @@ async function fetchBookConfigs(url: string): Promise<BookConfigsResult> {
 export async function getBookConfigs(): Promise<BookConfigsResult> {
   const url = getConfigsUrl();
   if (catalogCache?.url === url) return catalogCache.result;
+
+  // Skip the network when the browser reports offline so a prior successful
+  // download of configs.json can power the book list and open cached books.
+  if (isNavigatorOffline()) {
+    const offline = persistedResultFor(url) ?? { books: [], duplicateIds: [] };
+    const result = Promise.resolve(offline);
+    catalogCache = { url, result };
+    return result;
+  }
+
   const result = fetchBookConfigs(url);
   catalogCache = { url, result };
   return result;
