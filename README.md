@@ -70,7 +70,7 @@ src/views/       List and reader pages
 src/lib/         Catalog load, IndexedDB cache, EPUB/PDF parsing
 ```
 
-See [AGENTS.md](./AGENTS.md) for conventions and the data model. When changing code, follow [docs/change-code-steps.md](./docs/change-code-steps.md).
+See [AGENTS.md](./AGENTS.md) for conventions and the data model.
 
 ## License
 

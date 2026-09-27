@@ -9,7 +9,7 @@ When a task matches a row below, **read that skill’s `SKILL.md` first** (under
 
 | Skill | Use when |
 | ----- | -------- |
-| `test-driven-development` | Product behavior change (feature, bug fix, domain/API logic, regression). Align with `docs/change-code-steps.md`. Skip for docs-only / mechanical edits. |
+| `test-driven-development` | Product behavior change (feature, bug fix, domain/API logic, regression). Skip for docs-only / mechanical edits. |
 | `react-best-practices` | Writing/reviewing React UI: `.tsx`/`.jsx`, components, hooks, effects, composition. |
 | `javascript-typescript-best-practices` | JS/TS that is **not** React UI: `.ts`/`.js`, types, modules, async, APIs. Prefer `react-best-practices` for UI. |
 | `material-design-best-practices` | MUI / Material Design 3 UI (theme tokens, components, layout, a11y). Not for non-Material UI. |

@@ -48,7 +48,3 @@ Install notes: `tdkit` comes from GitHub Packages. Set `NODE_AUTH_TOKEN` (PAT wi
 ## Conventions
 
 See [docs/conventions.md](docs/conventions.md).
-
-## Changing code
-
-Follow [docs/change-code-steps.md](docs/change-code-steps.md) (structure check, TDD, tests, format, `npm run build`, and manual checks). Do not repeat those steps here.

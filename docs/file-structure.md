@@ -1,7 +1,6 @@
 # File structure
 
 ```
-docs/change-code-steps.md  how to change code (TDD, structure, tests, format, check)
 docs/file-structure.md     this file
 docs/conventions.md        coding conventions
 public/configs.json   default book catalog served at /configs.json (id, title, author?, type, path, hover?) — source of truth
