@@ -41,7 +41,7 @@ Use `npm run` scripts from `package.json`. Do not add `scripts/*.sh` wrappers.
 
 ## Adding a book
 
-Append an entry to the `books` array in `configs.json`:
+Append an entry to the `books` array in `public/configs.json`:
 
 ```json
 {
@@ -65,7 +65,7 @@ Append an entry to the `books` array in `configs.json`:
 ## Layout (brief)
 
 ```
-configs.json     Book catalog
+public/configs.json  Book catalog
 src/views/       List and reader pages
 src/lib/         Catalog load, IndexedDB cache, EPUB/PDF parsing
 ```

@@ -35,7 +35,7 @@
 | Config Guide 正文               | `public/how-to-write-config-file*.md`                        |
 | 单元测试                        | 与被测模块同目录的 `*.test.ts`（如 `src/lib/paths.test.ts`） |
 | 端到端测试                      | `e2e/*.spec.ts`                                              |
-| 书目条目                        | `configs.json`（独立 `id`，不要把书名写死在应用里）          |
+| 书目条目                        | `public/configs.json`（独立 `id`，不要把书名写死在应用里）   |
 
 检查问题：
 
@@ -105,7 +105,7 @@ TypeScript 或 React 有改动时，结束前必须 `npm run lint`、`npm run fm
 
 自动化过了之后，按改动面补手工路径（`npm run dev`，默认 http://localhost:3000）：
 
-- **只改书目 `configs.json`**：打开 `/books`，确认新书出现且能打开。
+- **只改书目 `public/configs.json`**：打开 `/books`，确认新书出现且能打开。
 - **改缓存或阅读器**：EPUB 与 PDF 都要能打开、翻页；Settings 里「Clear all cache」后再打开仍正常。
 - **改导航 / 设置 / i18n**：相关路由点一遍，并切换 en / zh，确认文案与状态一致。
 

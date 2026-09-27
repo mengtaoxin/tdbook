@@ -18,8 +18,8 @@ Run from the repo root (this app is not under `web/`). Use `package.json` script
 
 ```sh
 npm install
-npm run dev       # Vite on port 3000; serves /configs.json and /pdfjs/** via vite.config.ts plugin
-npm run build     # tsc -b && vite build (copies configs.json + pdfjs assets into dist/)
+npm run dev       # Vite on port 3000; serves public/ (incl. /configs.json) and /pdfjs/** via vite.config.ts plugin
+npm run build     # tsc -b && vite build (copies public/ + pdfjs assets into dist/)
 npm run preview   # preview production build
 npm run test      # Vitest unit tests (happy-dom + fake-indexeddb)
 npm run test:coverage  # unit tests + V8 coverage (text + coverage/html)

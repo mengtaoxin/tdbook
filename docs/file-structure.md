@@ -4,10 +4,10 @@
 docs/change-code-steps.md  how to change code (TDD, structure, tests, format, check)
 docs/file-structure.md     this file
 docs/conventions.md        coding conventions
-configs.json          book catalog (id, title, author?, type, path, hover?) — source of truth
+public/configs.json   default book catalog served at /configs.json (id, title, author?, type, path, hover?) — source of truth
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
 public/icons/         PWA icons (192 / 512 / maskable)
-vite.config.ts        React + repoStaticPlugin (/configs.json, /pdfjs/**) + VitePWA
+vite.config.ts        React + pdfjsAssetsPlugin (/pdfjs/**) + VitePWA
 src/
   main.tsx            app bootstrap (router + MUI theme + i18n + SW register)
   theme.ts            MUI theme (primary #3D5A80)
@@ -46,5 +46,5 @@ src/
   test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)
   **/*.test.ts        unit tests colocated next to the module under test
 e2e/                  Playwright
-public/testdata/      demo + e2e fixtures (Alice EPUB, covers, sample.epub / sample.pdf / configs.json; edit in place when needed)
+public/testdata/      demo + e2e fixtures (Alice EPUB, covers, sample.epub / sample.pdf; configs.json here is the e2e-only catalog, separate from public/configs.json)
 ```

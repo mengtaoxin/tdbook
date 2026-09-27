@@ -8,12 +8,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { pwaManifest } from './src/lib/pwaManifest.ts';
 
 const webRoot = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = webRoot;
 
 const MIME: Record<string, string> = {
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
   '.wasm': 'application/wasm',
 };
 
@@ -25,24 +23,21 @@ function isInsideDir(root: string, target: string) {
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
-function resolveRepoStatic(urlPath: string): string | null {
+function resolvePdfjsAsset(urlPath: string): string | null {
   const pathname = decodeURIComponent(urlPath.split('?')[0] ?? '');
-  if (pathname === '/configs.json') {
-    return path.join(repoRoot, 'configs.json');
+  if (!pathname.startsWith('/pdfjs/')) {
+    return null;
   }
-  if (pathname.startsWith('/pdfjs/')) {
-    const rest = pathname.slice('/pdfjs/'.length);
-    const kind = rest.split('/')[0] ?? '';
-    if (!PDFJS_ASSETS.includes(kind as (typeof PDFJS_ASSETS)[number])) {
-      return null;
-    }
-    const target = path.resolve(pdfjsRoot, rest);
-    if (!isInsideDir(path.join(pdfjsRoot, kind), target)) {
-      return null;
-    }
-    return target;
+  const rest = pathname.slice('/pdfjs/'.length);
+  const kind = rest.split('/')[0] ?? '';
+  if (!PDFJS_ASSETS.includes(kind as (typeof PDFJS_ASSETS)[number])) {
+    return null;
   }
-  return null;
+  const target = path.resolve(pdfjsRoot, rest);
+  if (!isInsideDir(path.join(pdfjsRoot, kind), target)) {
+    return null;
+  }
+  return target;
 }
 
 function sendFile(filePath: string, res: ServerResponse, next: (err?: unknown) => void) {
@@ -58,13 +53,13 @@ function sendFile(filePath: string, res: ServerResponse, next: (err?: unknown) =
   });
 }
 
-function repoStaticPlugin(): Plugin {
+function pdfjsAssetsPlugin(): Plugin {
   const middleware = (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => {
     if (!req.url || req.method !== 'GET') {
       next();
       return;
     }
-    const filePath = resolveRepoStatic(req.url);
+    const filePath = resolvePdfjsAsset(req.url);
     if (!filePath) {
       next();
       return;
@@ -73,7 +68,7 @@ function repoStaticPlugin(): Plugin {
   };
 
   return {
-    name: 'repo-static',
+    name: 'pdfjs-assets',
     configureServer(server) {
       server.middlewares.use(middleware);
     },
@@ -82,7 +77,6 @@ function repoStaticPlugin(): Plugin {
     },
     writeBundle(options) {
       const outDir = options.dir ?? path.join(webRoot, 'dist');
-      fs.copyFileSync(path.join(repoRoot, 'configs.json'), path.join(outDir, 'configs.json'));
       for (const asset of PDFJS_ASSETS) {
         const src = path.join(pdfjsRoot, asset);
         if (!fs.existsSync(src)) continue;
@@ -95,7 +89,7 @@ function repoStaticPlugin(): Plugin {
 export default defineConfig({
   plugins: [
     react(),
-    repoStaticPlugin(),
+    pdfjsAssetsPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       // Keep SW off in `npm run dev` so Playwright e2e stays stable.
@@ -108,7 +102,7 @@ export default defineConfig({
       ],
       manifest: pwaManifest,
       workbox: {
-        // Include mjs (pdf.js worker) and json (configs.json copied into dist)
+        // Include mjs (pdf.js worker) and json (public/configs.json)
         // so a production install can boot offline and reopen cached books.
         globPatterns: ['**/*.{js,mjs,css,html,ico,svg,png,woff2,webmanifest,json}'],
         navigateFallback: '/index.html',
