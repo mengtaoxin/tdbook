@@ -108,7 +108,9 @@ export default defineConfig({
       ],
       manifest: pwaManifest,
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2,webmanifest}'],
+        // Include mjs (pdf.js worker) and json (configs.json copied into dist)
+        // so a production install can boot offline and reopen cached books.
+        globPatterns: ['**/*.{js,mjs,css,html,ico,svg,png,woff2,webmanifest,json}'],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
@@ -129,7 +131,7 @@ export default defineConfig({
             options: {
               cacheName: 'pdfjs-assets',
               expiration: {
-                maxEntries: 64,
+                maxEntries: 256,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
               },
             },

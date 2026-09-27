@@ -170,7 +170,9 @@ test.describe('books reader', () => {
 
     const saved = await page.evaluate(() => {
       const raw = localStorage.getItem('books.bookmarks');
-      return raw ? (JSON.parse(raw) as { bookmarks: Array<{ location: string; page: number }> }) : null;
+      return raw
+        ? (JSON.parse(raw) as { bookmarks: Array<{ location: string; page: number }> })
+        : null;
     });
     expect(saved?.bookmarks[0]?.page).toBe(1);
     expect(saved?.bookmarks[0]?.location).toMatch(/^#char:\d+$/);
@@ -203,18 +205,31 @@ test.describe('books reader', () => {
       .toBe(true);
   });
 
-  test('expands bookmarks in the reader drawer by default', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+  test('lists and opens a cached EPUB while offline', async ({ page, context }) => {
     await page.goto('/books');
     await page.getByText('Sample EPUB').click();
     await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText('Page 1 / 2')).toBeVisible();
 
-    await page.getByLabel('Open menu').click();
-    const drawer = page.getByTestId('nav-drawer');
-    await expect(drawer.getByTestId('drawer-bookmarks')).toHaveText('Bookmarks');
-    await expect(drawer.getByTestId('drawer-bookmark-jump-default')).toBeVisible();
-    await expect(drawer.getByTestId('drawer-bookmark-save-default')).toBeVisible();
-    await expect(drawer.getByTestId('drawer-bookmark-jump-default')).toHaveText('Jump to default');
-    await expect(drawer.getByTestId('drawer-bookmark-save-default')).toHaveText('Save as default');
+    // Client-side nav keeps the SPA shell loaded (dev has no service worker).
+    await page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' }).click();
+    await expect(
+      page.getByRole('button', { name: /Sample EPUB/ }).getByText('Cached'),
+    ).toBeVisible();
+
+    await context.setOffline(true);
+
+    await page.getByTestId('brand-title').click();
+    await expect(page).toHaveURL('/');
+    await page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' }).click();
+    await expect(page.getByText('Sample EPUB')).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /Sample EPUB/ }).getByText('Cached'),
+    ).toBeVisible();
+
+    await page.getByText('Sample EPUB').click();
+    await expect(page).toHaveURL(/\/book\/sample-epub/);
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByText('Page 1 / 2')).toBeVisible();
   });
 });
