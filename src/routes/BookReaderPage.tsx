@@ -2,9 +2,9 @@ import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FormatReaderPane } from '@/components/FormatReaderPane';
-import { usesPaintGate } from '@/components/formatPanes';
+import { usesPaintGate } from '@/components/formatTraits';
 import { useBookReader } from '@/hooks/useBookReader';
 
 export function BookReaderPage() {
@@ -22,10 +22,11 @@ export function BookReaderPage() {
     goToPage,
   } = useBookReader();
   const [paintReady, setPaintReady] = useState(false);
-
-  useEffect(() => {
+  const [paintedContent, setPaintedContent] = useState(pageContent);
+  if (paintedContent !== pageContent) {
+    setPaintedContent(pageContent);
     setPaintReady(false);
-  }, [pageContent]);
+  }
 
   const awaitingPaint = Boolean(pageContent && usesPaintGate(pageContent.type) && !paintReady);
   const showRenderProgress = loading || (awaitingPaint && !error);

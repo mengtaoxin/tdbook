@@ -41,6 +41,8 @@ export async function extractEpubToCache(
   const batch: Array<{ relativePath: string; blob: Blob }> = [];
   let loaded = 0;
 
+  // Sequential unzip + batched writes keep memory bounded for large EPUBs.
+  /* oxlint-disable no-await-in-loop */
   for (const entry of fileEntries) {
     const relativePath = entry.name.replace(/^\/+/, '');
     if (!relativePath || relativePath.endsWith('/')) continue;
@@ -58,6 +60,7 @@ export async function extractEpubToCache(
       batch.length = 0;
     }
   }
+  /* oxlint-enable no-await-in-loop */
 
   if (batch.length) {
     await putFiles(sourceUrl, batch);

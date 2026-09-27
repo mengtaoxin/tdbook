@@ -1,11 +1,20 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatPanes, pagerWide } from '@/components/formatPanes';
+import { EpubFormatPane, PdfFormatPane, type FormatPaneProps } from '@/components/formatPanes';
+import { pagerWide } from '@/components/formatTraits';
 import { ReaderPager } from '@/components/ReaderPager';
 import { useReaderSwipe } from '@/hooks/useReaderSwipe';
 import type { PageContent } from '@/lib/formatAdapter';
 import '@/lib/pdfTextLayer.css';
+
+const formatPanes: {
+  [K in PageContent['type']]: ComponentType<FormatPaneProps>;
+} = {
+  epub: EpubFormatPane,
+  pdf: PdfFormatPane,
+};
 
 type FormatReaderPaneProps = {
   content: PageContent;

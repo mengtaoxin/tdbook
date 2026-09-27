@@ -32,7 +32,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { translateError } from '@/i18n';
 import {
@@ -78,7 +78,7 @@ export function AppShell() {
   const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null);
   const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null);
   const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null);
-  const [bookmarkRevision, setBookmarkRevision] = useState(0);
+  const [, refreshBookmarks] = useReducer((revision: number) => revision + 1, 0);
   const [bookmarkNotice, setBookmarkNotice] = useState('');
   const [bookmarkNoticeType, setBookmarkNoticeType] = useState<'success' | 'error'>('success');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -87,20 +87,19 @@ export function AppShell() {
   const [drawerMoreOpen, setDrawerMoreOpen] = useState(false);
   const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(DRAWER_BOOKMARKS_DEFAULT_OPEN);
   const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false);
-  const defaultBookmark = useMemo(() => {
-    if (!bookId) return null;
-    return getDefaultBookmark(bookId);
-  }, [bookId, bookmarkRevision]);
+  const [drawerPathname, setDrawerPathname] = useState(pathname);
+  if (drawerPathname !== pathname) {
+    setDrawerPathname(pathname);
+    setDrawerOpen(false);
+  }
+  const defaultBookmark = bookId ? getDefaultBookmark(bookId) : null;
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const brandRef = useRef<HTMLAnchorElement | null>(null);
   const desktopNavRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
-
-  useEffect(() => {
-    setDrawerOpen(false);
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- scroll to top on every route change
   }, [pathname]);
 
   useLayoutEffect(() => {
@@ -133,6 +132,7 @@ export function AppShell() {
     observer.observe(toolbar);
     observer.observe(nav);
     return () => observer.disconnect();
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- nav labels and the bookmarks button change its width
   }, [locale, t, bookId]);
 
   function chooseLocale(code: AppLocale) {
@@ -180,7 +180,7 @@ export function AppShell() {
         location,
         name: t('bookmarks.defaultName'),
       });
-      setBookmarkRevision((value) => value + 1);
+      refreshBookmarks();
       setBookmarkNoticeType('success');
       setBookmarkNotice(t('bookmarks.saved'));
     } catch (err) {

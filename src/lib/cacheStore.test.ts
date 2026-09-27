@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   clearAllCacheRecords,
   deleteBookCacheRecords,
+  getCachedBlobUrl,
   getCachedFile,
   isBookCached,
   putFiles,
@@ -34,6 +35,19 @@ describe('cacheStore + cacheIngest', () => {
     expect(await isBookCached(sourceUrl)).toBe(true);
     expect(await readCachedText(sourceUrl, 'OEBPS/a.xhtml')).toBe('hello');
     expect(await getCachedFile(sourceUrl, 'missing')).toBeNull();
+  });
+
+  it('shares one blob URL across concurrent lookups of the same file', async () => {
+    const sourceUrl = 'https://example.com/concurrent.epub';
+    await putFiles(sourceUrl, [{ relativePath: 'OEBPS/img.png', blob: new Blob(['png']) }]);
+
+    const [first, second] = await Promise.all([
+      getCachedBlobUrl(sourceUrl, 'OEBPS/img.png'),
+      getCachedBlobUrl(sourceUrl, 'OEBPS/img.png'),
+    ]);
+
+    expect(first).toMatch(/^blob:/);
+    expect(second).toBe(first);
   });
 
   it('extracts an EPUB zip into individual cached files', async () => {

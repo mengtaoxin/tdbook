@@ -34,6 +34,7 @@ async function fetchAsBlob(
   const chunks: Uint8Array[] = [];
   let loaded = 0;
   for (;;) {
+    // oxlint-disable-next-line no-await-in-loop -- stream chunks must be read in order
     const { done, value } = await reader.read();
     if (done) break;
     if (value) {

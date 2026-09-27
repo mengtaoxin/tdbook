@@ -116,32 +116,29 @@ async function rewriteFromDocument(
     if (css?.trim()) inlineStyles.push(css);
   });
 
-  for (const element of Array.from(doc.querySelectorAll('a[href], link[href]'))) {
-    const current = element.getAttribute('href');
-    if (!current) continue;
-    setAttr(element, 'href', await resolveHref(current, book, pageHref, pagesByHref));
-  }
+  const targets: Array<{ element: Element; attribute: string }> = [
+    ...Array.from(doc.querySelectorAll('a[href], link[href]'), (element) => ({
+      element,
+      attribute: 'href',
+    })),
+    ...Array.from(doc.querySelectorAll('[src]'), (element) => ({ element, attribute: 'src' })),
+    ...Array.from(doc.querySelectorAll('image')).flatMap((element) =>
+      ['href', 'xlink:href'].map((attribute) => ({ element, attribute })),
+    ),
+  ];
 
-  for (const element of Array.from(doc.querySelectorAll('[src]'))) {
-    const current = element.getAttribute('src');
-    if (!current) continue;
-    setAttr(element, 'src', await resolveHref(current, book, pageHref, pagesByHref));
-  }
-
-  for (const element of Array.from(doc.querySelectorAll('image'))) {
-    for (const attribute of ['href', 'xlink:href'] as const) {
-      const current = element.getAttribute(attribute);
-      if (!current) continue;
-      setAttr(element, attribute, await resolveHref(current, book, pageHref, pagesByHref));
-    }
-  }
-
-  const stylesheetUrls: string[] = [];
   const paths = stylesheetPaths.length > 0 ? stylesheetPaths : book.stylesheetHrefs;
-  for (const path of paths) {
-    const url = await getCachedBlobUrl(book.sourceUrl, normalizeEpubPath(path));
-    if (url) stylesheetUrls.push(url);
-  }
+  const [, resolvedStylesheetUrls] = await Promise.all([
+    Promise.all(
+      targets.map(async ({ element, attribute }) => {
+        const current = element.getAttribute(attribute);
+        if (!current) return;
+        setAttr(element, attribute, await resolveHref(current, book, pageHref, pagesByHref));
+      }),
+    ),
+    Promise.all(paths.map((path) => getCachedBlobUrl(book.sourceUrl, normalizeEpubPath(path)))),
+  ]);
+  const stylesheetUrls = resolvedStylesheetUrls.filter((url): url is string => Boolean(url));
 
   const body = doc.body ?? doc.querySelector('body');
   return {

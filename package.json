@@ -36,7 +36,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@mengtaoxin/oxc-config": "^0.1.0",
+    "@mengtaoxin/oxc-config": "^0.2.1",
     "@playwright/test": "^1.63.0",
     "@types/node": "^24.13.5",
     "@types/react": "^19.3.0",

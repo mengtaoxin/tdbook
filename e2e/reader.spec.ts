@@ -50,7 +50,7 @@ test.describe('books reader', () => {
     const y = box.y + box.height * 0.4;
 
     await page.evaluate(
-      ({ startX, endX, y }) => {
+      ({ startX: fromX, endX: toX, y: atY }) => {
         const target = document.querySelector('[data-testid="reader-swipe-host"]');
         if (!target) throw new Error('reader-swipe-host missing');
         const fire = (type, x, yPos) => {
@@ -67,8 +67,8 @@ test.describe('books reader', () => {
             }),
           );
         };
-        fire('pointerdown', startX, y);
-        fire('pointerup', endX, y);
+        fire('pointerdown', fromX, atY);
+        fire('pointerup', toX, atY);
       },
       { startX, endX, y },
     );

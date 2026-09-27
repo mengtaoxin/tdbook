@@ -16,11 +16,6 @@ export function LogsPage() {
   const [clearing, setClearing] = useState(false);
   const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
-  async function refresh() {
-    const page = await TdLog.query({ page: 1, pageSize: 100 });
-    setLogs(page.records);
-  }
-
   async function confirmClearLogs() {
     setConfirmClearOpen(false);
     setClearing(true);
@@ -37,7 +32,13 @@ export function LogsPage() {
   }
 
   useEffect(() => {
-    void refresh();
+    let cancelled = false;
+    void TdLog.query({ page: 1, pageSize: 100 }).then((page) => {
+      if (!cancelled) setLogs(page.records);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (

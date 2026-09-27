@@ -35,6 +35,7 @@ db.version(1).stores({
 const KEY_SEP = '\0';
 
 const blobUrlCache = new Map<string, string>();
+const pendingBlobUrls = new Map<string, Promise<string | null>>();
 
 function blobUrlKey(sourceUrl: string, relativePath: string) {
   return `${sourceUrl}${KEY_SEP}${relativePath}`;
@@ -54,20 +55,32 @@ export async function getCachedFile(sourceUrl: string, relativePath: string): Pr
   return record?.blob ?? null;
 }
 
-export async function getCachedBlobUrl(
+async function createCachedBlobUrl(
   sourceUrl: string,
   relativePath: string,
+  cacheKey: string,
 ): Promise<string | null> {
-  const cacheKey = blobUrlKey(sourceUrl, relativePath);
-  const existing = blobUrlCache.get(cacheKey);
-  if (existing) return existing;
-
   const blob = await getCachedFile(sourceUrl, relativePath);
   if (!blob) return null;
 
   const url = URL.createObjectURL(blob);
   blobUrlCache.set(cacheKey, url);
   return url;
+}
+
+export function getCachedBlobUrl(sourceUrl: string, relativePath: string): Promise<string | null> {
+  const cacheKey = blobUrlKey(sourceUrl, relativePath);
+  const existing = blobUrlCache.get(cacheKey);
+  if (existing) return Promise.resolve(existing);
+
+  const inFlight = pendingBlobUrls.get(cacheKey);
+  if (inFlight) return inFlight;
+
+  const pending = createCachedBlobUrl(sourceUrl, relativePath, cacheKey).finally(() => {
+    pendingBlobUrls.delete(cacheKey);
+  });
+  pendingBlobUrls.set(cacheKey, pending);
+  return pending;
 }
 
 /** In-memory blob URL for a cached file, if already created. */
