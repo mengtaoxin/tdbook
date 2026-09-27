@@ -1,6 +1,5 @@
-import type { BookType } from './bookTypes';
-import { isBookCached, putMeta, type BookCacheMeta } from './cacheStore';
-import type { FormatSnapshot } from './formatAdapter';
+import { putMeta, type BookCacheMeta } from './cacheStore';
+import type { FormatAdapter, FormatSnapshot } from './formatAdapter';
 
 export type CacheProgress = {
   phase: 'download' | 'extract' | 'done';
@@ -8,20 +7,16 @@ export type CacheProgress = {
   total: number | null;
 };
 
-export type BookIngestFn = (
-  sourceUrl: string,
-  blob: Blob,
-  onProgress?: (progress: CacheProgress) => void,
-) => Promise<void>;
-
-const ensureInFlight = new Map<string, Promise<void>>();
+/** The part of a format adapter the download pipeline needs. */
+export type CacheableFormat = Pick<FormatAdapter, 'type' | 'ingest' | 'snapshot'>;
 
 async function fetchAsBlob(
   sourceUrl: string,
-  onProgress?: (progress: CacheProgress) => void,
+  signal: AbortSignal,
+  onProgress: (progress: CacheProgress) => void,
 ): Promise<Blob> {
   // Remote hosts must allow CORS for browser fetch.
-  const response = await fetch(sourceUrl);
+  const response = await fetch(sourceUrl, { signal });
   if (!response.ok) {
     throw new Error(`errors.downloadFailed:${response.status}`);
   }
@@ -31,7 +26,7 @@ async function fetchAsBlob(
   const body = response.body;
   if (!body || total == null || !Number.isFinite(total)) {
     const blob = await response.blob();
-    onProgress?.({ phase: 'download', loaded: blob.size, total: blob.size });
+    onProgress({ phase: 'download', loaded: blob.size, total: blob.size });
     return blob;
   }
 
@@ -44,7 +39,7 @@ async function fetchAsBlob(
     if (value) {
       chunks.push(value);
       loaded += value.byteLength;
-      onProgress?.({ phase: 'download', loaded, total });
+      onProgress({ phase: 'download', loaded, total });
     }
   }
 
@@ -59,27 +54,36 @@ async function fetchAsBlob(
   });
 }
 
-async function downloadAndStore(
+/**
+ * Download → format ingest → snapshot → ready meta. Stops at the next step boundary once
+ * `signal` aborts; files an ingest already wrote are left for the caller to delete.
+ */
+export async function downloadAndStore(
   sourceUrl: string,
-  type: BookType,
-  catalogId: string,
-  ingest: BookIngestFn,
-  snapshot: ((sourceUrl: string) => Promise<FormatSnapshot | null>) | undefined,
-  onProgress?: (progress: CacheProgress) => void,
-) {
-  const blob = await fetchAsBlob(sourceUrl, onProgress);
-  await ingest(sourceUrl, blob, onProgress);
+  options: {
+    format: CacheableFormat;
+    catalogId: string;
+    signal: AbortSignal;
+    onProgress: (progress: CacheProgress) => void;
+  },
+): Promise<void> {
+  const { format, catalogId, signal, onProgress } = options;
+  const blob = await fetchAsBlob(sourceUrl, signal, onProgress);
+  signal.throwIfAborted();
+  await format.ingest(sourceUrl, blob, onProgress);
+  signal.throwIfAborted();
 
   let snap: FormatSnapshot | null = null;
   try {
-    snap = (await snapshot?.(sourceUrl)) ?? null;
+    snap = await format.snapshot(sourceUrl);
   } catch {
     snap = null;
   }
+  signal.throwIfAborted();
 
   const meta: BookCacheMeta = {
     sourceUrl,
-    type,
+    type: format.type,
     id: catalogId,
     status: 'ready',
     downloadedAt: Date.now(),
@@ -87,47 +91,5 @@ async function downloadAndStore(
     coverPath: snap ? snap.coverPath : undefined,
   };
   await putMeta(meta);
-  onProgress?.({ phase: 'done', loaded: 1, total: 1 });
-}
-
-/** Download once, then let the format adapter persist files and snapshot meta. */
-export async function ensureBookCached(
-  sourceUrl: string,
-  options: {
-    type: BookType;
-    ingest: BookIngestFn;
-    snapshot?: (sourceUrl: string) => Promise<FormatSnapshot | null>;
-    catalogId?: string;
-    onProgress?: (progress: CacheProgress) => void;
-  },
-): Promise<void> {
-  if (await isBookCached(sourceUrl)) {
-    options.onProgress?.({ phase: 'done', loaded: 1, total: 1 });
-    return;
-  }
-
-  const id = options.catalogId ?? sourceUrl;
-  let pending = ensureInFlight.get(sourceUrl);
-  if (!pending) {
-    pending = downloadAndStore(
-      sourceUrl,
-      options.type,
-      id,
-      options.ingest,
-      options.snapshot,
-      options.onProgress,
-    ).finally(() => {
-      ensureInFlight.delete(sourceUrl);
-    });
-    ensureInFlight.set(sourceUrl, pending);
-  }
-  await pending;
-}
-
-export function cancelEnsureInFlight(sourceUrl: string) {
-  ensureInFlight.delete(sourceUrl);
-}
-
-export function clearEnsureInFlight() {
-  ensureInFlight.clear();
+  onProgress({ phase: 'done', loaded: 1, total: 1 });
 }

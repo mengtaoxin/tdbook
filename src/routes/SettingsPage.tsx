@@ -16,9 +16,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { translateError } from '@/i18n';
 import { clearAllBookCaches } from '@/lib/bookCache';
-import { clearPersistedBookConfigs, invalidateBookConfigsCache } from '@/lib/catalog';
+import { clearPersistedBookConfigs } from '@/lib/catalog';
 import { DEFAULT_CONFIGS_URL } from '@/lib/settings';
-import { useBooksStore } from '@/stores/booksStore';
+import { invalidateCatalog, useBooksStore } from '@/stores/booksStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 type ClearTarget = 'catalog' | 'books' | null;
@@ -74,8 +74,7 @@ export function SettingsPage() {
     try {
       if (clearTarget === 'catalog') {
         clearPersistedBookConfigs();
-        invalidateBookConfigsCache();
-        useBooksStore.getState().invalidate();
+        invalidateCatalog();
         setClearTarget(null);
         showMessage(t('settings.catalogCacheCleared'), 'success');
       } else {

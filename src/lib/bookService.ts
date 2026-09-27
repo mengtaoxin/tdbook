@@ -1,4 +1,5 @@
-import { ensureBookCached, type CacheProgress } from './cacheIngest';
+import { ensureBookCached } from './bookCache';
+import type { CacheProgress } from './cacheIngest';
 import { getBookCacheMeta, getCachedBlobUrl, putMeta, type BookCacheMeta } from './cacheStore';
 import type { BookListItem, BookRecord } from './bookTypes';
 import { bookTypeOf, getBookConfigs, optionalCoverUrl, type BookConfig } from './catalog';
@@ -45,13 +46,7 @@ export async function getBook(
   const adapter = getFormatAdapter(bookTypeOf(config));
 
   try {
-    await ensureBookCached(config.path, {
-      type: adapter.type,
-      catalogId: config.id,
-      ingest: (sourceUrl, blob, progress) => adapter.ingest(sourceUrl, blob, progress),
-      snapshot: (sourceUrl) => adapter.snapshot(sourceUrl),
-      onProgress,
-    });
+    await ensureBookCached(config.path, { format: adapter, catalogId: config.id, onProgress });
   } catch (error) {
     throw error instanceof Error ? error : new Error('errors.cacheBookFailed');
   }

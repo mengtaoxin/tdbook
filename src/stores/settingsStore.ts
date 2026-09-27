@@ -1,7 +1,6 @@
 import { create } from 'zustand';
-import { invalidateBookConfigsCache } from '@/lib/catalog';
 import { getStoredConfigsUrl, setConfigsUrl as persistConfigsUrl } from '@/lib/settings';
-import { useBooksStore } from './booksStore';
+import { invalidateCatalog } from './booksStore';
 
 type SettingsState = {
   configsUrl: string;
@@ -18,13 +17,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setConfigsUrl: (url) => {
     persistConfigsUrl(url);
     set({ configsUrl: getStoredConfigsUrl() });
-    invalidateBookConfigsCache();
-    useBooksStore.getState().invalidate();
+    invalidateCatalog();
   },
   restoreDefault: () => {
     persistConfigsUrl('');
     set({ configsUrl: '' });
-    invalidateBookConfigsCache();
-    useBooksStore.getState().invalidate();
+    invalidateCatalog();
   },
 }));

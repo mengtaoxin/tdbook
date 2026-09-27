@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { listBooks } from '@/lib/bookService';
 import type { BookListItem } from '@/lib/bookTypes';
+import { invalidateBookConfigsCache } from '@/lib/catalog';
 
 type BooksState = {
   books: BookListItem[];
@@ -63,3 +64,9 @@ export const useBooksStore = create<BooksState>((set, get) => ({
     }
   },
 }));
+
+/** Drop the in-memory catalog and the book list so the next load re-fetches configs.json. */
+export function invalidateCatalog() {
+  invalidateBookConfigsCache();
+  useBooksStore.getState().invalidate();
+}

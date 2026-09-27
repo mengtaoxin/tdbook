@@ -28,9 +28,9 @@ src/
     epubPackage.ts    OPF / spine / cover-href parse
     epubIngest.ts     EPUB zip → cached files
     pdfFormat.ts      PDF adapter (ingest + cover snapshot + pdf.js unload on cache clear)
-    bookCache.ts      public clear API (notifies format adapters)
+    bookCache.ts      cache lifecycle: ensureBookCached (one shared download per source, progress fan-out) + clear (aborts in-flight downloads, notifies format adapters)
     cacheStore.ts     Dexie DB (meta + files tables) + blob URL lifecycle
-    cacheIngest.ts    download-once + format ingest + snapshot meta
+    cacheIngest.ts    abortable pipeline: fetch → format ingest → snapshot → ready meta
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
     epubShadow.ts     EPUB shadow-DOM mounting helpers

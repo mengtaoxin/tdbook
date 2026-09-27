@@ -123,6 +123,7 @@ export default {
     downloadFailed: '下载失败（HTTP {status}）。',
     epubExtractFailed: '无法解压 EPUB（文件可能已损坏或不是有效的 zip）。',
     cacheBookFailed: '下载或缓存图书失败。',
+    cacheCleared: '下载过程中图书缓存已被清除，请重新打开这本书。',
     canvasCreateFailed: '无法创建画布。',
   },
 };

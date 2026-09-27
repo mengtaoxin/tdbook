@@ -128,6 +128,7 @@ export default {
     downloadFailed: 'Download failed (HTTP {status}).',
     epubExtractFailed: 'Could not extract EPUB (file may be corrupt or not a valid zip).',
     cacheBookFailed: 'Failed to download or cache the book.',
+    cacheCleared: 'The book cache was cleared while downloading. Open the book again to retry.',
     canvasCreateFailed: 'Could not create canvas.',
   },
 };
