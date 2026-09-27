@@ -93,7 +93,14 @@ describe('epubAnchor', () => {
     vi.spyOn(Range.prototype, 'getBoundingClientRect').mockImplementation(function (this: Range) {
       const nodeText = this.startContainer.textContent ?? '';
       if (nodeText === 'AAAA') {
-        return mockZeroSizeRect({ y: -80, top: -80, width: 100, height: 20, right: 100, bottom: -60 });
+        return mockZeroSizeRect({
+          y: -80,
+          top: -80,
+          width: 100,
+          height: 20,
+          right: 100,
+          bottom: -60,
+        });
       }
       if (nodeText === 'BBBB') {
         const start = this.startOffset;
@@ -109,7 +116,14 @@ describe('epubAnchor', () => {
           });
         }
         const top = -10 + start * 10;
-        return mockZeroSizeRect({ y: top, top, width: 10, height: 10, right: 10, bottom: top + 10 });
+        return mockZeroSizeRect({
+          y: top,
+          top,
+          width: 10,
+          height: 10,
+          right: 10,
+          bottom: top + 10,
+        });
       }
       return mockZeroSizeRect({ y: 40, top: 40, width: 100, height: 20, right: 100, bottom: 60 });
     });

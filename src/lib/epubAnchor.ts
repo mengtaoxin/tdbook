@@ -88,10 +88,7 @@ function firstCharAtOrBelow(textNode: Text, viewportTop: number): number {
   return Math.min(lo, length - 1);
 }
 
-export function captureEpubAnchor(
-  shadow: ShadowRoot,
-  options?: { viewportTop?: number },
-): string {
+export function captureEpubAnchor(shadow: ShadowRoot, options?: { viewportTop?: number }): string {
   const body = shadow.querySelector('body');
   const host = shadow.host;
   if (!body || !host) return formatCharLocation(0);
