@@ -17,6 +17,7 @@ A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, d
 - PWA: `vite-plugin-pwa` (production service worker + web app manifest)
 - EPUB: `jszip` + `fast-xml-parser`
 - PDF: `pdfjs-dist`
+- Book cache: `dexie` (IndexedDB)
 
 ## Quick start
 

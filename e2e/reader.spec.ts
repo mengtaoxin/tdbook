@@ -12,7 +12,7 @@ test.describe('books reader', () => {
     await page.goto('/');
     await page.evaluate(() => {
       localStorage.clear();
-      return indexedDB.deleteDatabase('books-cache');
+      return indexedDB.deleteDatabase('tdbook-cache');
     });
     await useTestCatalog(page);
   });

@@ -29,7 +29,7 @@ src/
     epubIngest.ts     EPUB zip → cached files
     pdfFormat.ts      PDF adapter (ingest + cover snapshot + pdf.js unload on cache clear)
     bookCache.ts      public clear API (notifies format adapters)
-    cacheStore.ts     IndexedDB connection reuse + blob URL lifecycle
+    cacheStore.ts     Dexie DB (meta + files tables) + blob URL lifecycle
     cacheIngest.ts    download-once + format ingest + snapshot meta
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)

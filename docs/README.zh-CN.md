@@ -17,6 +17,7 @@
 - PWA：`vite-plugin-pwa`（生产环境 Service Worker + Web App Manifest）
 - EPUB：`jszip` + `fast-xml-parser`
 - PDF：`pdfjs-dist`
+- 书籍缓存：`dexie`（IndexedDB）
 
 ## 快速开始
 

@@ -8,6 +8,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 - PWA: `vite-plugin-pwa` (production service worker + web app manifest; SW off in `npm run dev`).
 - Shared kit: `tdkit` → `@mengtaoxin/tdkit` (GitHub Packages) for durable app logs (`TdLog`).
 - EPUB: `jszip` + `fast-xml-parser` (OPF / spine). PDF: `pdfjs-dist` (worker + text layer).
+- Book cache: `dexie` over IndexedDB (`src/lib/cacheStore.ts` only; no raw `indexedDB` calls elsewhere).
 - Config Guide: `marked` renders `public/how-to-write-config-file.md` / `.zh.md`.
 - Prefer MUI components; `sx` / theme tokens for local tweaks. No Vue, Vuetify, Pinia, or Tailwind.
 
