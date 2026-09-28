@@ -1,0 +1,26 @@
+---
+description: Project skills — when to use each one and how to load it
+alwaysApply: true
+---
+
+# Skills
+
+## How to use
+
+1. Match the task (intent + open files) to the table below; several skills may apply at once (e.g. TDD + React).
+2. Read each matching `.agents/skills/<name>/SKILL.md` before planning or editing, then follow it. Do not load unrelated skills.
+3. Project docs (`AGENTS.md`, `docs/`) win over a skill on conflict.
+4. `.agents/skills/` is installed via `npx skills` and pinned in `skills-lock.json` — do not hand-edit; update with `npx skills update`.
+
+## When to use
+
+| Skill | Use when |
+| ----- | -------- |
+| `test-driven-development` | Product behavior change (feature, bug fix, domain logic, regression). Skip docs-only, mechanical edits, declarative toolchain config. |
+| `react-best-practices` | Writing/reviewing React UI: `.tsx`/`.jsx`, components, hooks, effects. |
+| `javascript-typescript-best-practices` | JS/TS that is **not** React UI: `.ts`/`.js`, types, modules, async, APIs. |
+| `material-design-best-practices` | MUI / Material Design 3 UI (theme tokens, components, layout, a11y). |
+| `refactor` | Behavior-preserving cleanup: extract/rename, split large functions, tighten types, remove smells. |
+| `harness-engineering` | Turning repeated agent mistakes into durable rules, drift checks, or regression tests. |
+| `cursor-local-best-practices` | Starting/stopping a local server, `EADDRINUSE`, or ending a chat that opened ports. |
+| `cursor-cloud-best-practices` | Running as a Cursor Cloud Agent, walkthrough/demo artifacts, computer use / screen recording — **not** local chats. |

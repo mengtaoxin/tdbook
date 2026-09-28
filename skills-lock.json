@@ -13,6 +13,12 @@
       "skillPath": "skills/cursor-local-best-practices/SKILL.md",
       "computedHash": "2ae0b63696b9822c911d2b1899092e75dac14c680caf074c94198e651b90352b"
     },
+    "harness-engineering": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/harness-engineering/SKILL.md",
+      "computedHash": "a442c82ec3f8cb2d25f33f18bb28c586af3402d7b630bcc38501d7182a1d782d"
+    },
     "javascript-typescript-best-practices": {
       "source": "mengtaoxin/agent-kit",
       "sourceType": "github",
@@ -30,6 +36,12 @@
       "sourceType": "github",
       "skillPath": "skills/react-best-practices/SKILL.md",
       "computedHash": "c0e194abe4341fcebcf04cfba414b65f802158507ccf6b21f73a08bebf6558b1"
+    },
+    "refactor": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/refactor/SKILL.md",
+      "computedHash": "87789a786b96f99ba0680e89345a975106e10e7db1071c7cdc2e76d507c449d6"
     },
     "test-driven-development": {
       "source": "mengtaoxin/agent-kit",

@@ -32,3 +32,7 @@ Install notes: `tdkit` comes from GitHub Packages. Set `NODE_AUTH_TOKEN` (PAT wi
 ## Conventions
 
 See [docs/conventions.md](docs/conventions.md).
+
+## Skills
+
+See [.cursor/rules/skills-intro.mdc](.cursor/rules/skills-intro.mdc).
