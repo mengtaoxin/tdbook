@@ -3,6 +3,7 @@
 ```
 docs/file-structure.md     this file
 docs/conventions.md        coding conventions
+docs/data-model.md         catalog entries, cache keys, offline, reader, app logs
 docs/commands.md           npm scripts and setup
 docs/testing.md            unit (Vitest) + e2e (Playwright) testing
 docs/tech-stacks.md        libraries, build/PWA, tooling, deploy
