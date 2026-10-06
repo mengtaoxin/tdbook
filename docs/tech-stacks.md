@@ -22,7 +22,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 
 - **Vite 8** with `@vitejs/plugin-react`. Config: `vite.config.ts` (dev port 3000, `@/` → `src/`).
 - **Custom `pdfjsAssetsPlugin`** in `vite.config.ts`: serves `cmaps`, `standard_fonts`, `wasm`, `iccs` from `node_modules/pdfjs-dist` at `/pdfjs/**` in dev and preview, and copies them into `dist/` on build.
-- **vite-plugin-pwa** (Workbox): web app manifest from `src/lib/pwaManifest.ts`, precaches the app shell (including the pdf.js worker and `configs.json`), `NetworkFirst` for `configs.json`, `CacheFirst` for `/pdfjs/**`. Registered from `src/main.tsx`; inactive in `npm run dev`.
+- **vite-plugin-pwa** (Workbox): web app manifest from `src/lib/pwaManifest.ts`, precaches the app shell (including the pdf.js worker; `configs.json` is excluded via `globIgnores` so precache cannot pin it), `NetworkFirst` for any same- or cross-origin `…/configs.json` (route callback), `CacheFirst` for `/pdfjs/**`. Registered from `src/main.tsx`; inactive in `npm run dev`.
 
 ## Language and tooling
 

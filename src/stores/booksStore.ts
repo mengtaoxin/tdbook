@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { listBooks } from '@/lib/bookService';
 import type { BookListItem } from '@/lib/bookTypes';
-import { invalidateBookConfigsCache } from '@/lib/catalog';
+import { invalidateBookConfigsCache, revalidateBookConfigs } from '@/lib/catalog';
 
 type BooksState = {
   books: BookListItem[];
@@ -61,9 +61,27 @@ export const useBooksStore = create<BooksState>((set, get) => ({
         error: true,
         loaded: false,
       });
+      return;
     }
+
+    await refreshFromRemote(generation, set);
   },
 }));
+
+/** Swap in the remote catalog after the cached list is already on screen. */
+async function refreshFromRemote(
+  generation: number,
+  set: (partial: Partial<BooksState>) => void,
+): Promise<void> {
+  try {
+    if (!(await revalidateBookConfigs()) || generation !== loadGeneration) return;
+    const result = await listBooks();
+    if (generation !== loadGeneration) return;
+    set({ books: result.books, duplicateIds: result.duplicateIds });
+  } catch {
+    // Keep the list already shown; the next load revalidates again.
+  }
+}
 
 /** Drop the in-memory catalog and the book list so the next load re-fetches configs.json. */
 export function invalidateCatalog() {

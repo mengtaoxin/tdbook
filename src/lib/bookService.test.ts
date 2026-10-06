@@ -9,6 +9,7 @@ import {
   resetBlobUrlCacheForTests,
 } from '@/lib/cacheStore';
 import * as epubPackage from '@/lib/epubPackage';
+import { getConfigsUrl } from '@/lib/settings';
 
 const catalog = {
   books: [
@@ -23,6 +24,7 @@ const catalog = {
 
 describe('listBooks / getBook cache snapshot', () => {
   beforeEach(async () => {
+    localStorage.clear();
     resetBlobUrlCacheForTests();
     await clearAllCacheRecords();
     invalidateBookConfigsCache();
@@ -131,49 +133,16 @@ describe('listBooks / getBook cache snapshot', () => {
     expect(await getBook('missing-id')).toBeNull();
   });
 
+  it('opens a book added remotely after the persisted catalog was saved', async () => {
+    await putCachedSampleEpub();
+    localStorage.setItem('books.configsCache', JSON.stringify({ url: getConfigsUrl(), books: [] }));
+
+    const book = await getBook('sample-epub');
+    expect(book?.id).toBe('sample-epub');
+  });
+
   it('lists and opens a cached book when the network is unavailable', async () => {
-    const sourceUrl = 'https://example.com/sample.epub';
-    await putFiles(sourceUrl, [
-      {
-        relativePath: 'META-INF/container.xml',
-        blob: new Blob([
-          `<?xml version="1.0"?>
-<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
-  <rootfiles>
-    <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
-  </rootfiles>
-</container>`,
-        ]),
-      },
-      {
-        relativePath: 'content.opf',
-        blob: new Blob([
-          `<?xml version="1.0"?>
-<package version="3.0" xmlns="http://www.idpf.org/2007/opf">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title>Sample EPUB</dc:title>
-  </metadata>
-  <manifest>
-    <item id="c1" href="c1.xhtml" media-type="application/xhtml+xml"/>
-  </manifest>
-  <spine><itemref idref="c1"/></spine>
-</package>`,
-        ]),
-      },
-      {
-        relativePath: 'c1.xhtml',
-        blob: new Blob(['<html><body>Cached page</body></html>']),
-      },
-    ]);
-    await putMeta({
-      sourceUrl,
-      type: 'epub',
-      id: 'sample-epub',
-      status: 'ready',
-      downloadedAt: Date.now(),
-      pageCount: 1,
-      coverPath: null,
-    });
+    await putCachedSampleEpub();
 
     // Warm the durable catalog cache, then go offline with a fresh in-memory cache.
     await listBooks();
@@ -198,3 +167,48 @@ describe('listBooks / getBook cache snapshot', () => {
     }
   });
 });
+
+async function putCachedSampleEpub() {
+  const sourceUrl = 'https://example.com/sample.epub';
+  await putFiles(sourceUrl, [
+    {
+      relativePath: 'META-INF/container.xml',
+      blob: new Blob([
+        `<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>`,
+      ]),
+    },
+    {
+      relativePath: 'content.opf',
+      blob: new Blob([
+        `<?xml version="1.0"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>Sample EPUB</dc:title>
+  </metadata>
+  <manifest>
+    <item id="c1" href="c1.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine><itemref idref="c1"/></spine>
+</package>`,
+      ]),
+    },
+    {
+      relativePath: 'c1.xhtml',
+      blob: new Blob(['<html><body>Cached page</body></html>']),
+    },
+  ]);
+  await putMeta({
+    sourceUrl,
+    type: 'epub',
+    id: 'sample-epub',
+    status: 'ready',
+    downloadedAt: Date.now(),
+    pageCount: 1,
+    coverPath: null,
+  });
+}

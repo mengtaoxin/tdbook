@@ -102,13 +102,17 @@ export default defineConfig({
       ],
       manifest: pwaManifest,
       workbox: {
-        // Include mjs (pdf.js worker) and json (public/sample/configs.json)
-        // so a production install can boot offline and reopen cached books.
+        // Include mjs (pdf.js worker) so a production install can boot offline
+        // and reopen cached books.
         globPatterns: ['**/*.{js,mjs,css,html,ico,svg,png,woff2,webmanifest,json}'],
+        // Precache would shadow the NetworkFirst route below and pin configs.json
+        // to the deployed revision; the app keeps its own offline copy anyway.
+        globIgnores: ['**/node_modules/**/*', '**/configs.json'],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
-            urlPattern: /\/configs\.json$/i,
+            // A callback (unlike a RegExp) also matches cross-origin catalog URLs.
+            urlPattern: ({ url }) => url.pathname.toLowerCase().endsWith('/configs.json'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'configs-json',

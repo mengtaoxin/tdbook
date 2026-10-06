@@ -25,6 +25,17 @@ export function BooksPage() {
 
   useEffect(() => {
     void load();
+
+    // Re-check configs.json when the network returns or the tab is revisited.
+    const reload = () => {
+      if (document.visibilityState === 'visible') void load();
+    };
+    window.addEventListener('online', reload);
+    document.addEventListener('visibilitychange', reload);
+    return () => {
+      window.removeEventListener('online', reload);
+      document.removeEventListener('visibilitychange', reload);
+    };
   }, [load]);
 
   function goToBook(book: BookListItem) {

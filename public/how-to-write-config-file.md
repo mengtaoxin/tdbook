@@ -51,6 +51,7 @@ The root object contains a `books` array; each item describes one book.
 - If a duplicate `id` appears, the book list shows a warning and only the first occurrence is kept.
 - When the config or book files are hosted cross-origin, the server must allow browser CORS reads.
 - A successful download of `configs.json` is also stored in local storage so the book list can load offline; use “Clear catalog cache” in Settings to remove it.
+- The book list shows the saved copy right away and checks the server for a newer `configs.json` in the background, so edits appear on the next visit to the book list (or when the tab is reopened / the network returns) without clearing any cache.
 - Changing the config URL or catalog does not auto-delete old cached books; use “Clear all cache” in Settings.
 
 ## Ask an AI to generate configs.json

@@ -2,7 +2,13 @@ import { ensureBookCached } from './bookCache';
 import type { CacheProgress } from './cacheIngest';
 import { getBookCacheMeta, getCachedBlobUrl, putMeta, type BookCacheMeta } from './cacheStore';
 import type { BookListItem, BookRecord } from './bookTypes';
-import { bookTypeOf, getBookConfigs, optionalCoverUrl, type BookConfig } from './catalog';
+import {
+  bookTypeOf,
+  getBookConfigs,
+  optionalCoverUrl,
+  revalidateBookConfigs,
+  type BookConfig,
+} from './catalog';
 import { getFormatAdapter } from './formats';
 import { isSafeSegment } from './paths';
 
@@ -33,14 +39,20 @@ async function coverFromSnapshot(config: BookConfig, meta: BookCacheMeta): Promi
   return getCachedBlobUrl(config.path, coverPath);
 }
 
+/** Look up `id`, re-downloading the catalog once when the cached copy predates the book. */
+async function findBookConfig(id: string): Promise<BookConfig | undefined> {
+  const cached = (await getBookConfigs()).books.find((book) => book.id === id);
+  if (cached || !(await revalidateBookConfigs())) return cached;
+  return (await getBookConfigs()).books.find((book) => book.id === id);
+}
+
 export async function getBook(
   id: string,
   onProgress?: (progress: CacheProgress) => void,
 ): Promise<BookRecord | null> {
   if (!isSafeSegment(id)) return null;
 
-  const { books: configs } = await getBookConfigs();
-  const config = configs.find((book) => book.id === id);
+  const config = await findBookConfig(id);
   if (!config) return null;
 
   const adapter = getFormatAdapter(bookTypeOf(config));
