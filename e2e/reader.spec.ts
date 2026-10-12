@@ -96,52 +96,62 @@ test.describe('books reader', () => {
     await expect(page.getByText('All book caches cleared')).toBeVisible();
   });
 
-  test('saves and restores the default bookmark while reading', async ({ page }) => {
+  test('saves, lists, renames, and jumps to bookmarks while reading', async ({ page }) => {
     await page.goto('/books');
     await expect(page.getByTestId('nav-bookmarks')).toHaveCount(0);
 
     await page.getByText('Sample EPUB').click();
     await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByTestId('nav-bookmarks')).toBeVisible();
     await expect(page.getByTestId('nav-bookmarks')).toHaveText('Bookmarks');
 
+    const menu = page.getByTestId('nav-bookmarks-menu');
+    const items = menu.locator('[data-testid^="bookmark-item-"]');
     await page.getByTestId('nav-bookmarks').click();
-    await expect(page.getByTestId('bookmark-jump-default')).toBeDisabled();
-    await expect(page.getByTestId('bookmark-jump-default')).toHaveText('Jump to default');
-    await expect(page.getByTestId('bookmark-save-default')).toHaveText('Save as default');
+    await expect(menu.getByTestId('bookmark-save')).toHaveText('Save bookmark');
+    await expect(menu.getByTestId('bookmark-empty')).toHaveText('No bookmarks yet');
     await page.keyboard.press('Escape');
 
     await page.getByLabel('Next page').click();
     await expect(page).toHaveURL(/page=2/);
     await page.getByTestId('nav-bookmarks').click();
-    await page.getByTestId('bookmark-save-default').click();
-    await expect(page.getByText('Default bookmark saved.')).toBeVisible();
+    await menu.getByTestId('bookmark-save').click();
+    await expect(page.getByText('Bookmark saved.')).toBeVisible();
 
     const stored = await page.evaluate(() => localStorage.getItem('books.bookmarks'));
     const parsed = JSON.parse(stored ?? '') as {
-      bookmarks: Array<{
-        'book-id': string;
-        isDefault: boolean;
-        location: string;
-        name: string;
-        page: number;
-      }>;
+      bookmarks: Array<{ bookId: string; location: string; name?: string; page: number }>;
     };
     expect(parsed.bookmarks).toHaveLength(1);
-    expect(parsed.bookmarks[0]).toMatchObject({
-      'book-id': 'sample-epub',
-      isDefault: true,
-      name: 'Default bookmark',
-      page: 2,
-    });
+    expect(parsed.bookmarks[0]).toMatchObject({ bookId: 'sample-epub', page: 2 });
+    expect(parsed.bookmarks[0]?.name).toBeUndefined();
     expect(parsed.bookmarks[0]?.location).toMatch(/^#char:\d+$/);
 
     await page.getByLabel('Previous page').click();
     await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/);
     await page.getByTestId('nav-bookmarks').click();
-    await page.getByTestId('bookmark-jump-default').click();
+    await expect(menu.getByText('Recent')).toBeVisible();
+    await expect(items).toHaveCount(1);
+    await expect(items.first()).toContainText('Page 2');
+    await items.first().click();
     await expect(page).toHaveURL(/\/book\/sample-epub\?page=2/);
     await expect(page.getByText('Page 2 / 2')).toBeVisible();
+
+    await page.getByTestId('nav-bookmarks').click();
+    await menu.locator('[data-testid^="bookmark-edit-"]').first().click();
+    const dialog = page.getByTestId('bookmark-rename-dialog');
+    await expect(dialog.getByTestId('bookmark-rename-confirm')).toBeDisabled();
+    await dialog.getByTestId('bookmark-rename-input').fill('Chapter two');
+    await dialog.getByTestId('bookmark-rename-confirm').click();
+    await expect(page.getByText('Bookmark named.')).toBeVisible();
+    await expect(dialog).toHaveCount(0);
+    await expect(menu.getByText('Named')).toBeVisible();
+    await expect(menu.getByText('Recent')).toHaveCount(0);
+    await expect(items.first()).toContainText('Chapter two');
+
+    await menu.locator('[data-testid^="bookmark-edit-"]').first().click();
+    await dialog.getByTestId('bookmark-delete').click();
+    await expect(page.getByText('Bookmark deleted.')).toBeVisible();
+    await expect(menu.getByTestId('bookmark-empty')).toBeVisible();
   });
 
   test('bookmark restores in-page position after the window is resized', async ({ page }) => {
@@ -158,13 +168,15 @@ test.describe('books reader', () => {
     });
 
     await page.getByTestId('nav-bookmarks').click();
-    await page.getByTestId('bookmark-save-default').click();
-    await expect(page.getByText('Default bookmark saved.')).toBeVisible();
+    await page.getByTestId('nav-bookmarks-menu').getByTestId('bookmark-save').click();
+    await expect(page.getByText('Bookmark saved.')).toBeVisible();
 
     const saved = await page.evaluate(() => {
       const raw = localStorage.getItem('books.bookmarks');
       return raw
-        ? (JSON.parse(raw) as { bookmarks: Array<{ location: string; page: number }> })
+        ? (JSON.parse(raw) as {
+            bookmarks: Array<{ id: string; location: string; page: number }>;
+          })
         : null;
     });
     expect(saved?.bookmarks[0]?.page).toBe(1);
@@ -180,7 +192,7 @@ test.describe('books reader', () => {
     await page.setViewportSize({ width: 500, height: 480 });
     await page.getByLabel('Open menu').click();
     const drawer = page.getByTestId('nav-drawer');
-    await drawer.getByTestId('drawer-bookmark-jump-default').click();
+    await drawer.getByTestId(`bookmark-item-${saved?.bookmarks[0]?.id}`).click();
     await expect(page).toHaveURL(/page=1/);
 
     await expect

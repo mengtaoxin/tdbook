@@ -31,22 +31,20 @@ import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
+import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { translateError } from '@/i18n';
-import {
-  DRAWER_BOOKMARKS_DEFAULT_OPEN,
-  getDefaultBookmark,
-  readerBookIdFromPath,
-  saveDefaultBookmark,
-} from '@/lib/bookmarks';
-import { captureReaderLocation, locationToRouterHash } from '@/lib/epubAnchor';
+import { readerBookIdFromPath } from '@/lib/bookmarks';
 import type { AppLocale } from '@/lib/locale';
 import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { shouldCollapseNav, toolbarNavAvailableWidth } from '@/lib/navLayout';
 import { GITHUB_ISSUES_URL } from '@/lib/projectLinks';
 import { useLocaleStore } from '@/stores/localeStore';
+import {
+  type BookmarkNoticeType,
+  ReaderBookmarksList,
+  ReaderBookmarksMenu,
+} from './ReaderBookmarks';
 
 const NAV_ITEMS = [{ labelKey: 'nav.books', to: '/books' as const, Icon: AutoStoriesOutlinedIcon }];
 
@@ -65,34 +63,24 @@ export function AppShell() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
   const setLocale = useLocaleStore((s) => s.setLocale);
-  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const page = useRouterState({
-    select: (s) => {
-      const search = s.location.search as { page?: number };
-      return search.page ?? 1;
-    },
-  });
-  const hash = useRouterState({ select: (s) => s.location.hash });
   const bookId = readerBookIdFromPath(pathname);
   const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null);
   const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null);
   const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null);
-  const [, refreshBookmarks] = useReducer((revision: number) => revision + 1, 0);
   const [bookmarkNotice, setBookmarkNotice] = useState('');
-  const [bookmarkNoticeType, setBookmarkNoticeType] = useState<'success' | 'error'>('success');
+  const [bookmarkNoticeType, setBookmarkNoticeType] = useState<BookmarkNoticeType>('success');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [compactNav, setCompactNav] = useState(true);
   const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false);
   const [drawerMoreOpen, setDrawerMoreOpen] = useState(false);
-  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(DRAWER_BOOKMARKS_DEFAULT_OPEN);
+  const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(true);
   const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false);
   const [drawerPathname, setDrawerPathname] = useState(pathname);
   if (drawerPathname !== pathname) {
     setDrawerPathname(pathname);
     setDrawerOpen(false);
   }
-  const defaultBookmark = bookId ? getDefaultBookmark(bookId) : null;
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const brandRef = useRef<HTMLAnchorElement | null>(null);
   const desktopNavRef = useRef<HTMLElement | null>(null);
@@ -156,39 +144,14 @@ export function AppShell() {
     window.open(GITHUB_ISSUES_URL, '_blank', 'noopener,noreferrer');
   }
 
-  function jumpToDefaultBookmark() {
-    if (!bookId || !defaultBookmark) return;
-    void navigate({
-      to: '/book/$id',
-      params: { id: bookId },
-      search: { page: defaultBookmark.page },
-      hash: locationToRouterHash(defaultBookmark.location),
-    });
+  function closeBookmarks() {
     setBookmarkAnchor(null);
     setDrawerOpen(false);
   }
 
-  function saveCurrentAsDefaultBookmark() {
-    if (!bookId) return;
-    try {
-      // Prefer content-stable EPUB anchors (#char:N) over URL hash / scroll ratios
-      // so resize of the browser window does not drift the restored position.
-      const location = captureReaderLocation() || hash;
-      saveDefaultBookmark({
-        bookId,
-        page,
-        location,
-        name: t('bookmarks.defaultName'),
-      });
-      refreshBookmarks();
-      setBookmarkNoticeType('success');
-      setBookmarkNotice(t('bookmarks.saved'));
-    } catch (err) {
-      setBookmarkNoticeType('error');
-      setBookmarkNotice(translateError(err, 'bookmarks.saveFailed'));
-    }
-    setBookmarkAnchor(null);
-    setDrawerOpen(false);
+  function showBookmarkNotice(type: BookmarkNoticeType, message: string) {
+    setBookmarkNoticeType(type);
+    setBookmarkNotice(message);
   }
 
   const desktopNav = (
@@ -298,23 +261,11 @@ export function AppShell() {
                   <ListItemText primary={t('nav.bookmarks')} />
                 </ListItemButton>
                 <Collapse in={drawerBookmarksOpen} timeout="auto" unmountOnExit>
-                  <List dense disablePadding>
-                    <ListItemButton
-                      data-testid="drawer-bookmark-jump-default"
-                      disabled={!defaultBookmark}
-                      sx={{ pl: 4 }}
-                      onClick={jumpToDefaultBookmark}
-                    >
-                      <ListItemText primary={t('bookmarks.jumpDefault')} />
-                    </ListItemButton>
-                    <ListItemButton
-                      data-testid="drawer-bookmark-save-default"
-                      sx={{ pl: 4 }}
-                      onClick={saveCurrentAsDefaultBookmark}
-                    >
-                      <ListItemText primary={t('bookmarks.saveDefault')} />
-                    </ListItemButton>
-                  </List>
+                  <ReaderBookmarksList
+                    bookId={bookId}
+                    onDone={closeBookmarks}
+                    onNotice={showBookmarkNotice}
+                  />
                 </Collapse>
               </>
             ) : null}
@@ -468,28 +419,21 @@ export function AppShell() {
         </MenuItem>
       </Menu>
 
-      <Menu
-        anchorEl={bookmarkAnchor}
-        open={Boolean(bookmarkAnchor)}
-        onClose={() => setBookmarkAnchor(null)}
-        data-testid="nav-bookmarks-menu"
-      >
-        <MenuItem
-          data-testid="bookmark-jump-default"
-          disabled={!defaultBookmark}
-          onClick={jumpToDefaultBookmark}
-        >
-          {t('bookmarks.jumpDefault')}
-        </MenuItem>
-        <MenuItem data-testid="bookmark-save-default" onClick={saveCurrentAsDefaultBookmark}>
-          {t('bookmarks.saveDefault')}
-        </MenuItem>
-      </Menu>
+      {bookId ? (
+        <ReaderBookmarksMenu
+          anchorEl={bookmarkAnchor}
+          bookId={bookId}
+          onDone={closeBookmarks}
+          onNotice={showBookmarkNotice}
+        />
+      ) : null}
 
       <Snackbar
         open={Boolean(bookmarkNotice)}
         autoHideDuration={4000}
-        onClose={() => setBookmarkNotice('')}
+        onClose={(_event, reason) => {
+          if (reason !== 'clickaway') setBookmarkNotice('');
+        }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity={bookmarkNoticeType} variant="filled" onClose={() => setBookmarkNotice('')}>

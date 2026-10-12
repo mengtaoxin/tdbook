@@ -15,5 +15,5 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 - Running or writing tests → [docs/testing.md](docs/testing.md)
 - Adding or moving files → [docs/file-structure.md](docs/file-structure.md)
 - Style, i18n, adding books → [docs/conventions.md](docs/conventions.md)
-- Catalog entries, IndexedDB cache, offline, reader, app logs → [docs/data-model.md](docs/data-model.md)
+- Catalog entries, IndexedDB cache, offline, reader, bookmarks, app logs → [docs/data-model.md](docs/data-model.md)
 - Stack and versions → [docs/tech-stacks.md](docs/tech-stacks.md)

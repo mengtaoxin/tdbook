@@ -3,7 +3,7 @@
 ```
 docs/file-structure.md     this file
 docs/conventions.md        coding conventions
-docs/data-model.md         catalog entries, cache keys, offline, reader, app logs
+docs/data-model.md         catalog entries, cache keys, offline, reader, bookmarks, app logs
 docs/commands.md           npm scripts and setup
 docs/testing.md            unit (Vitest) + e2e (Playwright) testing
 docs/tech-stacks.md        libraries, build/PWA, tooling, deploy
@@ -16,8 +16,8 @@ src/
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
-  components/         AppShell, ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
-  stores/             Zustand (locale, settings, books list)
+  components/         AppShell, ReaderBookmarks (bookmark menu / drawer list + rename dialog), ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
+  stores/             Zustand (locale, settings, books list, bookmarks)
   hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging)
   lib/
     catalog.ts        configs.json fetch + normalize (BookConfig); stale-while-revalidate over in-memory + localStorage copies (getBookConfigs / revalidateBookConfigs)
@@ -41,7 +41,8 @@ src/
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
-    bookmarks.ts      all-books bookmark JSON in localStorage (default bookmark per book)
+    bookmarks.ts      bookmark pure logic: add (10 recent per book), rename (= permanent), remove, group, time label
+    bookmarkStorage.ts  bookmark JSON in localStorage (load with strict validation / store)
     locale.ts         UI locale preference (en/zh, default en)
     reportFailure.ts  console.error for failures (TdLog is separate)
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa

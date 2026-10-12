@@ -1,22 +1,21 @@
-export const BOOKMARKS_STORAGE_KEY = 'books.bookmarks';
-
-/** Fixed label for a new default bookmark. Existing names are never rewritten. */
-export const DEFAULT_BOOKMARK_NAME = 'Default bookmark';
-
-/** Reader drawer bookmarks section starts expanded. */
-export const DRAWER_BOOKMARKS_DEFAULT_OPEN = true;
+/** Unnamed bookmarks kept per book; named ones are permanent and not counted. */
+export const MAX_RECENT_BOOKMARKS = 10;
 
 export type Bookmark = {
-  'book-id': string;
-  isDefault: boolean;
-  /** In-page anchor: `#char:N` (EPUB content offset) or legacy `#elementId`. */
-  location: string;
-  name: string;
+  id: string;
+  bookId: string;
+  /** Set = named (permanent). Missing = recent, subject to `MAX_RECENT_BOOKMARKS`. */
+  name?: string;
+  /** Epoch milliseconds of the latest save. */
+  savedAt: number;
   page: number;
+  /** In-page anchor: `#char:N` (EPUB content offset) or `#elementId`. */
+  location: string;
 };
 
-type BookmarkStore = {
-  bookmarks: Bookmark[];
+export type BookBookmarks = {
+  named: Bookmark[];
+  recent: Bookmark[];
 };
 
 export function readerBookIdFromPath(pathname: string): string | null {
@@ -29,94 +28,80 @@ export function readerBookIdFromPath(pathname: string): string | null {
   }
 }
 
-function isBookmark(value: unknown): value is Bookmark {
-  if (!value || typeof value !== 'object') return false;
-  const item = value as Record<string, unknown>;
-  return (
-    typeof item['book-id'] === 'string' &&
-    item['book-id'].length > 0 &&
-    typeof item.isDefault === 'boolean' &&
-    typeof item.location === 'string' &&
-    typeof item.name === 'string' &&
-    item.name.length > 0 &&
-    Number.isInteger(item.page) &&
-    (item.page as number) >= 1
-  );
+function newestFirst(a: Bookmark, b: Bookmark): number {
+  return b.savedAt - a.savedAt;
 }
 
-/** One default bookmark per book; the first default wins. */
-function normalize(bookmarks: Bookmark[]): Bookmark[] {
-  const seenDefault = new Set<string>();
-  return bookmarks.map((bookmark) => {
-    if (!bookmark.isDefault) return bookmark;
-    const bookId = bookmark['book-id'];
-    if (seenDefault.has(bookId)) return { ...bookmark, isDefault: false };
-    seenDefault.add(bookId);
-    return bookmark;
-  });
-}
-
-export function listBookmarks(): Bookmark[] {
-  try {
-    const raw = localStorage.getItem(BOOKMARKS_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!parsed || typeof parsed !== 'object') return [];
-    const bookmarks = (parsed as { bookmarks?: unknown }).bookmarks;
-    if (!Array.isArray(bookmarks)) return [];
-    return normalize(bookmarks.filter(isBookmark));
-  } catch {
-    return [];
-  }
-}
-
-export function getDefaultBookmark(bookId: string): Bookmark | null {
-  return (
-    listBookmarks().find((bookmark) => bookmark['book-id'] === bookId && bookmark.isDefault) ?? null
-  );
-}
-
-function writeStore(store: BookmarkStore): void {
-  try {
-    localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(store));
-  } catch {
-    throw new Error('errors.localStorageWrite');
-  }
+export function groupBookBookmarks(list: Bookmark[], bookId: string): BookBookmarks {
+  const own = list.filter((bookmark) => bookmark.bookId === bookId).sort(newestFirst);
+  return {
+    named: own.filter((bookmark) => bookmark.name !== undefined),
+    recent: own.filter((bookmark) => bookmark.name === undefined),
+  };
 }
 
 /**
- * Create or update the single default bookmark for a book.
- * A later save changes page and location only; the name stays as first stored.
+ * Save a position as a recent bookmark. Saving the same position as the newest
+ * recent bookmark only refreshes its time; older recent ones beyond the limit are dropped.
  */
-export function saveDefaultBookmark(input: {
-  bookId: string;
-  page: number;
-  location: string;
-  name?: string;
-}): Bookmark {
-  const bookId = input.bookId.trim();
-  if (!bookId || !Number.isInteger(input.page) || input.page < 1) {
-    throw new Error('errors.invalidBookmark');
+export function addBookmark(
+  list: Bookmark[],
+  input: { id: string; bookId: string; page: number; location: string; now: number },
+): Bookmark[] {
+  const newest = groupBookBookmarks(list, input.bookId).recent[0];
+  if (newest && newest.page === input.page && newest.location === input.location) {
+    return list.map((bookmark) =>
+      bookmark.id === newest.id ? { ...bookmark, savedAt: input.now } : bookmark,
+    );
   }
 
-  const current = listBookmarks();
-  const existing = current.find((bookmark) => bookmark['book-id'] === bookId && bookmark.isDefault);
-  const next: Bookmark = existing
-    ? {
-        ...existing,
-        location: input.location,
-        page: input.page,
-      }
-    : {
-        'book-id': bookId,
-        isDefault: true,
-        location: input.location,
-        name: input.name?.trim() || DEFAULT_BOOKMARK_NAME,
-        page: input.page,
-      };
-  const kept = current.filter(
-    (bookmark) => !(bookmark['book-id'] === bookId && bookmark.isDefault),
+  const added: Bookmark = {
+    id: input.id,
+    bookId: input.bookId,
+    page: input.page,
+    location: input.location,
+    savedAt: input.now,
+  };
+  const next = [...list, added];
+  const dropped = new Set(
+    groupBookBookmarks(next, input.bookId)
+      .recent.slice(MAX_RECENT_BOOKMARKS)
+      .map((bookmark) => bookmark.id),
   );
-  writeStore({ bookmarks: normalize([...kept, next]) });
-  return next;
+  return next.filter((bookmark) => !dropped.has(bookmark.id));
+}
+
+/** Naming a bookmark makes it permanent. */
+export function renameBookmark(list: Bookmark[], id: string, name: string): Bookmark[] {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error('errors.invalidBookmarkName');
+  return list.map((bookmark) => (bookmark.id === id ? { ...bookmark, name: trimmed } : bookmark));
+}
+
+export function removeBookmark(list: Bookmark[], id: string): Bookmark[] {
+  return list.filter((bookmark) => bookmark.id !== id);
+}
+
+const TIME_FORMAT: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+};
+
+/** Time only for today; month and day otherwise; plus year when it differs from `now`. */
+export function formatBookmarkTime(savedAt: number, now: number, locale: string): string {
+  const saved = new Date(savedAt);
+  const current = new Date(now);
+  const sameYear = saved.getFullYear() === current.getFullYear();
+  const sameDay =
+    sameYear && saved.getMonth() === current.getMonth() && saved.getDate() === current.getDate();
+  const options: Intl.DateTimeFormatOptions = sameDay
+    ? TIME_FORMAT
+    : {
+        ...(sameYear ? {} : { year: 'numeric' }),
+        month: 'short',
+        day: 'numeric',
+        ...TIME_FORMAT,
+      };
+  return new Intl.DateTimeFormat(locale, options).format(saved);
 }
