@@ -16,7 +16,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 | EPUB         | JSZip + fast-xml-parser                       | 3 / 5   | Unzip in `src/lib/epubIngest.ts`; OPF / spine parse in `src/lib/epubPackage.ts`           |
 | PDF          | pdfjs-dist                                    | 6       | `src/lib/pdfReader.ts`: worker, page render, text layer, cover snapshot                   |
 | Markdown     | marked                                        | 18      | Renders the Config Guide (`public/how-to-write-config-file*.md`)                          |
-| App logs     | tdkit (`@mengtaoxin/tdkit`, GitHub Packages)  | 0.1     | `TdLog` durable logs from reader hooks; listed / cleared on `/logs`                       |
+| App logs     | tdkit (`@mengtaoxin/tdkit`, GitHub Packages)  | 0.3     | `TdLog` durable logs from reader hooks; listed / cleared on `/logs`                       |
 
 ## Build and PWA
 

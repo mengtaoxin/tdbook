@@ -6,6 +6,7 @@ import {
   type PDFDocumentProxy,
   type RenderTask,
 } from 'pdfjs-dist';
+// oxlint-disable-next-line import/default -- Vite `?url` imports are typed by vite/client, not the module.
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 GlobalWorkerOptions.workerSrc = pdfWorker;

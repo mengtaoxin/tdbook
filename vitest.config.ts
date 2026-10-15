@@ -17,11 +17,11 @@ export default defineConfig({
     // Colocated with source (Vitest default would also match e2e/*.spec.ts).
     include: ['src/**/*.test.ts'],
     setupFiles: ['src/test/setup.ts'],
-    // happy-dom fetches <link rel="stylesheet"> during DOMParser; real browsers do not.
+    // DOMParser must not fetch subresources (real browsers do not); CSS loading
+    // is already off by default since happy-dom 21.
     environmentOptions: {
       happyDOM: {
         settings: {
-          disableCSSFileLoading: true,
           disableJavaScriptFileLoading: true,
           handleDisabledFileLoadingAsSuccess: true,
         },

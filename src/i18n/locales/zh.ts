@@ -22,22 +22,40 @@ export default {
     zh: '中文',
   },
   home: {
-    tagline:
-      '个人电子书阅读器：在浏览器里浏览书目、打开电子书或 PDF，第一次阅读时会下载到本机，之后即使没有网络也能继续读。',
-    catalogHint: '书目由配置文件提供，如需更换书单来源，可在设置中修改配置地址。',
+    eyebrow: '个人电子书阅读器',
+    headline: '一个只读 JSON 文件，就是你的整座书库',
+    lead: '纯前端、无服务器：把书写进 configs.json，tdbook 就把它变成书架和离线阅读器。书目和图书始终掌握在你自己手里。',
     browseBooks: '浏览图书列表',
-    features: {
-      formats: {
-        title: '多种格式',
-        description: '支持常见的电子书与 PDF，打开即可在网页里阅读。',
+    writeConfig: '编写你的 configs.json',
+    sample: {
+      badge: '只读 · 静态文件',
+      required: '必填',
+      optional: '可选',
+      notes: {
+        books: '唯一的顶层字段：图书数组',
+        id: '唯一标识，也是阅读页地址 /book/:id',
+        title: '书架上显示的书名',
+        author: '作者，可省略',
+        type: 'epub 或 pdf，默认 epub',
+        path: '图书地址，首次打开后存进浏览器',
+        hover: '封面图，优先于书内封面',
+        more: '更多图书，结构完全相同',
       },
-      local: {
-        title: '本机保存',
-        description: '第一次打开时会自动下载到本机，之后无需反复加载。',
+    },
+    features: {
+      noServer: {
+        title: '无需服务器',
+        description:
+          'tdbook 是纯静态网站，只读取你的 JSON 和图书文件。没有数据库、没有账号，也不上传任何内容。',
+      },
+      yourData: {
+        title: '数据在你手里',
+        description:
+          '改一个文件就能更新书目。放在 GitHub Pages、对象存储或任意静态托管上，在设置里填上地址即可。',
       },
       offline: {
         title: '离线阅读',
-        description: '书下载完成后，没有网络也能继续翻页阅读。',
+        description: '首次打开时图书下载到当前浏览器，之后没有网络也能继续翻页阅读。',
       },
     },
   },

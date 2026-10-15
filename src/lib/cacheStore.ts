@@ -1,4 +1,4 @@
-import Dexie, { type EntityTable, type Table } from 'dexie';
+import { Dexie, type EntityTable, type Table } from 'dexie';
 import type { BookType } from './bookTypes';
 
 export type BookCacheMeta = {

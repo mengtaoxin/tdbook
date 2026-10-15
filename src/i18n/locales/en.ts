@@ -22,24 +22,41 @@ export default {
     zh: '中文',
   },
   home: {
-    tagline:
-      'A personal ebook reader: browse your catalog, open EPUB or PDF in the browser, download on first open, and keep reading offline.',
-    catalogHint:
-      'The book list comes from a config file. Change the config URL in Settings if you want a different catalog.',
+    eyebrow: 'Personal ebook reader',
+    headline: 'One read-only JSON file is your whole library',
+    lead: 'Pure front end, no server: list your books in configs.json and tdbook turns it into a bookshelf and an offline reader. Your catalog and your books stay in your hands.',
     browseBooks: 'Browse books',
-    features: {
-      formats: {
-        title: 'Multiple formats',
-        description: 'Open common ebooks and PDFs and read them in the browser.',
+    writeConfig: 'Write your configs.json',
+    sample: {
+      badge: 'read-only · static file',
+      required: 'required',
+      optional: 'optional',
+      notes: {
+        books: 'The only top-level key: a list of books',
+        id: 'Unique key; becomes the reader URL /book/:id',
+        title: 'Shown on the bookshelf',
+        author: 'Author; can be left out',
+        type: 'epub or pdf; defaults to epub',
+        path: 'Book file URL; saved in this browser on first open',
+        hover: 'Cover image; overrides the one in the book',
+        more: 'More books, same shape',
       },
-      local: {
-        title: 'Saved locally',
+    },
+    features: {
+      noServer: {
+        title: 'No server',
         description:
-          'The first open downloads the book to this device so you do not reload it every time.',
+          'tdbook is a static site that only reads your JSON and book files. No database, no account, nothing uploaded.',
+      },
+      yourData: {
+        title: 'Your data, your hands',
+        description:
+          'Edit one file to change your catalog. Host it on GitHub Pages, object storage, or any static host, then point Settings at it.',
       },
       offline: {
         title: 'Offline reading',
-        description: 'After a book is downloaded, you can keep turning pages without a network.',
+        description:
+          'Books are saved in this browser on first open, so EPUB and PDF pages keep turning without a network.',
       },
     },
   },
