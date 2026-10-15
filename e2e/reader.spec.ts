@@ -189,7 +189,7 @@ test.describe('books reader', () => {
 
     // Narrow/short viewport would break a scroll-ratio bookmark; content anchors stay put.
     // Compact nav hides the desktop Bookmarks button — jump from the drawer instead.
-    await page.setViewportSize({ width: 500, height: 480 });
+    await page.setViewportSize({ width: 360, height: 480 });
     await page.getByLabel('Open menu').click();
     const drawer = page.getByTestId('nav-drawer');
     await drawer.getByTestId(`bookmark-item-${saved?.bookmarks[0]?.id}`).click();

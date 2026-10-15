@@ -32,20 +32,19 @@ test.describe('app shell navigation', () => {
     await expect(page.getByTestId('nav-menu-toggle')).toHaveCount(0);
 
     // Mid widths used to clip "More" instead of collapsing (padding/gap ignored).
-    await page.setViewportSize({ width: 420, height: 800 });
+    await page.setViewportSize({ width: 320, height: 800 });
     await expect(page.getByTestId('nav-menu-toggle')).toBeVisible();
     await expect(page.getByTestId('desktop-nav')).toBeHidden();
 
     await page.getByTestId('nav-menu-toggle').click();
     const drawer = page.getByTestId('nav-drawer');
     await expect(drawer.getByRole('link', { name: 'Books' })).toBeVisible();
+    await expect(drawer.getByText('Language')).toHaveCount(0);
     await drawer.getByTestId('nav-drawer-more-toggle').click();
     await expect(drawer.getByRole('link', { name: 'Settings' })).toBeVisible();
   });
 
-  test('Logs, Settings, About, Config Guide, and Feedback live under More after Language', async ({
-    page,
-  }) => {
+  test('Logs, Settings, About, Config Guide, and Feedback live under More', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
@@ -57,16 +56,10 @@ test.describe('app shell navigation', () => {
     await expect(desktopNav.getByRole('link', { name: 'Config Guide' })).toHaveCount(0);
     await expect(desktopNav.getByTestId('nav-feedback')).toHaveCount(0);
 
-    const localeToggle = page.getByTestId('nav-locale-toggle');
-    const moreToggle = page.getByTestId('nav-more-toggle');
-    await expect(localeToggle).toBeVisible();
-    await expect(moreToggle).toBeVisible();
-    const localeBox = await localeToggle.boundingBox();
-    const moreBox = await moreToggle.boundingBox();
-    expect(localeBox).toBeTruthy();
-    expect(moreBox).toBeTruthy();
-    expect(moreBox!.x).toBeGreaterThan(localeBox!.x);
+    await expect(desktopNav.getByRole('button', { name: 'Language' })).toHaveCount(0);
 
+    const moreToggle = page.getByTestId('nav-more-toggle');
+    await expect(moreToggle).toBeVisible();
     await moreToggle.click();
 
     const moreMenu = page.getByTestId('nav-more-menu');
@@ -81,7 +74,7 @@ test.describe('app shell navigation', () => {
     await expect(page).toHaveURL('/logs');
   });
 
-  test('Language and More menus do not lock page scroll (scrollbar stays)', async ({ page }) => {
+  test('More menu does not lock page scroll (scrollbar stays)', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
 
@@ -90,12 +83,6 @@ test.describe('app shell navigation', () => {
     }
 
     expect(await bodyOverflow()).not.toBe('hidden');
-
-    await page.getByTestId('nav-locale-toggle').click();
-    await expect(page.getByTestId('nav-locale-menu')).toBeVisible();
-    expect(await bodyOverflow()).not.toBe('hidden');
-    await page.keyboard.press('Escape');
-    await expect(page.getByTestId('nav-locale-menu')).toBeHidden();
 
     await page.getByTestId('nav-more-toggle').click();
     await expect(page.getByTestId('nav-more-menu')).toBeVisible();

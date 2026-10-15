@@ -11,13 +11,11 @@ export default {
     feedbackConfirmTitle: '打开 GitHub Issues？',
     feedbackConfirmBody:
       '将离开本应用，并在 GitHub 打开 tdbook 的 Issues 页面，以便反馈问题或建议。',
-    language: '语言',
     openMenu: '打开菜单',
     bookmarks: '书签',
     beta: 'Beta',
   },
   locale: {
-    label: '语言',
     en: 'English',
     zh: '中文',
   },
@@ -112,6 +110,8 @@ export default {
     restoredDefault: '已恢复默认地址（{url}）。',
     saveFailed: '保存失败。',
     restoreFailed: '恢复失败。',
+    languageTitle: '语言',
+    languageLabel: '显示语言',
     cacheTitle: '缓存',
     catalogCacheDescription:
       '成功下载的 configs.json 会保存在本地存储中，以便在网络不可用时仍能加载书目列表。',

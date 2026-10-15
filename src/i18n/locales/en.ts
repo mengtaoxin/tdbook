@@ -11,13 +11,11 @@ export default {
     feedbackConfirmTitle: 'Open GitHub Issues?',
     feedbackConfirmBody:
       'You will leave this app and open the tdbook issues page on GitHub to report a problem or suggestion.',
-    language: 'Language',
     openMenu: 'Open menu',
     bookmarks: 'Bookmarks',
     beta: 'Beta',
   },
   locale: {
-    label: 'Language',
     en: 'English',
     zh: '中文',
   },
@@ -113,6 +111,8 @@ export default {
     restoredDefault: 'Restored default URL ({url}).',
     saveFailed: 'Save failed.',
     restoreFailed: 'Restore failed.',
+    languageTitle: 'Language',
+    languageLabel: 'Display language',
     cacheTitle: 'Cache',
     catalogCacheDescription:
       'A successful download of configs.json is kept in local storage so the book list can load when the network is unavailable.',

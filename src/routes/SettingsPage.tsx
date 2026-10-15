@@ -8,6 +8,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
+import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -17,8 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { translateError } from '@/i18n';
 import { clearAllBookCaches } from '@/lib/bookCache';
 import { clearPersistedBookConfigs } from '@/lib/catalog';
+import { isAppLocale, SUPPORTED_LOCALES } from '@/lib/locale';
 import { DEFAULT_CONFIGS_URL } from '@/lib/settings';
 import { invalidateCatalog, useBooksStore } from '@/stores/booksStore';
+import { useLocaleStore } from '@/stores/localeStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 type ClearTarget = 'catalog' | 'books' | null;
@@ -28,6 +31,8 @@ export function SettingsPage() {
   const configsUrl = useSettingsStore((s) => s.configsUrl);
   const setConfigsUrl = useSettingsStore((s) => s.setConfigsUrl);
   const restoreDefault = useSettingsStore((s) => s.restoreDefault);
+  const locale = useLocaleStore((s) => s.locale);
+  const setLocale = useLocaleStore((s) => s.setLocale);
   const [draft, setDraft] = useState(configsUrl);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
@@ -141,6 +146,26 @@ export function SettingsPage() {
             {t('settings.restoreDefault')}
           </Button>
         </Stack>
+
+        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+          {t('settings.languageTitle')}
+        </Typography>
+        <TextField
+          select
+          fullWidth
+          label={t('settings.languageLabel')}
+          value={locale}
+          onChange={(event) => {
+            if (isAppLocale(event.target.value)) setLocale(event.target.value);
+          }}
+          sx={{ mb: 5 }}
+        >
+          {SUPPORTED_LOCALES.map((code) => (
+            <MenuItem key={code} value={code}>
+              {t(`locale.${code}`)}
+            </MenuItem>
+          ))}
+        </TextField>
 
         <Typography variant="h6" component="h2" sx={{ mb: 1 }}>
           {t('settings.cacheTitle')}

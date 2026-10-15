@@ -6,7 +6,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import TranslateIcon from '@mui/icons-material/Translate';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import Alert from '@mui/material/Alert';
@@ -35,8 +34,6 @@ import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readerBookIdFromPath } from '@/lib/bookmarks';
-import type { AppLocale } from '@/lib/locale';
-import { SUPPORTED_LOCALES } from '@/lib/locale';
 import { shouldCollapseNav, toolbarNavAvailableWidth } from '@/lib/navLayout';
 import { GITHUB_ISSUES_URL } from '@/lib/projectLinks';
 import { useLocaleStore } from '@/stores/localeStore';
@@ -62,17 +59,14 @@ const MORE_NAV_ITEMS = [
 export function AppShell() {
   const { t } = useTranslation();
   const locale = useLocaleStore((s) => s.locale);
-  const setLocale = useLocaleStore((s) => s.setLocale);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const bookId = readerBookIdFromPath(pathname);
-  const [localeAnchor, setLocaleAnchor] = useState<null | HTMLElement>(null);
   const [moreAnchor, setMoreAnchor] = useState<null | HTMLElement>(null);
   const [bookmarkAnchor, setBookmarkAnchor] = useState<null | HTMLElement>(null);
   const [bookmarkNotice, setBookmarkNotice] = useState('');
   const [bookmarkNoticeType, setBookmarkNoticeType] = useState<BookmarkNoticeType>('success');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [compactNav, setCompactNav] = useState(true);
-  const [drawerLocaleOpen, setDrawerLocaleOpen] = useState(false);
   const [drawerMoreOpen, setDrawerMoreOpen] = useState(false);
   const [drawerBookmarksOpen, setDrawerBookmarksOpen] = useState(true);
   const [feedbackConfirmOpen, setFeedbackConfirmOpen] = useState(false);
@@ -122,12 +116,6 @@ export function AppShell() {
     return () => observer.disconnect();
     // oxlint-disable-next-line react/exhaustive-effect-dependencies -- nav labels and the bookmarks button change its width
   }, [locale, t, bookId]);
-
-  function chooseLocale(code: AppLocale) {
-    setLocale(code);
-    setLocaleAnchor(null);
-    setDrawerOpen(false);
-  }
 
   function openFeedbackConfirm() {
     setMoreAnchor(null);
@@ -201,16 +189,6 @@ export function AppShell() {
       ) : null}
       <Button
         color="inherit"
-        startIcon={<TranslateIcon />}
-        data-testid="nav-locale-toggle"
-        aria-label={t('locale.label')}
-        tabIndex={compactNav ? -1 : undefined}
-        onClick={(event) => setLocaleAnchor(event.currentTarget)}
-      >
-        {t(`locale.${locale}`)}
-      </Button>
-      <Button
-        color="inherit"
         startIcon={<MoreHorizOutlinedIcon />}
         data-testid="nav-more-toggle"
         aria-label={t('nav.more')}
@@ -269,30 +247,6 @@ export function AppShell() {
                 </Collapse>
               </>
             ) : null}
-            <ListItemButton onClick={() => setDrawerLocaleOpen((open) => !open)}>
-              <ListItemIcon>
-                <TranslateIcon />
-              </ListItemIcon>
-              <ListItemText primary={t('nav.language')} />
-            </ListItemButton>
-            <Collapse in={drawerLocaleOpen} timeout="auto" unmountOnExit>
-              <List dense disablePadding>
-                {SUPPORTED_LOCALES.map((code) => (
-                  <ListItemButton
-                    key={code}
-                    data-testid={`locale-option-${code}`}
-                    selected={locale === code}
-                    sx={{ pl: 4 }}
-                    onClick={() => chooseLocale(code)}
-                  >
-                    <ListItemIcon>
-                      <TranslateIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={t(`locale.${code}`)} />
-                  </ListItemButton>
-                ))}
-              </List>
-            </Collapse>
             <ListItemButton
               data-testid="nav-drawer-more-toggle"
               onClick={() => setDrawerMoreOpen((open) => !open)}
@@ -440,24 +394,6 @@ export function AppShell() {
           {bookmarkNotice}
         </Alert>
       </Snackbar>
-
-      <Menu
-        anchorEl={localeAnchor}
-        open={Boolean(localeAnchor)}
-        onClose={() => setLocaleAnchor(null)}
-        data-testid="nav-locale-menu"
-      >
-        {SUPPORTED_LOCALES.map((code) => (
-          <MenuItem
-            key={code}
-            data-testid={`locale-option-${code}`}
-            selected={locale === code}
-            onClick={() => chooseLocale(code)}
-          >
-            {t(`locale.${code}`)}
-          </MenuItem>
-        ))}
-      </Menu>
 
       <Dialog
         open={feedbackConfirmOpen}
