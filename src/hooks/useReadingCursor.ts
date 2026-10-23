@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { visibleReadingTop } from '@/lib/epubAnchor';
 import {
+  applyArrowPageSelection,
   excerptAtReadingPosition,
   markCurrentReadingBlock,
   normalizeSelectedText,
+  READER_CONTENT_READY_EVENT,
   selectionInside,
+  syncArrowPageSelection,
 } from '@/lib/readerA11y';
 
 function readingSurface(): { root: Element; host: Element } | null {
@@ -24,12 +27,13 @@ function readingSurface(): { root: Element; host: Element } | null {
  * Tracks the in-view passage and the settled text selection.
  * The passage is not a live region: scrolling must not keep announcing.
  */
-export function useReadingCursor(pageKey: string) {
+export function useReadingCursor(pageKey: string, page: number) {
   const [passage, setPassage] = useState('');
   const [selected, setSelected] = useState('');
 
   useEffect(() => {
     let frame = 0;
+    syncArrowPageSelection(page);
     const observer = new MutationObserver(() => {
       schedule();
     });
@@ -42,6 +46,7 @@ export function useReadingCursor(pageKey: string) {
       }
       const line = visibleReadingTop(surface.host);
       markCurrentReadingBlock(surface.root, line);
+      applyArrowPageSelection(page, surface.root, line);
       const next = excerptAtReadingPosition(surface.root, line);
       setPassage((current) => (current === next ? current : next));
     }
@@ -53,17 +58,19 @@ export function useReadingCursor(pageKey: string) {
 
     // EPUB HTML and the PDF text layer arrive as later light-DOM mutations.
     observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener(READER_CONTENT_READY_EVENT, schedule);
     schedule();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
 
     return () => {
       cancelAnimationFrame(frame);
+      document.removeEventListener(READER_CONTENT_READY_EVENT, schedule);
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
       observer.disconnect();
     };
-  }, [pageKey]);
+  }, [page, pageKey]);
 
   useEffect(() => {
     let timer = 0;

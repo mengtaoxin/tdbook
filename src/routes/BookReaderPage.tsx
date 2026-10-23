@@ -51,6 +51,7 @@ export function BookReaderPage() {
   const documentTitle = book ? t('reader.documentTitle', { title: book.title }) : '';
   const { passage, selected } = useReadingCursor(
     `${book?.id ?? ''}:${page}:${pageContent?.type ?? 'loading'}`,
+    page,
   );
 
   useEffect(() => {

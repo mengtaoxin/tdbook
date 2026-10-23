@@ -2,12 +2,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import en from '@/i18n/locales/en';
 import zh from '@/i18n/locales/zh';
 import {
+  applyArrowPageSelection,
+  armArrowPageSelection,
   blockAtReadingPosition,
   excerptAtReadingPosition,
+  hasSelectedText,
   markCurrentReadingBlock,
+  markReaderContentCommitted,
   normalizeSelectedText,
   pageArrowDirection,
   selectionInside,
+  syncArrowPageSelection,
   type PageArrowInput,
 } from '@/lib/readerA11y';
 
@@ -66,6 +71,179 @@ describe('pageArrowDirection', () => {
     expect(pageArrowDirection(arrow({ metaKey: true }))).toBeNull();
     expect(pageArrowDirection(arrow({ defaultPrevented: true }))).toBeNull();
     expect(pageArrowDirection(arrow({ hasSelection: true }))).toBeNull();
+  });
+});
+
+describe('arrow page selection', () => {
+  afterEach(() => {
+    document.getSelection()?.removeAllRanges();
+    document.body.innerHTML = '';
+    vi.restoreAllMocks();
+  });
+
+  it('selects the full new passage after the page content commits, without blocking another arrow', () => {
+    const article = document.createElement('article');
+    const hint = document.createElement('p');
+    hint.textContent = '当前段落：Chapter Two';
+    const host = document.createElement('div');
+    const body = document.createElement('body');
+    const heading = document.createElement('h1');
+    const paragraph = document.createElement('p');
+    const full = `${'Long passage '.repeat(40)}end`;
+    heading.textContent = 'Chapter Two';
+    paragraph.append('Hello ');
+    const strong = document.createElement('strong');
+    strong.textContent = 'world';
+    paragraph.append(strong, ` ${full}`);
+    body.append(heading, paragraph);
+    host.append(body);
+    article.append(hint, host);
+    document.body.append(article);
+
+    vi.spyOn(heading, 'getBoundingClientRect').mockReturnValue(rect(0, 10));
+    vi.spyOn(paragraph, 'getBoundingClientRect').mockReturnValue(rect(10, 80));
+
+    markReaderContentCommitted(host);
+    armArrowPageSelection(2);
+    applyArrowPageSelection(2, body, 0);
+    expect(document.getSelection()?.toString() ?? '').toBe('');
+
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, body, 20);
+
+    const selected = document.getSelection()?.toString() ?? '';
+    expect(selected).toBe(`Hello world ${full}`);
+    expect(selected).not.toContain('当前段落');
+    expect(selected.endsWith('…')).toBe(false);
+    expect(hasSelectedText()).toBe(false);
+    expect(pageArrowDirection(arrow({ hasSelection: hasSelectedText() }))).toBe('next');
+    expect(pageArrowDirection(arrow({ key: 'ArrowLeft', hasSelection: hasSelectedText() }))).toBe(
+      'prev',
+    );
+  });
+
+  it('keeps a mouse selection blocking page arrows', () => {
+    const host = document.createElement('div');
+    const body = document.createElement('body');
+    const paragraph = document.createElement('p');
+    paragraph.textContent = 'Hello from the book';
+    body.append(paragraph);
+    host.append(body);
+    document.body.append(host);
+    vi.spyOn(paragraph, 'getBoundingClientRect').mockReturnValue(rect(0, 40));
+
+    markReaderContentCommitted(host);
+    armArrowPageSelection(2);
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, body, 0);
+    expect(document.getSelection()?.toString()).toBe('Hello from the book');
+    expect(hasSelectedText()).toBe(false);
+
+    const text = paragraph.firstChild;
+    if (!text) throw new Error('missing text');
+    const range = document.createRange();
+    range.setStart(text, 0);
+    range.setEnd(text, 5);
+    const selection = document.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+
+    expect(hasSelectedText()).toBe(true);
+    expect(pageArrowDirection(arrow({ hasSelection: hasSelectedText() }))).toBeNull();
+  });
+
+  it('releases an identical passage selection when the pointer changes it', () => {
+    const host = document.createElement('div');
+    const body = document.createElement('body');
+    const paragraph = document.createElement('p');
+    paragraph.textContent = 'Hello from the book';
+    body.append(paragraph);
+    host.append(body);
+    document.body.append(host);
+    vi.spyOn(paragraph, 'getBoundingClientRect').mockReturnValue(rect(0, 40));
+
+    markReaderContentCommitted(host);
+    armArrowPageSelection(2);
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, body, 0);
+    expect(hasSelectedText()).toBe(false);
+
+    document.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.dispatchEvent(new Event('selectionchange'));
+    expect(document.getSelection()?.toString()).toBe('Hello from the book');
+    expect(hasSelectedText()).toBe(true);
+    document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+  });
+
+  it('drops an armed selection when the reader leaves that page', () => {
+    const host = document.createElement('div');
+    const body = document.createElement('body');
+    const paragraph = document.createElement('p');
+    paragraph.textContent = 'Stay unselected';
+    body.append(paragraph);
+    host.append(body);
+    document.body.append(host);
+    vi.spyOn(paragraph, 'getBoundingClientRect').mockReturnValue(rect(0, 40));
+
+    markReaderContentCommitted(host);
+    armArrowPageSelection(2);
+    syncArrowPageSelection(1);
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, body, 0);
+
+    expect(document.getSelection()?.toString() ?? '').toBe('');
+  });
+
+  it('selects the replacement passage when a later commit swaps the page', () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+
+    function mount(text: string) {
+      const body = document.createElement('body');
+      const paragraph = document.createElement('p');
+      paragraph.textContent = text;
+      body.append(paragraph);
+      host.replaceChildren(body);
+      vi.spyOn(paragraph, 'getBoundingClientRect').mockReturnValue(rect(0, 40));
+      return body;
+    }
+
+    const first = mount('First commit');
+    markReaderContentCommitted(host);
+    armArrowPageSelection(2);
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, first, 0);
+    expect(document.getSelection()?.toString()).toBe('First commit');
+
+    first.remove();
+    const second = mount('Second commit');
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, second, 0);
+    expect(document.getSelection()?.toString()).toBe('Second commit');
+    expect(hasSelectedText()).toBe(false);
+  });
+
+  it('selects the visible PDF line when the page has no semantic block', () => {
+    const host = document.createElement('div');
+    const layer = document.createElement('div');
+    layer.innerHTML = '<span id="s1">Hel</span><span id="s2">lo</span><span id="s3">next</span>';
+    host.append(layer);
+    document.body.append(host);
+    const s1 = layer.querySelector('#s1');
+    const s2 = layer.querySelector('#s2');
+    const s3 = layer.querySelector('#s3');
+    if (!s1 || !s2 || !s3) throw new Error('missing spans');
+    vi.spyOn(s1, 'getBoundingClientRect').mockReturnValue(rect(40, 12));
+    vi.spyOn(s2, 'getBoundingClientRect').mockReturnValue(rect(41, 12));
+    vi.spyOn(s3, 'getBoundingClientRect').mockReturnValue(rect(70, 12));
+
+    markReaderContentCommitted(host);
+    armArrowPageSelection(2);
+    markReaderContentCommitted(host);
+    applyArrowPageSelection(2, layer, 30);
+
+    expect(document.getSelection()?.toString()).toBe('Hello');
+    expect(hasSelectedText()).toBe(false);
   });
 });
 
