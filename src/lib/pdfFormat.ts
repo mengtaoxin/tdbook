@@ -6,7 +6,7 @@ import {
   peekBlobUrlsForRelativePath,
   putFiles,
 } from './cacheStore';
-import { resolvedAuthor, type PdfBookRecord } from './bookTypes';
+import type { PdfBookRecord } from './bookTypes';
 import type { BookConfig } from './catalog';
 import type { FormatAdapter, FormatSnapshot, PdfPageContent } from './formatAdapter';
 import { loadPdfDocument, renderPdfCover, unloadPdfDocument } from './pdfReader';
@@ -95,7 +95,7 @@ async function openPdf(id: string, config: BookConfig): Promise<PdfBookRecord | 
       id,
       type: 'pdf',
       title: config.title,
-      author: resolvedAuthor('', config.author),
+      author: '',
       description: '',
       sourceUrl: config.path,
       coverHref: null,

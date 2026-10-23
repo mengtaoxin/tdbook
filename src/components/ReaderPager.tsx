@@ -44,15 +44,7 @@ export function ReaderPager({
       >
         <ChevronLeftIcon />
       </IconButton>
-      <Typography
-        id="reader-page-status"
-        component="p"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        variant="body2"
-        color="text.secondary"
-      >
+      <Typography variant="body2" color="text.secondary">
         {t('reader.pageOf', { page, total: totalPages })}
       </Typography>
       <IconButton

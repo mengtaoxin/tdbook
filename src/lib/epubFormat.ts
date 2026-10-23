@@ -1,6 +1,6 @@
 import { type CacheProgress } from './cacheIngest';
 import { getCachedBlobUrl, readCachedText } from './cacheStore';
-import { resolvedAuthor, type EpubBookRecord } from './bookTypes';
+import type { EpubBookRecord } from './bookTypes';
 import type { BookConfig } from './catalog';
 import { extractEpubToCache } from './epubIngest';
 import { parseCachedEpubPackage } from './epubPackage';
@@ -36,7 +36,7 @@ async function openEpub(id: string, config: BookConfig): Promise<EpubBookRecord 
     id,
     type: 'epub',
     title: parsed.title,
-    author: resolvedAuthor(parsed.author, config.author),
+    author: parsed.author,
     description: parsed.description,
     sourceUrl: config.path,
     opfDir: parsed.opfDir,

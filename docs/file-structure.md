@@ -18,7 +18,7 @@ src/
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
   components/         AppShell, ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (bookmark menu / drawer list + rename dialog), ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
   stores/             Zustand (locale, settings, books list, bookmarks)
-  hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging) + useReadingCursor (in-view passage and selection)
+  hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging)
   lib/
     catalog.ts        configs.json fetch + normalize (BookConfig); stale-while-revalidate over in-memory + localStorage copies (getBookConfigs / revalidateBookConfigs)
     configGuideMarkdown.ts  locale → guide .md URL + marked render
@@ -39,7 +39,6 @@ src/
     epubShadow.ts     EPUB HTML mount (document text nodes, scoped book CSS)
     epubAnchor.ts     content-stable EPUB in-page anchors (#char:N) for bookmarks
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
-    readerA11y.ts     reading position, selection text, and page-arrow guards for assistive tech
     pdfReader.ts      pdf.js document load + page/cover render
     settings.ts       configs URL preference (localStorage)
     bookmarks.ts      bookmark pure logic: add (10 recent per book), rename (= permanent), remove, group, time label

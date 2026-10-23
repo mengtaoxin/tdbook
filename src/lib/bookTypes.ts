@@ -47,10 +47,3 @@ export type BookListItem = {
 export function bookPageCount(book: BookRecord): number {
   return book.type === 'epub' ? book.pages.length : book.pageCount;
 }
-
-/** Prefer the file's own author. Use the catalog when the file has none. */
-export function resolvedAuthor(extracted: string, catalog?: string): string {
-  const fromBook = extracted.trim();
-  if (fromBook) return fromBook;
-  return (catalog ?? '').trim();
-}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bookPageCount, resolvedAuthor, type BookRecord } from '@/lib/bookTypes';
+import { bookPageCount, type BookRecord } from '@/lib/bookTypes';
 
 describe('bookPageCount', () => {
   it('uses spine length for EPUB and pageCount for PDF', () => {
@@ -34,13 +34,5 @@ describe('bookPageCount', () => {
 
     expect(bookPageCount(epub)).toBe(2);
     expect(bookPageCount(pdf)).toBe(7);
-  });
-});
-
-describe('resolvedAuthor', () => {
-  it('keeps the extracted author and falls back to the catalog', () => {
-    expect(resolvedAuthor('  OPF Author  ', 'Catalog')).toBe('OPF Author');
-    expect(resolvedAuthor('', '  Test Author  ')).toBe('Test Author');
-    expect(resolvedAuthor('   ', undefined)).toBe('');
   });
 });
