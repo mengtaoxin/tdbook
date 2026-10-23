@@ -82,7 +82,66 @@ test.describe('books reader', () => {
     await page.getByText('Sample PDF').click();
     await expect(page).toHaveURL(/\/book\/sample-pdf/);
     await expect(page.getByTestId('pdf-host')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByText('Page 1 / 1')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Sample PDF' })).toBeVisible();
+    await expect(page.getByText('Test Author · PDF')).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Page 1 / 1' })).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-host"] canvas')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+  });
+
+  test('exposes the book, the current passage, and the selection', async ({ page }) => {
+    await page.goto('/books');
+    await page.getByText('Sample EPUB').click();
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByRole('heading', { level: 1, name: 'Sample EPUB' })).toBeVisible();
+    await expect(page.getByText('Test Author · EPUB')).toBeVisible();
+    await expect(page).toHaveTitle('Sample EPUB — tdbook');
+    await expect(page.getByRole('status').filter({ hasText: 'Page 1 / 2' })).toBeVisible();
+    await expect(page.getByTestId('reader-passage')).toContainText('Chapter One');
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const host = document.querySelector('[data-testid="epub-content"]');
+          return host?.querySelector('[aria-current="location"]')?.textContent ?? '';
+        }),
+      )
+      .toContain('Chapter One');
+
+    await page.evaluate(() => {
+      const host = document.querySelector('[data-testid="epub-content"]');
+      const target = host?.querySelectorAll('p')[8];
+      const bar = document.querySelector('.MuiAppBar-root');
+      if (!target || !bar) throw new Error('missing passage target');
+      const line = bar.getBoundingClientRect().bottom;
+      window.scrollBy(0, target.getBoundingClientRect().top - line);
+    });
+
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const host = document.querySelector('[data-testid="epub-content"]');
+          return host?.querySelector('[aria-current="location"]')?.textContent ?? '';
+        }),
+      )
+      .toContain('Paragraph 08');
+
+    await page.evaluate(() => {
+      const host = document.querySelector('[data-testid="epub-content"]');
+      const paragraph = host?.querySelector('p');
+      if (!paragraph?.firstChild) throw new Error('missing paragraph');
+      const range = document.createRange();
+      range.selectNodeContents(paragraph);
+      const selection = document.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      document.dispatchEvent(new Event('selectionchange'));
+    });
+    await expect(page.getByTestId('reader-selection')).toContainText(
+      'Hello from sample EPUB page one.',
+    );
   });
 
   test('clears cache from settings', async ({ page }) => {

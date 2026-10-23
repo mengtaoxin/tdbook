@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TdLog } from 'tdkit';
 import { useBookSession, useReaderPageSearch } from '@/hooks/useBookSession';
 import { bookPageCount } from '@/lib/bookTypes';
+import { hasSelectedText, pageArrowDirection } from '@/lib/readerA11y';
 import { getBookPage, type PageContent } from '@/lib/formats';
 import { reportFailure } from '@/lib/reportFailure';
 
@@ -117,12 +118,18 @@ export function useBookReader() {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'ArrowLeft' && prevPage != null) {
-        goToPage(prevPage);
-      }
-      if (event.key === 'ArrowRight' && nextPage != null) {
-        goToPage(nextPage);
-      }
+      const direction = pageArrowDirection({
+        key: event.key,
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+        defaultPrevented: event.defaultPrevented,
+        target: event.target,
+        hasSelection: hasSelectedText(),
+      });
+      if (direction === 'prev' && prevPage != null) goToPage(prevPage);
+      if (direction === 'next' && nextPage != null) goToPage(nextPage);
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
