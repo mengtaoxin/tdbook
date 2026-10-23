@@ -1,7 +1,6 @@
 import Paper from '@mui/material/Paper';
 import { useEffect, useRef } from 'react';
 import { clearEpubContent, renderEpubContent, scrollEpubHash } from '@/lib/epubShadow';
-import { markReaderContentCommitted } from '@/lib/readerA11y';
 import type { RewrittenPage } from '@/lib/rewriteHtml';
 
 type EpubReaderPaneProps = {
@@ -21,7 +20,6 @@ export function EpubReaderPane({ rewritten, hash = '' }: EpubReaderPaneProps) {
       .then(() => {
         if (controller.signal.aborted) return;
         if (hash) scrollEpubHash(host, hash);
-        markReaderContentCommitted(host);
       })
       .catch(() => {
         // Abort or a failed stylesheet leaves the previous clear in place.

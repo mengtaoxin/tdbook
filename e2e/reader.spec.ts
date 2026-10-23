@@ -297,55 +297,6 @@ test.describe('books reader', () => {
     await expect(page.getByText('Page 1 / 2')).toBeVisible();
   });
 
-  test('arrow keys select the landed passage and still turn the page', async ({ page }) => {
-    await page.goto('/books');
-    await page.getByText('Sample EPUB').click();
-    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByText('Page 1 / 2')).toBeVisible();
-
-    await page.keyboard.press('ArrowRight');
-    await expect(page).toHaveURL(/page=2/);
-
-    await expect
-      .poll(() =>
-        page.evaluate(() => {
-          const current = document.querySelector('[aria-current="location"]');
-          const raw = current?.textContent ?? '';
-          const selected = document.getSelection()?.toString() ?? '';
-          const hint = document.querySelector('#reader-passage');
-          const anchor = document.getSelection()?.anchorNode;
-          const hintSelected = Boolean(
-            hint && anchor && (hint === anchor || hint.contains(anchor)),
-          );
-          return (
-            raw.trim().length > 0 &&
-            selected === raw &&
-            !hintSelected &&
-            !selected.includes('Current passage') &&
-            !selected.includes('当前段落')
-          );
-        }),
-      )
-      .toBe(true);
-
-    await page.keyboard.press('ArrowLeft');
-    await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/);
-    await expect
-      .poll(() =>
-        page.evaluate(() => {
-          const raw = document.querySelector('[aria-current="location"]')?.textContent ?? '';
-          return document.getSelection()?.toString() === raw && raw.includes('Chapter One');
-        }),
-      )
-      .toBe(true);
-
-    await page.getByText('Hello from sample EPUB page one.').selectText();
-    await page.keyboard.press('ArrowRight');
-    await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/);
-    const mouseSelected = await page.evaluate(() => window.getSelection()?.toString() ?? '');
-    expect(mouseSelected).toContain('Hello from sample EPUB page one.');
-  });
-
   test('EPUB body text is a native browser selection', async ({ page }) => {
     await page.goto('/books');
     await page.getByText('Sample EPUB').click();

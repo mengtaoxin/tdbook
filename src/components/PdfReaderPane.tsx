@@ -1,7 +1,6 @@
 import Paper from '@mui/material/Paper';
 import { useEffect, useRef } from 'react';
 import { loadPdfDocument, renderPdfPage, type PdfPageRender } from '@/lib/pdfReader';
-import { markReaderContentCommitted } from '@/lib/readerA11y';
 
 type PdfReaderPaneProps = {
   pdfUrl: string;
@@ -65,8 +64,6 @@ export function PdfReaderPane({ pdfUrl, pageNumber, onReady }: PdfReaderPaneProp
         // Cancelled or render error; readiness stays false
       }
       if (!disposed && seq === paintSeq && paintRef.current === task) {
-        const paintedHost = hostRef.current;
-        if (paintedHost) markReaderContentCommitted(paintedHost);
         onReadyRef.current(true);
       }
     }

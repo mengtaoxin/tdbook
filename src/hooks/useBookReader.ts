@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TdLog } from 'tdkit';
 import { useBookSession, useReaderPageSearch } from '@/hooks/useBookSession';
 import { bookPageCount } from '@/lib/bookTypes';
-import { armArrowPageSelection, hasSelectedText, pageArrowDirection } from '@/lib/readerA11y';
+import { hasSelectedText, pageArrowDirection } from '@/lib/readerA11y';
 import { getBookPage, type PageContent } from '@/lib/formats';
 import { reportFailure } from '@/lib/reportFailure';
 
@@ -128,14 +128,8 @@ export function useBookReader() {
         target: event.target,
         hasSelection: hasSelectedText(),
       });
-      if (direction === 'prev' && prevPage != null) {
-        armArrowPageSelection(prevPage);
-        goToPage(prevPage);
-      }
-      if (direction === 'next' && nextPage != null) {
-        armArrowPageSelection(nextPage);
-        goToPage(nextPage);
-      }
+      if (direction === 'prev' && prevPage != null) goToPage(prevPage);
+      if (direction === 'next' && nextPage != null) goToPage(nextPage);
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
