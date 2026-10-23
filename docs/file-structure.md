@@ -36,7 +36,7 @@ src/
     cacheIngest.ts    abortable pipeline: fetch → format ingest → snapshot → ready meta
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
-    epubShadow.ts     EPUB HTML mount (document text nodes, scoped book CSS)
+    epubShadow.ts     EPUB shadow-DOM mounting helpers
     epubAnchor.ts     content-stable EPUB in-page anchors (#char:N) for bookmarks
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render

@@ -97,7 +97,7 @@ export function PdfReaderPane({ pdfUrl, pageNumber, onReady }: PdfReaderPaneProp
     <Paper elevation={3} sx={{ mx: 'auto', maxWidth: 900, borderRadius: 1, overflow: 'hidden' }}>
       <div ref={hostRef} className="pdf-host" data-testid="pdf-host" style={{ width: '100%' }}>
         <div ref={pageRef} className="pdf-page">
-          <canvas ref={canvasRef} aria-hidden="true" />
+          <canvas ref={canvasRef} />
           <div ref={textLayerRef} className="textLayer" />
         </div>
       </div>

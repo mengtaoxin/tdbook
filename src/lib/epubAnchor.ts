@@ -88,11 +88,12 @@ function firstCharAtOrBelow(textNode: Text, viewportTop: number): number {
   return Math.min(lo, length - 1);
 }
 
-export function captureEpubAnchor(root: HTMLElement, options?: { viewportTop?: number }): string {
-  const body = root.querySelector('body');
-  if (!body) return formatCharLocation(0);
+export function captureEpubAnchor(shadow: ShadowRoot, options?: { viewportTop?: number }): string {
+  const body = shadow.querySelector('body');
+  const host = shadow.host;
+  if (!body || !host) return formatCharLocation(0);
 
-  const viewportTop = options?.viewportTop ?? visibleReadingTop(root);
+  const viewportTop = options?.viewportTop ?? visibleReadingTop(host);
   let offset = 0;
   const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
   let node = walker.nextNode();
@@ -123,8 +124,8 @@ export function captureEpubAnchor(root: HTMLElement, options?: { viewportTop?: n
   return formatCharLocation(Math.max(0, offset));
 }
 
-function scrollToCharOffset(root: HTMLElement, offset: number) {
-  const body = root.querySelector('body');
+function scrollToCharOffset(shadow: ShadowRoot, offset: number) {
+  const body = shadow.querySelector('body');
   if (!body) return;
   const position = textPositionAtCharOffset(body, offset);
   if (!position) return;
@@ -143,7 +144,7 @@ function scrollToCharOffset(root: HTMLElement, offset: number) {
   range.setEnd(node, Math.min(start + 1, node.data.length));
   const rect = range.getBoundingClientRect();
   if (rect.height > 0 || rect.width > 0) {
-    const targetTop = visibleReadingTop(root);
+    const targetTop = visibleReadingTop(shadow.host);
     window.scrollBy(0, rect.top - targetTop);
     return;
   }
@@ -151,25 +152,26 @@ function scrollToCharOffset(root: HTMLElement, offset: number) {
   parent.scrollIntoView();
 }
 
-export function scrollEpubAnchor(root: HTMLElement, location: string): void {
+export function scrollEpubAnchor(shadow: ShadowRoot, location: string): void {
   const normalized = normalizeAnchorLocation(location);
   if (!normalized) return;
 
   const charOffset = parseCharLocation(normalized);
   if (charOffset !== null) {
-    scrollToCharOffset(root, charOffset);
+    scrollToCharOffset(shadow, charOffset);
     return;
   }
 
   const id = normalized.startsWith('#') ? normalized.slice(1) : normalized;
   if (!id) return;
-  root.querySelector<HTMLElement>(`#${CSS.escape(id)}`)?.scrollIntoView();
+  shadow.getElementById(id)?.scrollIntoView();
 }
 
 export function captureReaderLocation(): string {
   const host = document.querySelector<HTMLElement>('[data-testid="epub-content"]');
-  if (!host) return '';
-  return captureEpubAnchor(host);
+  const shadow = host?.shadowRoot;
+  if (!shadow) return '';
+  return captureEpubAnchor(shadow);
 }
 
 /** Hash value for TanStack navigate (no leading `#`). */

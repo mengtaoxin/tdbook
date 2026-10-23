@@ -163,7 +163,7 @@ test.describe('books reader', () => {
     // Scroll the marker near the top of the viewport, then save.
     await page.evaluate(() => {
       const host = document.querySelector('[data-testid="epub-content"]');
-      const marker = host?.querySelector('#bookmark-target');
+      const marker = host?.shadowRoot?.getElementById('bookmark-target');
       marker?.scrollIntoView({ block: 'start' });
     });
 
@@ -199,7 +199,7 @@ test.describe('books reader', () => {
       .poll(async () =>
         page.evaluate(() => {
           const host = document.querySelector('[data-testid="epub-content"]');
-          const marker = host?.querySelector('#bookmark-target');
+          const marker = host?.shadowRoot?.getElementById('bookmark-target');
           if (!marker) return null;
           const top = marker.getBoundingClientRect().top;
           const barBottom =
@@ -236,35 +236,5 @@ test.describe('books reader', () => {
     await expect(page).toHaveURL(/\/book\/sample-epub/);
     await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
     await expect(page.getByText('Page 1 / 2')).toBeVisible();
-  });
-
-  test('EPUB body text is a native browser selection', async ({ page }) => {
-    await page.goto('/books');
-    await page.getByText('Sample EPUB').click();
-    const paragraph = page.getByText('Hello from sample EPUB page one.');
-    await expect(paragraph).toBeVisible({ timeout: 60_000 });
-    await paragraph.selectText();
-
-    const selected = await page.evaluate(() => window.getSelection()?.toString() ?? '');
-    expect(selected).toContain('Hello from sample EPUB page one.');
-
-    const userSelect = await paragraph.evaluate((el) => getComputedStyle(el).userSelect);
-    expect(userSelect).not.toBe('none');
-  });
-
-  test('PDF body text is a native browser selection', async ({ page }) => {
-    await page.goto('/books');
-    await page.getByText('Sample PDF').click();
-    const span = page.locator('.textLayer span', { hasText: 'Sample PDF' });
-    await expect(span).toBeVisible({ timeout: 60_000 });
-    await span.selectText();
-
-    const selected = await page.evaluate(() => window.getSelection()?.toString() ?? '');
-    expect(selected).toContain('Sample PDF');
-    await expect(span).not.toHaveAttribute('role', 'presentation');
-    await expect(page.locator('.pdf-page > canvas')).toHaveAttribute('aria-hidden', 'true');
-
-    const userSelect = await span.evaluate((el) => getComputedStyle(el).userSelect);
-    expect(userSelect).not.toBe('none');
   });
 });

@@ -9,7 +9,7 @@ import {
   scrollEpubAnchor,
   textPositionAtCharOffset,
 } from '@/lib/epubAnchor';
-import { renderEpubContent } from '@/lib/epubShadow';
+import { attachEpubShadow, renderEpubShadow } from '@/lib/epubShadow';
 import type { RewrittenPage } from '@/lib/rewriteHtml';
 
 function page(html: string): RewrittenPage {
@@ -22,13 +22,14 @@ function page(html: string): RewrittenPage {
   };
 }
 
-async function mountEpub(html: string) {
+function mountEpub(html: string) {
   const host = document.createElement('div');
   host.setAttribute('data-testid', 'epub-content');
   host.className = 'epub-content';
   document.body.appendChild(host);
-  await renderEpubContent(host, page(html));
-  return { host };
+  const shadow = attachEpubShadow(host);
+  renderEpubShadow(shadow, page(html), host);
+  return { host, shadow };
 }
 
 function mockZeroSizeRect(overrides: Partial<DOMRect> = {}): DOMRect {
@@ -68,9 +69,9 @@ describe('epubAnchor', () => {
     expect(locationToRouterHash('#char:3')).toBe('char:3');
   });
 
-  it('maps a char offset back to the matching text node', async () => {
-    const { host } = await mountEpub('<p>Hi</p><p>there</p>');
-    const body = host.querySelector('body');
+  it('maps a char offset back to the matching text node', () => {
+    const { shadow } = mountEpub('<p>Hi</p><p>there</p>');
+    const body = shadow.querySelector('body');
     expect(body).toBeTruthy();
 
     expect(textPositionAtCharOffset(body!, 0)?.node.textContent).toBe('Hi');
@@ -82,8 +83,8 @@ describe('epubAnchor', () => {
     expect(textPositionAtCharOffset(body!, 99)).toBeNull();
   });
 
-  it('captures the char offset of text at the viewport top, not a scroll ratio', async () => {
-    const { host } = await mountEpub('<p id="a">AAAA</p><p id="b">BBBB</p><p id="c">CCCC</p>');
+  it('captures the char offset of text at the viewport top, not a scroll ratio', () => {
+    const { host, shadow } = mountEpub('<p id="a">AAAA</p><p id="b">BBBB</p><p id="c">CCCC</p>');
 
     vi.spyOn(host, 'getBoundingClientRect').mockReturnValue(
       mockZeroSizeRect({ y: -40, top: -40, width: 400, height: 900, right: 400, bottom: 860 }),
@@ -128,30 +129,30 @@ describe('epubAnchor', () => {
     });
 
     // Visible top is y=0. "AAAA" is above; first "BBBB" char with top >= 0 is index 1 → #char:5
-    expect(captureEpubAnchor(host, { viewportTop: 0 })).toBe('#char:5');
+    expect(captureEpubAnchor(shadow, { viewportTop: 0 })).toBe('#char:5');
   });
 
-  it('restores a char location by scrolling that text into view', async () => {
-    const { host } = await mountEpub('<p>Hello</p><p>World</p>');
+  it('restores a char location by scrolling that text into view', () => {
+    const { shadow } = mountEpub('<p>Hello</p><p>World</p>');
     const scrollIntoView = vi.fn();
     Element.prototype.scrollIntoView = scrollIntoView;
 
-    scrollEpubAnchor(host, '##char:5');
+    scrollEpubAnchor(shadow, '##char:5');
     expect(scrollIntoView).toHaveBeenCalled();
   });
 
-  it('still restores legacy element-id locations', async () => {
-    const { host } = await mountEpub('<h1 id="top">Title</h1><p>Body</p>');
-    const heading = host.querySelector('#top');
+  it('still restores legacy element-id locations', () => {
+    const { shadow } = mountEpub('<h1 id="top">Title</h1><p>Body</p>');
+    const heading = shadow.getElementById('top');
     const scrollIntoView = vi.fn();
     if (heading) heading.scrollIntoView = scrollIntoView;
 
-    scrollEpubAnchor(host, '#top');
+    scrollEpubAnchor(shadow, '#top');
     expect(scrollIntoView).toHaveBeenCalled();
   });
 
-  it('reads the live reader host when saving a bookmark location', async () => {
-    const { host } = await mountEpub('<p>Hello</p><p>World</p>');
+  it('reads the live reader host when saving a bookmark location', () => {
+    const { host, shadow } = mountEpub('<p>Hello</p><p>World</p>');
     vi.spyOn(host, 'getBoundingClientRect').mockReturnValue(
       mockZeroSizeRect({ width: 400, height: 200, right: 400, bottom: 200 }),
     );
@@ -170,7 +171,7 @@ describe('epubAnchor', () => {
       return mockZeroSizeRect({ y: top, top, bottom: top + 4, width: 4, height: 4, right: 4 });
     });
 
-    expect(host.querySelector('body')).toBeTruthy();
+    expect(shadow.querySelector('body')).toBeTruthy();
     // "Hello"(5) + start of "World"
     expect(captureReaderLocation()).toBe('#char:5');
   });

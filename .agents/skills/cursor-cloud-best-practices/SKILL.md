@@ -8,13 +8,14 @@ description: >-
 license: MIT
 metadata:
   author: mengtaoxin
-  version: "1.0.1"
+  version: '1.0.0'
 ---
 
 # Cursor cloud best practices
 
 Apply when the agent runs in a **Cursor Cloud** environment (Cloud Agent /
-isolated cloud VM). Do **not** apply in local Cursor chats.
+isolated cloud VM). Do **not** apply in local Cursor chats (see
+`cursor-local-best-practices` for local port hygiene).
 
 ## When to apply
 
