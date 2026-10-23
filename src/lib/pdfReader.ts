@@ -1,6 +1,7 @@
 import {
   getDocument,
   GlobalWorkerOptions,
+  OPS,
   RenderingCancelledException,
   TextLayer,
   type PDFDocumentProxy,
@@ -38,6 +39,25 @@ export function loadPdfDocument(url: string): Promise<PDFDocumentProxy> {
 
 export function unloadPdfDocument(url: string) {
   documents.delete(url);
+}
+
+const TEXT_SHOW_OPS = new Set<number>([
+  OPS.showText,
+  OPS.showSpacedText,
+  OPS.nextLineShowText,
+  OPS.nextLineSetSpacingShowText,
+]);
+
+/** Text glyphs belong in the DOM text layer, not on the page canvas. */
+export function canvasShouldPaintOperator(operator: number): boolean {
+  return !TEXT_SHOW_OPS.has(operator);
+}
+
+/** Drop presentational roles so accessibility can read the selected text. */
+export function exposePdfTextLayer(container: HTMLElement) {
+  for (const el of container.querySelectorAll('[role="presentation"]')) {
+    el.removeAttribute('role');
+  }
 }
 
 export async function renderPdfCover(
@@ -116,6 +136,10 @@ export function renderPdfPage(
       canvasContext: context,
       viewport,
       transform,
+      operationsFilter(index, operatorList) {
+        const fn = operatorList.fnArray[index];
+        return typeof fn !== 'number' || canvasShouldPaintOperator(fn);
+      },
     });
     await renderTask.promise;
     if (cancelled) return;
@@ -127,6 +151,8 @@ export function renderPdfPage(
       viewport,
     });
     await textLayer.render();
+    if (cancelled) return;
+    exposePdfTextLayer(target.textLayerEl);
   })().catch((error: unknown) => {
     if (cancelled || isCancelled(error)) return;
     throw error;

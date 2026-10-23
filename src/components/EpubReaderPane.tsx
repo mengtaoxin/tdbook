@@ -1,11 +1,6 @@
 import Paper from '@mui/material/Paper';
 import { useEffect, useRef } from 'react';
-import {
-  attachEpubShadow,
-  clearEpubShadow,
-  renderEpubShadow,
-  scrollEpubHash,
-} from '@/lib/epubShadow';
+import { clearEpubContent, renderEpubContent, scrollEpubHash } from '@/lib/epubShadow';
 import type { RewrittenPage } from '@/lib/rewriteHtml';
 
 type EpubReaderPaneProps = {
@@ -15,22 +10,24 @@ type EpubReaderPaneProps = {
 
 export function EpubReaderPane({ rewritten, hash = '' }: EpubReaderPaneProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const shadowRef = useRef<ShadowRoot | null>(null);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
 
-    const shadow = attachEpubShadow(host);
-    shadowRef.current = shadow;
-    renderEpubShadow(shadow, rewritten, host);
-    if (hash) {
-      scrollEpubHash(shadow, hash);
-    }
+    const controller = new AbortController();
+    void renderEpubContent(host, rewritten, controller.signal)
+      .then(() => {
+        if (controller.signal.aborted) return;
+        if (hash) scrollEpubHash(host, hash);
+      })
+      .catch(() => {
+        // Abort or a failed stylesheet leaves the previous clear in place.
+      });
 
     return () => {
-      clearEpubShadow(shadowRef.current);
-      shadowRef.current = null;
+      controller.abort();
+      clearEpubContent(host);
     };
   }, [rewritten, hash]);
 
