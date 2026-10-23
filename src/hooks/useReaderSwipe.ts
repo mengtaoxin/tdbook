@@ -1,4 +1,5 @@
 import { useRef, type PointerEvent as ReactPointerEvent } from 'react';
+import { hasSelectedText } from '@/lib/readerA11y';
 import { decideReaderSwipe, type ReaderSwipeDirection } from '@/lib/readerSwipe';
 
 const INTERACTIVE_TAGS = new Set(['A', 'BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'LABEL']);
@@ -9,11 +10,6 @@ function isInteractiveTarget(event: PointerEvent): boolean {
     if (INTERACTIVE_TAGS.has(node.tagName)) return true;
   }
   return false;
-}
-
-function hasTextSelection(): boolean {
-  const selection = window.getSelection()?.toString();
-  return Boolean(selection && selection.length > 0);
 }
 
 export function useReaderSwipe(options: { onSwipe: (direction: ReaderSwipeDirection) => void }) {
@@ -36,7 +32,7 @@ export function useReaderSwipe(options: { onSwipe: (direction: ReaderSwipeDirect
     if (!start || start.id !== event.pointerId) return;
     startRef.current = null;
     if (event.pointerType !== 'touch') return;
-    if (hasTextSelection()) return;
+    if (hasSelectedText()) return;
     const direction = decideReaderSwipe({
       dx: event.clientX - start.x,
       dy: event.clientY - start.y,

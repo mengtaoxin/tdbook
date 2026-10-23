@@ -79,6 +79,12 @@ export default {
     prevPage: '上一页',
     nextPage: '下一页',
     pageOf: '第 {page} / {total} 页',
+    documentTitle: '{title} — tdbook',
+    formatEpub: 'EPUB',
+    formatPdf: 'PDF',
+    byline: '{author} · {format}',
+    passage: '当前段落：{text}',
+    selected: '第 {page} 页已选中：{text}',
   },
   bookmarks: {
     save: '保存书签',

@@ -51,11 +51,15 @@ export function textPositionAtCharOffset(
   return null;
 }
 
-/** Top of the readable viewport (below a sticky app bar when present). */
+/**
+ * Top of the readable viewport.
+ * A sticky app bar is the stable line: the book host moves when the page scrolls,
+ * so its top cannot be the scroll target.
+ */
 export function visibleReadingTop(host: Element): number {
   const appBar = document.querySelector('.MuiAppBar-root');
-  const barBottom = appBar?.getBoundingClientRect().bottom ?? 0;
-  return Math.max(barBottom, host.getBoundingClientRect().top);
+  if (appBar) return appBar.getBoundingClientRect().bottom;
+  return Math.max(0, host.getBoundingClientRect().top);
 }
 
 function probeNodeRect(textNode: Text): DOMRect {

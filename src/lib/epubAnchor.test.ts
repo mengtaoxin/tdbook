@@ -8,6 +8,7 @@ import {
   parseCharLocation,
   scrollEpubAnchor,
   textPositionAtCharOffset,
+  visibleReadingTop,
 } from '@/lib/epubAnchor';
 import { attachEpubShadow, renderEpubShadow } from '@/lib/epubShadow';
 import type { RewrittenPage } from '@/lib/rewriteHtml';
@@ -149,6 +150,21 @@ describe('epubAnchor', () => {
 
     scrollEpubAnchor(shadow, '#top');
     expect(scrollIntoView).toHaveBeenCalled();
+  });
+
+  it('keeps the sticky app bar as the reading line when the book starts lower on the page', () => {
+    const bar = document.createElement('div');
+    bar.className = 'MuiAppBar-root';
+    document.body.append(bar);
+    vi.spyOn(bar, 'getBoundingClientRect').mockReturnValue(
+      mockZeroSizeRect({ top: 0, bottom: 64, height: 64, width: 400, right: 400 }),
+    );
+    const { host } = mountEpub('<p>Hi</p>');
+    vi.spyOn(host, 'getBoundingClientRect').mockReturnValue(
+      mockZeroSizeRect({ top: 220, bottom: 900, height: 680, width: 400, right: 400 }),
+    );
+
+    expect(visibleReadingTop(host)).toBe(64);
   });
 
   it('reads the live reader host when saving a bookmark location', () => {

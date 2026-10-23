@@ -80,6 +80,12 @@ export default {
     prevPage: 'Previous page',
     nextPage: 'Next page',
     pageOf: 'Page {page} / {total}',
+    documentTitle: '{title} — tdbook',
+    formatEpub: 'EPUB',
+    formatPdf: 'PDF',
+    byline: '{author} · {format}',
+    passage: 'Current passage: {text}',
+    selected: 'Selected on page {page}: {text}',
   },
   bookmarks: {
     save: 'Save bookmark',
