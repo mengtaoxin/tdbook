@@ -4,10 +4,10 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 
 ## Rules
 
+- Changing code (structure, TDD, tests, format/check, i18n): [docs/change-code-steps.md](docs/change-code-steps.md).
 - Run commands from the repo root (this app is not under `web/`) via `package.json` scripts. Do not add `scripts/*.sh` wrappers.
 - Route identity is the catalog `id` (`/book/$id`), not the title; cache key is the catalog `path`.
 - `tdkit` comes from GitHub Packages: set `NODE_AUTH_TOKEN` (PAT with `read:packages`) so `.npmrc` can fetch `@mengtaoxin/tdkit`.
-- Skills: [.cursor/rules/skills-intro.mdc](.cursor/rules/skills-intro.mdc).
 
 ## Read when
 

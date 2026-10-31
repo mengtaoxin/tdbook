@@ -2,6 +2,8 @@
 
 Run everything from the repo root with the `npm run` scripts in `package.json`. Do not add `scripts/*.sh` wrappers.
 
+When to run these while changing code: [change-code-steps.md](change-code-steps.md).
+
 ## Setup
 
 ```sh
@@ -23,39 +25,33 @@ The dev server serves `public/` (including the default catalog `/sample/configs.
 ## Build and preview
 
 ```sh
-npm run build     # tsc -b typecheck + vite build → dist/ (public/ and pdfjs assets copied)
+npm run build     # tsc -b + vite build → dist/ (public/ and pdfjs assets copied)
 npm run preview   # serve dist/ locally (Vite default port 4173), with the service worker
 ```
 
 ## Test
 
 ```sh
-npm run test            # Vitest unit tests
+npm run test            # Vitest unit tests, once
 npm run test:watch      # Vitest in watch mode
 npm run test:coverage   # unit tests + V8 coverage (coverage/)
 npm run test:e2e        # Playwright e2e (Chromium)
+npm run verify          # check + full unit suite (read-only)
 ```
 
 Running a single file or test, fixtures, and which layer to use: [testing.md](./testing.md).
 
-## Lint and format
+## Lint, format, and type-check
 
 ```sh
-npm run lint        # oxlint
-npm run lint:fix    # oxlint with autofix
-npm run fmt         # oxfmt, rewrite files
-npm run fmt:check   # oxfmt, check only
+npm run lint          # oxlint
+npm run lint:fix      # oxlint with autofix
+npm run format        # oxfmt, rewrite files
+npm run format:check  # oxfmt, check only
+npm run type-check    # tsc -b (read-only)
+npm run check         # format:check + lint + type-check (read-only)
 ```
 
 Rules come from `@mengtaoxin/oxc-config` via `oxlint.config.ts` and `oxfmt.config.ts`.
-
-## Before committing
-
-```sh
-npm run test
-npm run lint
-npm run fmt:check
-npm run build
-```
 
 Add `npm run test:e2e` when the change touches the reader, cache, format adapters, or navigation.

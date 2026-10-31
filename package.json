@@ -10,12 +10,16 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "type-check": "tsc -b --pretty false",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "fmt": "oxfmt .",
-    "fmt:check": "oxfmt --check"
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check",
+    "check": "npm run format:check && npm run lint && npm run type-check",
+    "verify": "npm run check && npm run test"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

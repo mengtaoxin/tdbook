@@ -51,6 +51,6 @@ npm run test:e2e -- --ui                   # Playwright UI mode
 
 ## What to run before finishing
 
-- Any code change: `npm run test`.
+- Any code change: `npm run verify` (see [change-code-steps.md](./change-code-steps.md)).
 - Reader, cache, format adapters, routes, or navigation: also `npm run test:e2e`.
-- TypeScript / React changes: also `npm run lint`, `npm run fmt:check`, and `npm run build` (see [commands.md](./commands.md)).
+- Production build smoke when routing or bundling changed: `npm run build` (see [commands.md](./commands.md)).
