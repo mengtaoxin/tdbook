@@ -7,6 +7,7 @@ import { getBook } from '@/lib/bookService';
 import { bookPageCount, type BookRecord } from '@/lib/bookTypes';
 import type { CacheProgress } from '@/lib/cacheIngest';
 import { reportFailure } from '@/lib/reportFailure';
+import { useRecentReadsStore } from '@/stores/recentReadsStore';
 
 export function useBookSession() {
   const { t } = useTranslation();
@@ -40,6 +41,11 @@ export function useBookSession() {
         }
 
         setBook(nextBook);
+        try {
+          useRecentReadsStore.getState().touch(id);
+        } catch (persistErr) {
+          reportFailure(persistErr instanceof Error ? persistErr.message : String(persistErr));
+        }
       } catch (err) {
         if (cancelled) return;
         setCacheProgress(null);

@@ -29,9 +29,48 @@ test.describe('books reader', () => {
     await expect(page.getByText('Page 2 / 2')).toBeVisible();
 
     await page.goto('/books');
+    await expect(page.getByTestId('recent-reads')).toBeVisible();
     await expect(
-      page.getByRole('button', { name: /Sample EPUB/ }).getByText('Cached'),
+      page
+        .getByRole('button', { name: /Sample EPUB/ })
+        .first()
+        .getByText('Cached'),
     ).toBeVisible();
+  });
+
+  test('keeps sticky recently-read order when reopening an earlier book', async ({ page }) => {
+    await page.goto('/books');
+    await page.getByText('Sample EPUB').click();
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
+
+    await page.goto('/books');
+    await page.getByText('Sample PDF').click();
+    await expect(page.getByTestId('pdf-host')).toBeVisible({ timeout: 60_000 });
+
+    await page.goto('/books');
+    const recent = page.getByTestId('recent-reads');
+    await expect(recent.getByRole('heading', { name: 'Recently read' })).toBeVisible();
+    await expect(recent.getByRole('button')).toHaveCount(2);
+    await expect(recent.getByRole('button').nth(0)).toContainText('Sample PDF');
+    await expect(recent.getByRole('button').nth(1)).toContainText('Sample EPUB');
+
+    await recent.getByRole('button').nth(1).click();
+    await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
+
+    await page.goto('/books');
+    const recentAgain = page.getByTestId('recent-reads');
+    await expect(recentAgain.getByRole('button').nth(0)).toContainText('Sample PDF');
+    await expect(recentAgain.getByRole('button').nth(1)).toContainText('Sample EPUB');
+
+    const stored = await page.evaluate(() => localStorage.getItem('books.recentReads'));
+    const parsed = JSON.parse(stored ?? '') as {
+      recentReads: Array<{ bookId: string; enteredAt: number; lastAccessedAt: number }>;
+    };
+    expect(parsed.recentReads).toHaveLength(2);
+    const epub = parsed.recentReads.find((item) => item.bookId === 'sample-epub');
+    const pdf = parsed.recentReads.find((item) => item.bookId === 'sample-pdf');
+    expect(epub?.enteredAt).toBeLessThan(pdf?.enteredAt ?? 0);
+    expect(epub?.lastAccessedAt).toBeGreaterThan(pdf?.lastAccessedAt ?? 0);
   });
 
   test('turns EPUB page with a touch swipe', async ({ page }) => {
@@ -219,7 +258,10 @@ test.describe('books reader', () => {
     // Client-side nav keeps the SPA shell loaded (dev has no service worker).
     await page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' }).click();
     await expect(
-      page.getByRole('button', { name: /Sample EPUB/ }).getByText('Cached'),
+      page
+        .getByRole('button', { name: /Sample EPUB/ })
+        .first()
+        .getByText('Cached'),
     ).toBeVisible();
 
     await context.setOffline(true);
@@ -227,12 +269,15 @@ test.describe('books reader', () => {
     await page.getByTestId('brand-title').click();
     await expect(page).toHaveURL('/');
     await page.getByTestId('desktop-nav').getByRole('link', { name: 'Books' }).click();
-    await expect(page.getByText('Sample EPUB')).toBeVisible();
+    await expect(page.getByText('Sample EPUB').first()).toBeVisible();
     await expect(
-      page.getByRole('button', { name: /Sample EPUB/ }).getByText('Cached'),
+      page
+        .getByRole('button', { name: /Sample EPUB/ })
+        .first()
+        .getByText('Cached'),
     ).toBeVisible();
 
-    await page.getByText('Sample EPUB').click();
+    await page.getByText('Sample EPUB').first().click();
     await expect(page).toHaveURL(/\/book\/sample-epub/);
     await expect(page.getByTestId('epub-content')).toBeVisible({ timeout: 60_000 });
     await expect(page.getByText('Page 1 / 2')).toBeVisible();

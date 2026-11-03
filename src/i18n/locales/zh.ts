@@ -60,6 +60,7 @@ export default {
   books: {
     title: '图书列表',
     count: '{n} 本',
+    recent: '最近阅读',
     loadFailed: '加载图书列表失败。',
     duplicateId: '配置文件错误，存在id重复的图书。id={id}',
     empty: '暂无图书。',

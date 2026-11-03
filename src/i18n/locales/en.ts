@@ -61,6 +61,7 @@ export default {
   books: {
     title: 'Books',
     count: '{n} books',
+    recent: 'Recently read',
     loadFailed: 'Failed to load the book list.',
     duplicateId: 'Config error: duplicate book id. id={id}',
     empty: 'No books yet.',

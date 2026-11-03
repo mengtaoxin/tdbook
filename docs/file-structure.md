@@ -12,12 +12,12 @@ public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + mark
 public/icons/         PWA icons (192 / 512 / maskable)
 vite.config.ts        React + pdfjsAssetsPlugin (/pdfjs/**) + VitePWA
 src/
-  main.tsx            app bootstrap (router + MUI theme + i18n + SW register)
+  main.tsx            app bootstrap (router + MUI theme + i18n + SW register + spa update notice)
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
-  components/         AppShell, ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (bookmark menu / drawer list + rename dialog), ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
-  stores/             Zustand (locale, settings, books list, bookmarks)
+  components/         AppShell, ChunkErrorBoundary (stale-chunk recover → spa-update-notice), ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (bookmark menu / drawer list + rename dialog), ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
+  stores/             Zustand (locale, settings, books list, bookmarks, recent reads)
   hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging)
   lib/
     catalog.ts        configs.json fetch + normalize (BookConfig); stale-while-revalidate over in-memory + localStorage copies (getBookConfigs / revalidateBookConfigs)
@@ -43,8 +43,11 @@ src/
     settings.ts       configs URL preference (localStorage)
     bookmarks.ts      bookmark pure logic: add (10 recent per book), rename (= permanent), remove, group, time label
     bookmarkStorage.ts  bookmark JSON in localStorage (load with strict validation / store)
+    recentReads.ts    sticky recently-read list (max 10; reopen refreshes access time only)
+    recentReadStorage.ts  recent-reads JSON in localStorage (load with strict validation / store)
     locale.ts         UI locale preference (en/zh, default en)
     reportFailure.ts  console.error for failures (TdLog is separate)
+    spaUpdateNotice.ts  detect stale chunk / dynamic-import failures; load hosted spa-update-notice and show refresh UI
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa
   i18n/               i18next setup + en/zh message catalogs
   test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)
