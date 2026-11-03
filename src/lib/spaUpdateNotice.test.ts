@@ -78,25 +78,6 @@ describe('handleUpdateNotice', () => {
       container: '#root',
     });
   });
-
-  it('falls back to confirm + reload when the script fails to load', async () => {
-    const reload = vi.fn();
-    const confirmFn = vi.fn(() => true);
-    vi.spyOn(document.head, 'appendChild').mockImplementation((node) => {
-      const script = node as HTMLScriptElement;
-      queueMicrotask(() => script.onerror?.(new Event('error')));
-      return node;
-    });
-
-    await handleUpdateNotice({
-      lang: 'en',
-      confirmFn,
-      reload,
-    });
-
-    expect(confirmFn).toHaveBeenCalledOnce();
-    expect(reload).toHaveBeenCalledOnce();
-  });
 });
 
 describe('registerSpaUpdateNotice', () => {
@@ -126,24 +107,5 @@ describe('registerSpaUpdateNotice', () => {
       appName: 'tdbook',
       container: '#root',
     });
-  });
-
-  it('registers a confirm+reload fallback on vite:preloadError when the script fails', async () => {
-    const reload = vi.fn();
-    const confirmFn = vi.fn(() => true);
-    vi.spyOn(document.head, 'appendChild').mockImplementation((node) => {
-      const script = node as HTMLScriptElement;
-      queueMicrotask(() => script.onerror?.(new Event('error')));
-      return node;
-    });
-
-    await registerSpaUpdateNotice({ confirmFn, reload });
-
-    const event = new Event('vite:preloadError', { cancelable: true });
-    window.dispatchEvent(event);
-
-    expect(event.defaultPrevented).toBe(true);
-    expect(confirmFn).toHaveBeenCalledOnce();
-    expect(reload).toHaveBeenCalledOnce();
   });
 });

@@ -5,7 +5,6 @@ import { getStoredLocale } from '@/lib/locale';
 export const SPA_UPDATE_NOTICE_JS = 'https://spa-update-notice.smt.sh/update-required.js';
 
 const APP_NAME = 'tdbook';
-const FALLBACK_CONFIRM = 'App updated. Refresh now?';
 
 export type SpaUpdateNoticeOptions = {
   lang?: AppLocale;
@@ -46,8 +45,6 @@ type NoticeCallDeps = {
   lang?: AppLocale;
   appName?: string;
   container?: HTMLElement | string;
-  confirmFn?: (message: string) => boolean;
-  reload?: () => void;
 };
 
 function noticeOptions(deps: NoticeCallDeps): SpaUpdateNoticeOptions {
@@ -60,12 +57,11 @@ function noticeOptions(deps: NoticeCallDeps): SpaUpdateNoticeOptions {
 
 async function ensureNoticeScript(): Promise<void> {
   if (window.SpaUpdateNotice) return;
-  await new Promise<void>((resolve, reject) => {
+  await new Promise<void>((resolve) => {
     const script = document.createElement('script');
     script.src = SPA_UPDATE_NOTICE_JS;
     script.async = true;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error('spa-update-notice script failed to load'));
     document.head.appendChild(script);
   });
 }
@@ -75,37 +71,15 @@ async function ensureNoticeScript(): Promise<void> {
  * silent reload once, then the refresh UI. Auto-reload lives in the library.
  */
 export async function handleUpdateNotice(deps: NoticeCallDeps = {}): Promise<void> {
-  const options = noticeOptions(deps);
-  const reload = deps.reload ?? (() => location.reload());
-  const confirmFn = deps.confirmFn ?? ((message: string) => window.confirm(message));
-
-  try {
-    await ensureNoticeScript();
-    window.SpaUpdateNotice?.handle(options);
-  } catch {
-    if (confirmFn(FALLBACK_CONFIRM)) reload();
-  }
+  await ensureNoticeScript();
+  window.SpaUpdateNotice?.handle(noticeOptions(deps));
 }
-
-type RegisterDeps = NoticeCallDeps;
 
 /**
  * Eagerly load the hosted script and call install() so Vite's vite:preloadError
- * is handled inside the library. If the script fails to load, register a tiny
- * confirm + reload fallback (no local auto-reload window).
+ * is handled inside the library.
  */
-export async function registerSpaUpdateNotice(deps: RegisterDeps = {}): Promise<void> {
-  const options = noticeOptions(deps);
-  const reload = deps.reload ?? (() => location.reload());
-  const confirmFn = deps.confirmFn ?? ((message: string) => window.confirm(message));
-
-  try {
-    await ensureNoticeScript();
-    window.SpaUpdateNotice?.install(options);
-  } catch {
-    window.addEventListener('vite:preloadError', (event) => {
-      event.preventDefault();
-      if (confirmFn(FALLBACK_CONFIRM)) reload();
-    });
-  }
+export async function registerSpaUpdateNotice(deps: NoticeCallDeps = {}): Promise<void> {
+  await ensureNoticeScript();
+  window.SpaUpdateNotice?.install(noticeOptions(deps));
 }
