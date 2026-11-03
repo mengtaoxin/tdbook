@@ -15,8 +15,8 @@ import './style.css';
 // Production-only: vite-plugin-pwa leaves registration a no-op in `npm run dev`.
 registerSW({ immediate: true });
 
-// Stale hashed chunks after deploy → hosted spa-update-notice refresh UI.
-registerSpaUpdateNotice();
+// Stale hashed chunks after deploy → hosted spa-update-notice (reload once, then UI).
+void registerSpaUpdateNotice();
 
 const rootEl = document.getElementById('root');
 if (!rootEl) {
