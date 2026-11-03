@@ -1,28 +1,26 @@
 import { Component, type ReactNode } from 'react';
-import { handleUpdateNotice, isChunkError } from '@/lib/spaUpdateNotice';
+import { handleChunkLoadFailure, isChunkLoadError } from '@/lib/spaUpdateNotice';
 
 type Props = { children: ReactNode };
-type State = { chunkError: boolean };
+type State = { hasError: boolean };
 
-/**
- * Catches stale-chunk / dynamic-import failures after a deploy and runs the
- * hosted spa-update-notice handle() flow instead of a blank React error.
- */
+/** Forwards stale-chunk failures to spa-update-notice; other errors rethrow. */
 export class ChunkErrorBoundary extends Component<Props, State> {
-  state: State = { chunkError: false };
+  state: State = { hasError: false };
 
   static getDerivedStateFromError(error: unknown): State {
-    if (isChunkError(error)) return { chunkError: true };
+    if (isChunkLoadError(error)) return { hasError: true };
     throw error;
   }
 
   componentDidCatch(error: unknown): void {
-    if (!isChunkError(error)) return;
-    void handleUpdateNotice();
+    if (isChunkLoadError(error)) {
+      handleChunkLoadFailure();
+    }
   }
 
   render(): ReactNode {
-    if (this.state.chunkError) return null;
+    if (this.state.hasError) return null;
     return this.props.children;
   }
 }

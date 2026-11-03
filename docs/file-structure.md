@@ -47,7 +47,7 @@ src/
     recentReadStorage.ts  recent-reads JSON in localStorage (load with strict validation / store)
     locale.ts         UI locale preference (en/zh, default en)
     reportFailure.ts  console.error for failures (TdLog is separate)
-    spaUpdateNotice.ts  load hosted spa-update-notice; install()/handle() for stale chunks (library owns auto-reload)
+    spaUpdateNotice.ts  thin wrapper: load hosted spa-update-notice, install/handle/isChunkError only
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa
   i18n/               i18next setup + en/zh message catalogs
   test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)

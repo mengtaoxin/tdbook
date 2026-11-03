@@ -23,7 +23,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 - **Vite 8** with `@vitejs/plugin-react`. Config: `vite.config.ts` (dev port 3000, `@/` → `src/`).
 - **Custom `pdfjsAssetsPlugin`** in `vite.config.ts`: serves `cmaps`, `standard_fonts`, `wasm`, `iccs` from `node_modules/pdfjs-dist` at `/pdfjs/**` in dev and preview, and copies them into `dist/` on build.
 - **vite-plugin-pwa** (Workbox): web app manifest from `src/lib/pwaManifest.ts`, precaches the app shell (including the pdf.js worker; `configs.json` is excluded via `globIgnores` so precache cannot pin it), `NetworkFirst` for any same- or cross-origin `…/configs.json` (route callback), `CacheFirst` for `/pdfjs/**`. Registered from `src/main.tsx`; inactive in `npm run dev`.
-- **spa-update-notice** v1.1+ (hosted at `https://spa-update-notice.smt.sh/update-required.js`): after a deploy, open tabs that hit missing hashed chunks get a silent reload once, then the shared “please refresh” UI. Wired in `src/lib/spaUpdateNotice.ts` (`install` / `handle`) and `ChunkErrorBoundary` in `src/main.tsx`. Not a Service Worker / hard-cache clear.
+- **spa-update-notice** (hosted at `https://spa-update-notice.smt.sh/update-required.js`): after a deploy, open tabs that hit missing hashed chunks get a silent reload once, then the shared “please refresh” UI. Startup renders first, then loads the script in the background (`src/lib/spaUpdateNotice.ts` → `install`); `ChunkErrorBoundary` only forwards to the library. Not a Service Worker / hard-cache clear.
 
 ## Language and tooling
 

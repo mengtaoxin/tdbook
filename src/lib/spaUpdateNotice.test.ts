@@ -1,111 +1,109 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { handleUpdateNotice, isChunkError, registerSpaUpdateNotice } from '@/lib/spaUpdateNotice';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setStoredLocale } from '@/lib/locale';
+import {
+  SPA_UPDATE_APP_NAME,
+  SPA_UPDATE_NOTICE_URL,
+  handleChunkLoadFailure,
+  installSpaUpdateNotice,
+  isChunkLoadError,
+} from '@/lib/spaUpdateNotice';
 
-function mockNoticeApi(api: {
-  show?: ReturnType<typeof vi.fn>;
-  hide?: ReturnType<typeof vi.fn>;
-  handle?: ReturnType<typeof vi.fn>;
-  install?: ReturnType<typeof vi.fn>;
-  isChunkError?: ReturnType<typeof vi.fn>;
-}) {
-  Object.defineProperty(window, 'SpaUpdateNotice', {
-    configurable: true,
-    value: {
-      show: api.show ?? vi.fn(),
-      hide: api.hide ?? vi.fn(),
-      handle: api.handle ?? vi.fn(),
-      install: api.install ?? vi.fn(),
-      isChunkError: api.isChunkError ?? vi.fn(),
-    },
-    writable: true,
-  });
+type NoticeApi = {
+  install: ReturnType<typeof vi.fn>;
+  handle: ReturnType<typeof vi.fn>;
+  isChunkError: ReturnType<typeof vi.fn>;
+};
+
+function mockNoticeApi(overrides: Partial<NoticeApi> = {}): NoticeApi {
+  return {
+    install: vi.fn(),
+    handle: vi.fn(),
+    isChunkError: vi.fn((err: unknown) =>
+      /Failed to fetch dynamically imported module|Loading chunk/i.test(String(err)),
+    ),
+    ...overrides,
+  };
 }
 
-function loadScriptOnAppend(onReady: (script: HTMLScriptElement) => void) {
-  return vi.spyOn(document.head, 'appendChild').mockImplementation((node) => {
-    const script = node as HTMLScriptElement;
-    onReady(script);
-    queueMicrotask(() => script.onload?.(new Event('load')));
-    return node;
-  });
-}
-
-describe('isChunkError', () => {
-  it('detects common chunk / dynamic-import failure messages', () => {
-    expect(
-      isChunkError(new Error('Failed to fetch dynamically imported module: /assets/x.js')),
-    ).toBe(true);
-    expect(isChunkError(new Error('Loading chunk 5 failed.'))).toBe(true);
-    expect(isChunkError(new Error('Importing a module script failed.'))).toBe(true);
-    expect(isChunkError(new Error('ChunkLoadError: Loading chunk foo failed'))).toBe(true);
-    expect(isChunkError(new Error('CSS_CHUNK_LOAD_FAILED'))).toBe(true);
+describe('spaUpdateNotice', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    delete (window as { SpaUpdateNotice?: unknown }).SpaUpdateNotice;
+    document.head.querySelectorAll(`script[src="${SPA_UPDATE_NOTICE_URL}"]`).forEach((node) => {
+      node.remove();
+    });
   });
 
-  it('rejects unrelated errors', () => {
-    expect(isChunkError(new Error('NetworkError when attempting to fetch resource.'))).toBe(false);
-    expect(isChunkError('boom')).toBe(false);
-    expect(isChunkError(null)).toBe(false);
-  });
-});
-
-describe('handleUpdateNotice', () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    document.head.replaceChildren();
-    delete (window as Window & { SpaUpdateNotice?: unknown }).SpaUpdateNotice;
+    delete (window as { SpaUpdateNotice?: unknown }).SpaUpdateNotice;
   });
 
-  it('loads the hosted script once and calls SpaUpdateNotice.handle', async () => {
-    const handle = vi.fn();
-    Object.defineProperty(window, 'SpaUpdateNotice', {
-      configurable: true,
-      value: undefined,
-      writable: true,
-    });
+  it('installs the hosted notice with app name, root container, and stored locale', async () => {
+    setStoredLocale('zh');
+    const api = mockNoticeApi();
+    (window as { SpaUpdateNotice?: NoticeApi }).SpaUpdateNotice = api;
 
-    const appendSpy = loadScriptOnAppend(() => {
-      mockNoticeApi({ handle });
-    });
+    await installSpaUpdateNotice();
 
-    await handleUpdateNotice({ lang: 'zh', appName: 'tdbook' });
-
-    expect(appendSpy).toHaveBeenCalledOnce();
-    const script = appendSpy.mock.calls[0]?.[0] as HTMLScriptElement;
-    expect(script.src).toBe('https://spa-update-notice.smt.sh/update-required.js');
-    expect(handle).toHaveBeenCalledExactlyOnceWith({
+    expect(api.install).toHaveBeenCalledWith({
+      appName: SPA_UPDATE_APP_NAME,
+      container: '#root',
       lang: 'zh',
-      appName: 'tdbook',
+    });
+  });
+
+  it('loads the hosted script once when SpaUpdateNotice is missing, then installs', async () => {
+    const api = mockNoticeApi();
+    const injected: { current: HTMLScriptElement | null } = { current: null };
+    vi.spyOn(document.head, 'appendChild').mockImplementation((node) => {
+      injected.current = node as HTMLScriptElement;
+      return node;
+    });
+
+    const installPromise = installSpaUpdateNotice({ lang: 'en' });
+
+    expect(injected.current).not.toBeNull();
+    expect(injected.current?.src).toContain(SPA_UPDATE_NOTICE_URL);
+    expect(injected.current?.async).toBe(true);
+
+    (window as { SpaUpdateNotice?: NoticeApi }).SpaUpdateNotice = api;
+    injected.current?.onload?.(new Event('load'));
+
+    await installPromise;
+
+    expect(api.install).toHaveBeenCalledWith({
+      appName: SPA_UPDATE_APP_NAME,
       container: '#root',
-    });
-  });
-});
-
-describe('registerSpaUpdateNotice', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-    document.head.replaceChildren();
-    delete (window as Window & { SpaUpdateNotice?: unknown }).SpaUpdateNotice;
-  });
-
-  it('loads the hosted script and calls SpaUpdateNotice.install', async () => {
-    const install = vi.fn();
-    Object.defineProperty(window, 'SpaUpdateNotice', {
-      configurable: true,
-      value: undefined,
-      writable: true,
-    });
-
-    const appendSpy = loadScriptOnAppend(() => {
-      mockNoticeApi({ install });
-    });
-
-    await registerSpaUpdateNotice({ lang: 'en', appName: 'tdbook' });
-
-    expect(appendSpy).toHaveBeenCalledOnce();
-    expect(install).toHaveBeenCalledExactlyOnceWith({
       lang: 'en',
-      appName: 'tdbook',
-      container: '#root',
     });
+  });
+
+  it('handleChunkLoadFailure delegates to SpaUpdateNotice.handle', () => {
+    const api = mockNoticeApi();
+    (window as { SpaUpdateNotice?: NoticeApi }).SpaUpdateNotice = api;
+
+    handleChunkLoadFailure({ lang: 'en' });
+
+    expect(api.handle).toHaveBeenCalledWith({
+      appName: SPA_UPDATE_APP_NAME,
+      container: '#root',
+      lang: 'en',
+    });
+  });
+
+  it('isChunkLoadError uses the library detector', () => {
+    const api = mockNoticeApi({
+      isChunkError: vi.fn().mockReturnValue(true),
+    });
+    (window as { SpaUpdateNotice?: NoticeApi }).SpaUpdateNotice = api;
+    const err = new Error('boom');
+
+    expect(isChunkLoadError(err)).toBe(true);
+    expect(api.isChunkError).toHaveBeenCalledWith(err);
+  });
+
+  it('isChunkLoadError is false when the library is not loaded', () => {
+    expect(isChunkLoadError(new Error('Loading chunk 5 failed.'))).toBe(false);
   });
 });
