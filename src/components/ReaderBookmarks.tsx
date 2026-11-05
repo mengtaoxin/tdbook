@@ -110,6 +110,7 @@ function useReaderBookmarks({ bookId, onDone, onNotice }: ReaderBookmarksProps) 
       <BookmarkEditDialog
         key={editing.id}
         bookmark={editing}
+        currentPosition={() => ({ page, location: captureReaderLocation() || hash })}
         onClose={() => setEditing(null)}
         onNotice={onNotice}
       />
@@ -240,15 +241,18 @@ export function ReaderBookmarksList(props: ReaderBookmarksProps) {
 
 function BookmarkEditDialog({
   bookmark,
+  currentPosition,
   onClose,
   onNotice,
 }: {
   bookmark: Bookmark;
+  currentPosition: () => { page: number; location: string };
   onClose: () => void;
   onNotice: ReaderBookmarksProps['onNotice'];
 }) {
   const { t } = useTranslation();
   const rename = useBookmarksStore((s) => s.rename);
+  const updatePosition = useBookmarksStore((s) => s.update);
   const remove = useBookmarksStore((s) => s.remove);
   const [name, setName] = useState(bookmark.name ?? '');
 
@@ -265,6 +269,10 @@ function BookmarkEditDialog({
   function submit(event: FormEvent) {
     event.preventDefault();
     update(() => rename(bookmark.id, name), 'bookmarks.renamed');
+  }
+
+  function moveToCurrentPosition() {
+    update(() => updatePosition(bookmark.id, currentPosition()), 'bookmarks.updated');
   }
 
   return (
@@ -289,6 +297,16 @@ function BookmarkEditDialog({
           autoComplete="off"
           slotProps={{ htmlInput: { 'data-testid': 'bookmark-rename-input' } }}
         />
+        <Button
+          type="button"
+          variant="outlined"
+          fullWidth
+          sx={{ mt: 2 }}
+          data-testid="bookmark-update-position"
+          onClick={moveToCurrentPosition}
+        >
+          {t('bookmarks.updatePosition')}
+        </Button>
       </DialogContent>
       <DialogActions>
         <Button

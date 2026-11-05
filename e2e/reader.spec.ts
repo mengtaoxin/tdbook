@@ -135,7 +135,7 @@ test.describe('books reader', () => {
     await expect(page.getByText('All book caches cleared')).toBeVisible();
   });
 
-  test('saves, lists, renames, and jumps to bookmarks while reading', async ({ page }) => {
+  test('saves, lists, renames, updates, and jumps to bookmarks while reading', async ({ page }) => {
     await page.goto('/books');
     await expect(page.getByTestId('nav-bookmarks')).toHaveCount(0);
 
@@ -186,6 +186,23 @@ test.describe('books reader', () => {
     await expect(menu.getByText('Named')).toBeVisible();
     await expect(menu.getByText('Recent')).toHaveCount(0);
     await expect(items.first()).toContainText('Chapter two');
+
+    await page.keyboard.press('Escape');
+    await page.getByLabel('Previous page').click();
+    await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/);
+    await page.getByTestId('nav-bookmarks').click();
+    await menu.locator('[data-testid^="bookmark-edit-"]').first().click();
+    await dialog.getByTestId('bookmark-update-position').click();
+    await expect(page.getByText('Bookmark updated.')).toBeVisible();
+    await expect(dialog).toHaveCount(0);
+    const updated = await page.evaluate(() => localStorage.getItem('books.bookmarks'));
+    const updatedParsed = JSON.parse(updated ?? '') as {
+      bookmarks: Array<{ location: string; name?: string; page: number }>;
+    };
+    expect(updatedParsed.bookmarks).toHaveLength(1);
+    expect(updatedParsed.bookmarks[0]).toMatchObject({ name: 'Chapter two', page: 1 });
+    expect(updatedParsed.bookmarks[0]?.location).toMatch(/^#char:\d+$/);
+    await expect(items.first()).toContainText('Page 1');
 
     await menu.locator('[data-testid^="bookmark-edit-"]').first().click();
     await dialog.getByTestId('bookmark-delete').click();

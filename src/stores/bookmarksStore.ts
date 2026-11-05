@@ -1,5 +1,11 @@
 import { create } from 'zustand';
-import { addBookmark, type Bookmark, removeBookmark, renameBookmark } from '@/lib/bookmarks';
+import {
+  addBookmark,
+  type Bookmark,
+  removeBookmark,
+  renameBookmark,
+  updateBookmark,
+} from '@/lib/bookmarks';
 import { loadBookmarks, storeBookmarks } from '@/lib/bookmarkStorage';
 
 type BookmarksState = {
@@ -8,6 +14,8 @@ type BookmarksState = {
   save: (position: { bookId: string; page: number; location: string }) => void;
   /** @throws on an empty name or a failed write; state is left unchanged. */
   rename: (id: string, name: string) => void;
+  /** @throws when the write fails; state is left unchanged. Name is kept. */
+  update: (id: string, position: { page: number; location: string }) => void;
   /** @throws when the write fails; state is left unchanged. */
   remove: (id: string) => void;
 };
@@ -33,6 +41,9 @@ export const useBookmarksStore = create<BookmarksState>((set, get) => {
     },
     rename: (id, name) => {
       commit(renameBookmark(get().bookmarks, id, name));
+    },
+    update: (id, position) => {
+      commit(updateBookmark(get().bookmarks, id, { ...position, now: Date.now() }));
     },
     remove: (id) => {
       commit(removeBookmark(get().bookmarks, id));

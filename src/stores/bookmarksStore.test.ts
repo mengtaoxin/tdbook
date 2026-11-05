@@ -32,6 +32,27 @@ describe('bookmarksStore', () => {
     expect(useBookmarksStore.getState().bookmarks).toEqual([]);
   });
 
+  it('persists an updated reading position without changing the name', () => {
+    const { save, rename, update } = useBookmarksStore.getState();
+
+    save(position);
+    const [saved] = useBookmarksStore.getState().bookmarks;
+    rename(saved!.id, 'Chapter 3');
+
+    update(saved!.id, { page: 4, location: '#char:40' });
+
+    const [updated] = loadBookmarks();
+    expect(updated).toMatchObject({
+      id: saved!.id,
+      bookId: 'sample-epub',
+      name: 'Chapter 3',
+      page: 4,
+      location: '#char:40',
+    });
+    expect(updated?.savedAt).toBeGreaterThanOrEqual(saved!.savedAt);
+    expect(useBookmarksStore.getState().bookmarks[0]).toEqual(updated);
+  });
+
   it('keeps state unchanged when the write fails', () => {
     vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
       throw new Error('quota');

@@ -71,6 +71,24 @@ export function addBookmark(
   return next.filter((bookmark) => !dropped.has(bookmark.id));
 }
 
+/** Replace page and in-page location, and refresh the save time. The name stays. */
+export function updateBookmark(
+  list: Bookmark[],
+  id: string,
+  position: { page: number; location: string; now: number },
+): Bookmark[] {
+  return list.map((bookmark) =>
+    bookmark.id === id
+      ? {
+          ...bookmark,
+          page: position.page,
+          location: position.location,
+          savedAt: position.now,
+        }
+      : bookmark,
+  );
+}
+
 /** Naming a bookmark makes it permanent. */
 export function renameBookmark(list: Bookmark[], id: string, name: string): Bookmark[] {
   const trimmed = name.trim();

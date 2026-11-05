@@ -8,6 +8,7 @@ import {
   readerBookIdFromPath,
   removeBookmark,
   renameBookmark,
+  updateBookmark,
 } from '@/lib/bookmarks';
 import en from '@/i18n/locales/en';
 import zh from '@/i18n/locales/zh';
@@ -102,6 +103,29 @@ describe('bookmarks', () => {
       },
     ]);
     expect(recent).toHaveLength(MAX_RECENT_BOOKMARKS);
+  });
+
+  it('moves a bookmark to the current position and keeps its name', () => {
+    let list = saveMany([], 2);
+    list = renameBookmark(list, `${BOOK}-1`, 'Chapter');
+
+    const next = updateBookmark(list, `${BOOK}-1`, {
+      page: 9,
+      location: '#char:90',
+      now: 9000,
+    });
+
+    expect(next.find((item) => item.id === `${BOOK}-1`)).toEqual({
+      id: `${BOOK}-1`,
+      bookId: BOOK,
+      page: 9,
+      location: '#char:90',
+      savedAt: 9000,
+      name: 'Chapter',
+    });
+    expect(next.find((item) => item.id === `${BOOK}-2`)).toEqual(
+      list.find((item) => item.id === `${BOOK}-2`),
+    );
   });
 
   it('rejects an empty name', () => {
