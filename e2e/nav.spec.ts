@@ -74,6 +74,55 @@ test.describe('app shell navigation', () => {
     await expect(page).toHaveURL('/logs');
   });
 
+  test('reader Bookmarks control leads the nav with its inset on the left', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/book/sample-epub');
+
+    const nav = page.getByTestId('desktop-nav');
+    const bookmarks = nav.getByTestId('nav-bookmarks');
+    const books = nav.getByRole('link', { name: 'Books' });
+    const more = nav.getByTestId('nav-more-toggle');
+
+    await expect(bookmarks).toBeVisible();
+
+    const [bookmarkBox, booksBox, moreBox] = await Promise.all([
+      bookmarks.boundingBox(),
+      books.boundingBox(),
+      more.boundingBox(),
+    ]);
+    expect(bookmarkBox).not.toBeNull();
+    expect(booksBox).not.toBeNull();
+    expect(moreBox).not.toBeNull();
+    expect(bookmarkBox!.x).toBeLessThan(booksBox!.x);
+    expect(booksBox!.x).toBeLessThan(moreBox!.x);
+
+    const gapBeforeBooks = booksBox!.x - (bookmarkBox!.x + bookmarkBox!.width);
+    const gapBeforeMore = moreBox!.x - (booksBox!.x + booksBox!.width);
+    expect(gapBeforeBooks).toBeLessThanOrEqual(gapBeforeMore + 1);
+
+    const margin = await bookmarks.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return {
+        left: Number.parseFloat(style.marginLeft),
+        right: Number.parseFloat(style.marginRight),
+      };
+    });
+    expect(margin.left).toBeGreaterThan(margin.right);
+  });
+
+  test('reader Bookmarks control is styled apart from permanent nav links', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/book/sample-epub');
+
+    const nav = page.getByTestId('desktop-nav');
+    const bookmarks = nav.getByTestId('nav-bookmarks');
+    const books = nav.getByRole('link', { name: 'Books' });
+
+    await expect(bookmarks).toBeVisible();
+    await expect(bookmarks).toHaveClass(/MuiButton-outlined/);
+    await expect(books).toHaveClass(/MuiButton-text/);
+  });
+
   test('More menu does not lock page scroll (scrollbar stays)', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');

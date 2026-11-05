@@ -30,6 +30,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -163,6 +164,32 @@ export function AppShell() {
           : {}),
       }}
     >
+      {bookId ? (
+        <Button
+          color="inherit"
+          variant="outlined"
+          startIcon={<BookmarkBorderOutlinedIcon />}
+          data-testid="nav-bookmarks"
+          aria-haspopup="menu"
+          aria-expanded={bookmarkAnchor ? true : undefined}
+          tabIndex={compactNav ? -1 : undefined}
+          onClick={(event) => setBookmarkAnchor(event.currentTarget)}
+          sx={(theme) => ({
+            // Reader-only control: extra inset stays on the left so Books and More stay packed.
+            ml: 1,
+            mr: 0,
+            px: 1.25,
+            borderColor: alpha(theme.palette.primary.contrastText, bookmarkAnchor ? 0.92 : 0.55),
+            backgroundColor: alpha(theme.palette.primary.contrastText, bookmarkAnchor ? 0.22 : 0.1),
+            '&:hover': {
+              borderColor: alpha(theme.palette.primary.contrastText, 0.92),
+              backgroundColor: alpha(theme.palette.primary.contrastText, 0.2),
+            },
+          })}
+        >
+          {t('nav.bookmarks')}
+        </Button>
+      ) : null}
       {NAV_ITEMS.map((item) => (
         <Button
           key={item.to}
@@ -176,17 +203,6 @@ export function AppShell() {
           {t(item.labelKey)}
         </Button>
       ))}
-      {bookId ? (
-        <Button
-          color="inherit"
-          startIcon={<BookmarkBorderOutlinedIcon />}
-          data-testid="nav-bookmarks"
-          tabIndex={compactNav ? -1 : undefined}
-          onClick={(event) => setBookmarkAnchor(event.currentTarget)}
-        >
-          {t('nav.bookmarks')}
-        </Button>
-      ) : null}
       <Button
         color="inherit"
         startIcon={<MoreHorizOutlinedIcon />}
