@@ -36,8 +36,15 @@ export const theme = createTheme({
         size: 'small',
       },
     },
-    // Nav dropdowns must not hide the page scrollbar (Modal scroll lock).
+    // Overlay scrollbars only keep `scrollbar-gutter: stable` while the page
+    // overflows. Modal scroll lock drops that gutter and adds padding-right,
+    // which shifts the page width (nav menus and confirm dialogs).
     MuiMenu: {
+      defaultProps: {
+        disableScrollLock: true,
+      },
+    },
+    MuiDialog: {
       defaultProps: {
         disableScrollLock: true,
       },
