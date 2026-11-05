@@ -141,6 +141,25 @@ describe('epubAnchor', () => {
     expect(scrollIntoView).toHaveBeenCalled();
   });
 
+  it('scrolls the reader pane when that element owns the page scroll', () => {
+    const scroller = document.createElement('main');
+    scroller.className = 'reader-scroll';
+    document.body.appendChild(scroller);
+    const { host, shadow } = mountEpub('<p>Hello</p><p>World</p>');
+    scroller.appendChild(host);
+    vi.spyOn(host, 'getBoundingClientRect').mockReturnValue(mockZeroSizeRect());
+    vi.spyOn(Range.prototype, 'getBoundingClientRect').mockReturnValue(
+      mockZeroSizeRect({ top: 80, width: 10, height: 16, right: 10, bottom: 96 }),
+    );
+    const paneScrollBy = vi.spyOn(scroller, 'scrollBy').mockImplementation(() => {});
+    const windowScrollBy = vi.spyOn(window, 'scrollBy').mockImplementation(() => {});
+
+    scrollEpubAnchor(shadow, '#char:5');
+
+    expect(paneScrollBy).toHaveBeenCalledWith(0, 80);
+    expect(windowScrollBy).not.toHaveBeenCalled();
+  });
+
   it('still restores legacy element-id locations', () => {
     const { shadow } = mountEpub('<h1 id="top">Title</h1><p>Body</p>');
     const heading = shadow.getElementById('top');

@@ -124,6 +124,16 @@ export function captureEpubAnchor(shadow: ShadowRoot, options?: { viewportTop?: 
   return formatCharLocation(Math.max(0, offset));
 }
 
+/** Reader pages scroll `main.reader-scroll`; other pages use the viewport. */
+function scrollReadingBy(deltaY: number) {
+  const scroller = document.querySelector('main.reader-scroll');
+  if (scroller instanceof HTMLElement) {
+    scroller.scrollBy(0, deltaY);
+    return;
+  }
+  window.scrollBy(0, deltaY);
+}
+
 function scrollToCharOffset(shadow: ShadowRoot, offset: number) {
   const body = shadow.querySelector('body');
   if (!body) return;
@@ -145,7 +155,7 @@ function scrollToCharOffset(shadow: ShadowRoot, offset: number) {
   const rect = range.getBoundingClientRect();
   if (rect.height > 0 || rect.width > 0) {
     const targetTop = visibleReadingTop(shadow.host);
-    window.scrollBy(0, rect.top - targetTop);
+    scrollReadingBy(rect.top - targetTop);
     return;
   }
 

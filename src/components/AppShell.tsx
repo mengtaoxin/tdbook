@@ -82,6 +82,9 @@ export function AppShell() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (!window.location.hash) {
+      document.querySelector('main.reader-scroll')?.scrollTo(0, 0);
+    }
     // oxlint-disable-next-line react/exhaustive-effect-dependencies -- scroll to top on every route change
   }, [pathname]);
 
@@ -220,7 +223,14 @@ export function AppShell() {
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        ...(bookId ? { height: '100vh', overflow: 'hidden' } : null),
+      }}
+    >
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -434,7 +444,15 @@ export function AppShell() {
         </DialogActions>
       </Dialog>
 
-      <Box component="main" sx={{ flex: 1 }}>
+      <Box
+        component="main"
+        className={bookId ? 'reader-scroll' : undefined}
+        sx={{
+          flex: '1 1 auto',
+          minHeight: 0,
+          ...(bookId ? { overflowY: 'auto' } : null),
+        }}
+      >
         <Outlet />
       </Box>
     </Box>
