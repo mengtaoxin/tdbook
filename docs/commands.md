@@ -1,6 +1,6 @@
 # Commands
 
-Run everything from the repo root with the `npm run` scripts in `package.json`. Do not add `scripts/*.sh` wrappers.
+Run everything from the repo root with the `npm run` scripts in `package.json`.
 
 When to run these while changing code: [change-code-steps.md](change-code-steps.md).
 
@@ -35,7 +35,8 @@ npm run preview   # serve dist/ locally (Vite default port 4173), with the servi
 npm run test            # Vitest unit tests, once
 npm run test:watch      # Vitest in watch mode
 npm run test:coverage   # unit tests + V8 coverage (coverage/)
-npm run test:e2e        # Playwright e2e (Chromium)
+npm run test:e2e        # Playwright e2e (Chromium); shared script
+npm run test:e2e:local  # same suite, host Playwright cache; system terminal
 npm run verify          # check + full unit suite (read-only)
 ```
 
@@ -54,4 +55,4 @@ npm run check         # format:check + lint + type-check (read-only)
 
 Rules come from `@mengtaoxin/oxc-config` via `oxlint.config.ts` and `oxfmt.config.ts`.
 
-Add `npm run test:e2e` when the change touches the reader, cache, format adapters, or navigation.
+Add `npm run test:e2e:local` from the system terminal when the change touches the reader, cache, format adapters, or navigation. `npm run test:e2e` is the shared script.
