@@ -17,6 +17,7 @@ import ListSubheader from '@mui/material/ListSubheader';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import type { TFunction } from 'i18next';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { type FormEvent, type ReactNode, useState, useSyncExternalStore } from 'react';
@@ -297,11 +298,22 @@ function BookmarkEditDialog({
           autoComplete="off"
           slotProps={{ htmlInput: { 'data-testid': 'bookmark-rename-input' } }}
         />
+        <Typography variant="subtitle2" component="h3" sx={{ mt: 2 }}>
+          {t('bookmarks.positionTitle')}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          data-testid="bookmark-update-hint"
+          sx={{ mt: 0.5 }}
+        >
+          {t('bookmarks.updatePositionHint', { page: bookmark.page })}
+        </Typography>
         <Button
           type="button"
           variant="outlined"
-          fullWidth
-          sx={{ mt: 2 }}
+          size="small"
+          sx={{ mt: 1 }}
           data-testid="bookmark-update-position"
           onClick={moveToCurrentPosition}
         >

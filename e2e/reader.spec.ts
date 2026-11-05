@@ -192,6 +192,16 @@ test.describe('books reader', () => {
     await expect(page).toHaveURL(/\/book\/sample-epub\?page=1$/);
     await page.getByTestId('nav-bookmarks').click();
     await menu.locator('[data-testid^="bookmark-edit-"]').first().click();
+    await expect(dialog.getByTestId('bookmark-update-hint')).toHaveText(
+      'This bookmark is on page 2. Updating moves it to where you are reading now and keeps the name.',
+    );
+    const [inputBox, updateBox] = await Promise.all([
+      dialog.getByTestId('bookmark-rename-input').boundingBox(),
+      dialog.getByTestId('bookmark-update-position').boundingBox(),
+    ]);
+    expect(inputBox).not.toBeNull();
+    expect(updateBox).not.toBeNull();
+    expect(updateBox!.width).toBeLessThan(inputBox!.width);
     await dialog.getByTestId('bookmark-update-position').click();
     await expect(page.getByText('Bookmark updated.')).toBeVisible();
     await expect(dialog).toHaveCount(0);

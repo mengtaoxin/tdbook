@@ -95,7 +95,10 @@ export default {
     renameHint: 'A named bookmark is kept permanently and frees one of the 10 recent slots.',
     nameLabel: 'Name',
     rename: 'Save name',
-    updatePosition: 'Update to current position',
+    positionTitle: 'Reading position',
+    updatePositionHint:
+      'This bookmark is on page {page}. Updating moves it to where you are reading now and keeps the name.',
+    updatePosition: 'Update position',
     delete: 'Delete',
     renamed: 'Bookmark named.',
     updated: 'Bookmark updated.',
