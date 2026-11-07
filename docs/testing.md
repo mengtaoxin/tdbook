@@ -29,13 +29,10 @@ npm run test:coverage                      # + V8 coverage (terminal summary, co
 
 ```sh
 npx playwright install chromium            # once per machine
-npm run test:e2e:local                     # all specs; host Playwright cache; system terminal
-npm run test:e2e:local -- e2e/reader.spec.ts
-npm run test:e2e:local -- -g "opens an EPUB"
-npm run test:e2e                           # shared script
+npm run test:e2e                           # all specs
+npm run test:e2e -- e2e/reader.spec.ts
+npm run test:e2e -- -g "opens an EPUB"
 ```
-
-`scripts/test-e2e-local.sh` sets `PLAYWRIGHT_BROWSERS_PATH` to the host Playwright cache, then runs `playwright test`. Arguments after `--` are forwarded. Run `npm run test:e2e:local` from the system terminal.
 
 - Config: `playwright.config.ts`. Playwright starts `npm run dev` on `127.0.0.1:3000`. Locally it reuses a server already on port 3000; in CI (`CI` set) it always starts its own, retries once, and records a trace on the retry.
 - Specs run serially (`workers: 1`) because they share one origin's `localStorage` and IndexedDB.
@@ -53,5 +50,5 @@ npm run test:e2e                           # shared script
 ## What to run before finishing
 
 - Any code change: `npm run verify` (see [change-code-steps.md](./change-code-steps.md)).
-- Reader, cache, format adapters, routes, or navigation: also `npm run test:e2e:local` from the system terminal.
+- Reader, cache, format adapters, routes, or navigation: also `npm run test:e2e`.
 - Production build smoke when routing or bundling changed: `npm run build` (see [commands.md](./commands.md)).

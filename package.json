@@ -13,7 +13,6 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:local": "sh scripts/test-e2e-local.sh",
     "type-check": "tsc -b --pretty false",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
