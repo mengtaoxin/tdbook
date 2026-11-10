@@ -19,7 +19,7 @@
     "format": "oxfmt .",
     "format:check": "oxfmt --check",
     "check": "npm run format:check && npm run lint && npm run type-check",
-    "verify": "npm run check && npm run test"
+    "verify": "npm run check && npm run test && npm run test:e2e"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -32,7 +32,7 @@ No new test required for docs, comments, formatting, or mechanical moves (still 
 
 ## 4. Tests
 
-Run the focused spec during Red/Green (`npm run test -- path/to/file.test.ts` or `npm run test:watch`). Before finishing a behavior change, run the full unit suite (`npm run test`). Add or run e2e only for user-visible integration smoke — see [testing.md](testing.md).
+Run the focused spec during Red/Green (`npm run test -- path/to/file.test.ts` or `npm run test:watch`). Before finishing a behavior change, run `npm run verify` (check + unit + e2e). Add e2e specs only for user-visible integration smoke — see [testing.md](testing.md).
 
 ## 5. Format and verify
 
@@ -42,5 +42,5 @@ Run `npm run format` (and `npm run lint:fix` when lint autofix is needed) when t
 
 - Structure matches [file-structure.md](file-structure.md).
 - Behavior changes went through Red → Green.
-- `npm run verify` passes; e2e when that layer is required.
+- `npm run verify` passes (includes e2e).
 - i18n and docs are updated when they apply.
