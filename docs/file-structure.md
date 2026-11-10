@@ -35,7 +35,6 @@ src/
     cacheStore.ts     book cache façade (blob URL lifecycle + SQLite backend selection)
     cacheDb.ts        CacheDb interface + OPFS capability check
     cacheSqlite*.ts   wa-sqlite open (MemoryVFS / OPFS worker), SQL helpers, module load
-    cacheMigrateIdb.ts  one-shot Dexie IndexedDB → SQLite migration
     cacheIngest.ts    abortable pipeline: fetch → format ingest → snapshot → ready meta
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
@@ -53,7 +52,7 @@ src/
     spaUpdateNotice.ts  thin wrapper: load hosted spa-update-notice, install/handle/isChunkError only
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa
   i18n/               i18next setup + en/zh message catalogs
-  test/setup.ts       Vitest setup (fake-indexeddb for migration/tdkit / Blob polyfill)
+  test/setup.ts       Vitest setup (fake-indexeddb for tdkit / Blob polyfill)
   **/*.test.ts        unit tests colocated next to the module under test
 e2e/                  Playwright
 ```

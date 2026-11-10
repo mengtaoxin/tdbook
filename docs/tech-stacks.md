@@ -33,7 +33,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 
 ## Testing
 
-- **Vitest 5** with **jsdom**, **fake-indexeddb** (legacy Dexie migration + tdkit logs), and `@vitest/coverage-v8` for unit tests. Book-cache unit tests use wa-sqlite MemoryVFS.
+- **Vitest 5** with **jsdom**, **fake-indexeddb** (tdkit logs/settings), and `@vitest/coverage-v8` for unit tests. Book-cache unit tests use wa-sqlite MemoryVFS.
 - **Playwright** (Chromium) for e2e.
 
 Details: [testing.md](./testing.md). Commands: [commands.md](./commands.md).

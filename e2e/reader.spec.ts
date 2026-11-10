@@ -5,12 +5,6 @@ test.describe('books reader', () => {
     await page.goto('/');
     await page.evaluate(async () => {
       localStorage.clear();
-      await new Promise<void>((resolve, reject) => {
-        const request = indexedDB.deleteDatabase('tdbook-cache');
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error ?? new Error('deleteDatabase failed'));
-        request.onblocked = () => resolve();
-      });
       // OPFS directory used by the wa-sqlite AccessHandlePoolVFS book cache.
       if (navigator.storage?.getDirectory) {
         const root = await navigator.storage.getDirectory();

@@ -1,6 +1,5 @@
 import type { BookType } from './bookTypes';
 import { canUseOpfsCache, type CacheDb } from './cacheDb';
-import { migrateLegacyIndexedDbCache } from './cacheMigrateIdb';
 import { openMemoryCacheDb } from './cacheSqliteMemory';
 import { openOpfsCacheDb } from './cacheSqliteOpfs';
 
@@ -41,15 +40,7 @@ async function getDb(): Promise<CacheDb> {
   if (!dbPromise) {
     dbPromise = openCacheDb();
   }
-  const db = await dbPromise;
-  // Cheap no-op when the Dexie DB is gone; needed so tests can seed IDB after first open.
-  await migrateLegacyIndexedDbCache(db);
-  return db;
-}
-
-/** Test helper: force the next open through a fresh backend (memory in Vitest). */
-export async function resetCacheDbForTests(): Promise<void> {
-  dbPromise = null;
+  return dbPromise;
 }
 
 function blobUrlKey(sourceUrl: string, relativePath: string) {
