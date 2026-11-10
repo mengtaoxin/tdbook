@@ -12,7 +12,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 | Styling      | Emotion (`@emotion/react`, `@emotion/styled`) | 11      | MUI's styling engine; no Tailwind or CSS frameworks                                       |
 | State        | Zustand                                       | 5       | Shared preferences and books-list cache in `src/stores/`                                  |
 | i18n         | i18next + react-i18next                       | 26 / 17 | en / zh catalogs in `src/i18n/locales/`; default English                                  |
-| Book cache   | Dexie (IndexedDB)                             | 4       | Only in `src/lib/cacheStore.ts` (meta + files tables)                                     |
+| Book cache   | wa-sqlite (SQLite Wasm + OPFS)                | 1       | Only via `src/lib/cacheStore.ts` (meta + files); MemoryVFS in unit tests                  |
 | EPUB         | JSZip + fast-xml-parser                       | 3 / 5   | Unzip in `src/lib/epubIngest.ts`; OPF / spine parse in `src/lib/epubPackage.ts`           |
 | PDF          | pdfjs-dist                                    | 6       | `src/lib/pdfReader.ts`: worker, page render, text layer, cover snapshot                   |
 | Markdown     | marked                                        | 18      | Renders the Config Guide (`public/how-to-write-config-file*.md`)                          |
@@ -33,7 +33,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 
 ## Testing
 
-- **Vitest 5** with **jsdom**, **fake-indexeddb**, and `@vitest/coverage-v8` for unit tests.
+- **Vitest 5** with **jsdom**, **fake-indexeddb** (tdkit logs/settings), and `@vitest/coverage-v8` for unit tests. Book-cache unit tests use wa-sqlite MemoryVFS.
 - **Playwright** (Chromium) for e2e.
 
 Details: [testing.md](./testing.md). Commands: [commands.md](./commands.md).
@@ -46,4 +46,4 @@ Details: [testing.md](./testing.md). Commands: [commands.md](./commands.md).
 
 ## Not used
 
-Vue, Vuetify, Pinia, Tailwind, a backend or server-side rendering, and raw `indexedDB` calls outside `src/lib/cacheStore.ts`.
+Vue, Vuetify, Pinia, Tailwind, a backend or server-side rendering, and Dexie in this repo (tdkit still uses Dexie for logs/settings until it migrates). Book-cache OPFS access stays behind `cacheStore`.

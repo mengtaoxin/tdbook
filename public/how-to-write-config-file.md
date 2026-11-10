@@ -8,7 +8,7 @@ tdbook loads its catalog from a JSON config file (default `/sample/configs.json`
 
 1. Write a `configs.json` in the format below, and host EPUB / PDF files on a static site, object storage, or any publicly reachable URL.
 2. Open Settings, change the “Book config URL” to your `configs.json` address (for example `https://example.com/configs.json`), then save.
-3. Go back to Books and refresh. The first time you open a book it downloads into IndexedDB; afterward you can read offline.
+3. Go back to Books and refresh. The first time you open a book it downloads into the local book cache; afterward you can read offline.
 
 ## books
 

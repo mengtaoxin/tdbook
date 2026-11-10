@@ -11,7 +11,7 @@ import type { BookConfig } from './catalog';
 import type { FormatAdapter, FormatSnapshot, PdfPageContent } from './formatAdapter';
 import { loadPdfDocument, renderPdfCover, unloadPdfDocument } from './pdfReader';
 
-/** IndexedDB relative path for the cached PDF blob. */
+/** Cache relative path for the cached PDF blob. */
 export const PDF_CACHE_FILE_KEY = '__pdf__';
 
 /** Snapshot cover rendered from page 1. */

@@ -12,7 +12,7 @@ type BookRecordBase = {
   title: string;
   author: string;
   description: string;
-  /** Catalog source URL/path; used as IndexedDB cache key. */
+  /** Catalog source URL/path; used as the book-cache key. */
   sourceUrl: string;
   coverHref: string | null;
   coverUrl: string | null;
