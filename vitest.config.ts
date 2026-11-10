@@ -13,20 +13,10 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'happy-dom',
+    environment: 'jsdom',
     // Colocated with source (Vitest default would also match e2e/*.spec.ts).
     include: ['src/**/*.test.ts'],
     setupFiles: ['src/test/setup.ts'],
-    // DOMParser must not fetch subresources (real browsers do not); CSS loading
-    // is already off by default since happy-dom 21.
-    environmentOptions: {
-      happyDOM: {
-        settings: {
-          disableJavaScriptFileLoading: true,
-          handleDisabledFileLoadingAsSuccess: true,
-        },
-      },
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],

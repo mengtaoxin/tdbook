@@ -33,7 +33,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 
 ## Testing
 
-- **Vitest 5** with **happy-dom**, **fake-indexeddb**, and `@vitest/coverage-v8` for unit tests.
+- **Vitest 5** with **jsdom**, **fake-indexeddb**, and `@vitest/coverage-v8` for unit tests.
 - **Playwright** (Chromium) for e2e.
 
 Details: [testing.md](./testing.md). Commands: [commands.md](./commands.md).

@@ -4,7 +4,7 @@ Two layers, both run from the repo root:
 
 | Layer | Tool                  | Location                               | Covers                                             |
 | ----- | --------------------- | -------------------------------------- | -------------------------------------------------- |
-| Unit  | Vitest (happy-dom)    | `src/**/*.test.ts`, next to the module | `src/lib/` logic: catalog, cache, EPUB/PDF parsing |
+| Unit  | Vitest (jsdom)        | `src/**/*.test.ts`, next to the module | `src/lib/` logic: catalog, cache, EPUB/PDF parsing |
 | E2E   | Playwright (Chromium) | `e2e/*.spec.ts`                        | User-visible flows: navigation, open book, paging  |
 
 Command reference: [commands.md](./commands.md).
@@ -20,8 +20,8 @@ npm run test:coverage                      # + V8 coverage (terminal summary, co
 ```
 
 - Config: `vitest.config.ts`. Only `src/**/*.test.ts` is collected, so `e2e/*.spec.ts` never runs under Vitest.
-- Environment: happy-dom, with CSS/JS file loading disabled so `DOMParser` does not fetch stylesheets.
-- Shared setup: `src/test/setup.ts` loads `fake-indexeddb/auto` and swaps in Node's `Blob` / `File` so Dexie can store blobs. Put new global setup there, not in individual tests.
+- Environment: jsdom (DOMParser does not fetch linked stylesheets).
+- Shared setup: `src/test/setup.ts` loads `fake-indexeddb/auto`, swaps in Node's `Blob` / `File` (and matching `URL.createObjectURL`) so Dexie can store blobs, stubs missing jsdom APIs (`Range#getBoundingClientRect`, `Element#scrollBy`), and installs Map-backed `localStorage` / `sessionStorage` so `vi.spyOn(localStorage, …)` works. Put new global setup there, not in individual tests.
 - Coverage is measured for `src/lib/**` only; routes and components are covered by e2e.
 - Name new tests `<module>.test.ts` beside the module and follow the style of neighboring tests.
 
