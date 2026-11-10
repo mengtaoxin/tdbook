@@ -3,9 +3,23 @@ import { expect, test } from '@playwright/test';
 test.describe('books reader', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.evaluate(() => {
+    await page.evaluate(async () => {
       localStorage.clear();
-      return indexedDB.deleteDatabase('tdbook-cache');
+      await new Promise<void>((resolve, reject) => {
+        const request = indexedDB.deleteDatabase('tdbook-cache');
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error ?? new Error('deleteDatabase failed'));
+        request.onblocked = () => resolve();
+      });
+      // OPFS directory used by the wa-sqlite AccessHandlePoolVFS book cache.
+      if (navigator.storage?.getDirectory) {
+        const root = await navigator.storage.getDirectory();
+        try {
+          await root.removeEntry('tdbook-cache', { recursive: true });
+        } catch {
+          // Missing directory is fine.
+        }
+      }
     });
   });
 

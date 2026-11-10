@@ -1,6 +1,6 @@
 # tdbook
 
-Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, download once into IndexedDB, then read offline in the browser. Static deploy only — no backend.
+Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, download once into a SQLite Wasm + OPFS book cache, then read offline in the browser. Static deploy only — no backend.
 
 ## Rules
 
@@ -19,5 +19,5 @@ Never verify this application in a browser. Browser Use, Computer Use, screensho
 - Running or writing tests → [docs/testing.md](docs/testing.md)
 - Adding or moving files → [docs/file-structure.md](docs/file-structure.md)
 - Style, i18n, adding books → [docs/conventions.md](docs/conventions.md)
-- Catalog entries, IndexedDB cache, offline, reader, bookmarks, app logs → [docs/data-model.md](docs/data-model.md)
+- Catalog entries, book cache (SQLite/OPFS), offline, reader, bookmarks, app logs → [docs/data-model.md](docs/data-model.md)
 - Stack and versions → [docs/tech-stacks.md](docs/tech-stacks.md)

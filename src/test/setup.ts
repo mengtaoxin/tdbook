@@ -3,6 +3,7 @@ import { Blob as NodeBlob, File as NodeFile } from 'node:buffer';
 import { URL as NodeURL } from 'node:url';
 
 // jsdom's Blob is not structured-cloneable into fake-indexeddb reliably.
+// Keep Node's Blob for legacy IndexedDB → SQLite migration tests and tdkit logs.
 globalThis.Blob = NodeBlob as unknown as typeof globalThis.Blob;
 globalThis.File = NodeFile as unknown as typeof globalThis.File;
 

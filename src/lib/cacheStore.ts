@@ -1,5 +1,8 @@
-import { Dexie, type EntityTable, type Table } from 'dexie';
 import type { BookType } from './bookTypes';
+import { canUseOpfsCache, type CacheDb } from './cacheDb';
+import { migrateLegacyIndexedDbCache } from './cacheMigrateIdb';
+import { openMemoryCacheDb } from './cacheSqliteMemory';
+import { openOpfsCacheDb } from './cacheSqliteOpfs';
 
 export type BookCacheMeta = {
   sourceUrl: string;
@@ -16,33 +19,45 @@ export type BookCacheMeta = {
   coverPath?: string | null;
 };
 
-type CachedFileRecord = {
-  sourceUrl: string;
-  relativePath: string;
-  blob: Blob;
-};
-
-const db = new Dexie('tdbook-cache') as Dexie & {
-  meta: EntityTable<BookCacheMeta, 'sourceUrl'>;
-  files: Table<CachedFileRecord, [string, string]>;
-};
-
-db.version(1).stores({
-  meta: 'sourceUrl',
-  files: '[sourceUrl+relativePath], sourceUrl',
-});
-
 const KEY_SEP = '\0';
 
 const blobUrlCache = new Map<string, string>();
 const pendingBlobUrls = new Map<string, Promise<string | null>>();
+
+let dbPromise: Promise<CacheDb> | null = null;
+
+async function openCacheDb(): Promise<CacheDb> {
+  if (canUseOpfsCache()) {
+    try {
+      return await openOpfsCacheDb();
+    } catch (error) {
+      console.warn('OPFS book cache unavailable; falling back to memory', error);
+    }
+  }
+  return openMemoryCacheDb();
+}
+
+async function getDb(): Promise<CacheDb> {
+  if (!dbPromise) {
+    dbPromise = openCacheDb();
+  }
+  const db = await dbPromise;
+  // Cheap no-op when the Dexie DB is gone; needed so tests can seed IDB after first open.
+  await migrateLegacyIndexedDbCache(db);
+  return db;
+}
+
+/** Test helper: force the next open through a fresh backend (memory in Vitest). */
+export async function resetCacheDbForTests(): Promise<void> {
+  dbPromise = null;
+}
 
 function blobUrlKey(sourceUrl: string, relativePath: string) {
   return `${sourceUrl}${KEY_SEP}${relativePath}`;
 }
 
 export async function getBookCacheMeta(sourceUrl: string): Promise<BookCacheMeta | null> {
-  const meta = await db.meta.get(sourceUrl);
+  const meta = await (await getDb()).getMeta(sourceUrl);
   return meta?.status === 'ready' ? meta : null;
 }
 
@@ -51,8 +66,7 @@ export async function isBookCached(sourceUrl: string): Promise<boolean> {
 }
 
 export async function getCachedFile(sourceUrl: string, relativePath: string): Promise<Blob | null> {
-  const record = await db.files.get([sourceUrl, relativePath]);
-  return record?.blob ?? null;
+  return (await getDb()).getFile(sourceUrl, relativePath);
 }
 
 async function createCachedBlobUrl(
@@ -109,11 +123,7 @@ function revokeBlobUrlsForSource(sourceUrl: string) {
 
 export async function deleteBookCacheRecords(sourceUrl: string): Promise<void> {
   revokeBlobUrlsForSource(sourceUrl);
-
-  await db.transaction('rw', db.meta, db.files, async () => {
-    await db.meta.delete(sourceUrl);
-    await db.files.where('sourceUrl').equals(sourceUrl).delete();
-  });
+  await (await getDb()).deleteBook(sourceUrl);
 }
 
 export async function clearAllCacheRecords(): Promise<void> {
@@ -122,22 +132,18 @@ export async function clearAllCacheRecords(): Promise<void> {
   }
   blobUrlCache.clear();
 
-  await db.transaction('rw', db.meta, db.files, async () => {
-    await Promise.all([db.meta.clear(), db.files.clear()]);
-  });
+  await (await getDb()).clearAll();
 }
 
 export async function putFiles(
   sourceUrl: string,
   entries: Array<{ relativePath: string; blob: Blob }>,
 ): Promise<void> {
-  await db.files.bulkPut(
-    entries.map(({ relativePath, blob }) => ({ sourceUrl, relativePath, blob })),
-  );
+  await (await getDb()).putFiles(sourceUrl, entries);
 }
 
 export async function putMeta(meta: BookCacheMeta): Promise<void> {
-  await db.meta.put(meta);
+  await (await getDb()).putMeta(meta);
 }
 
 export async function readCachedText(
@@ -149,7 +155,7 @@ export async function readCachedText(
   return blob.text();
 }
 
-/** Test helper: drop in-memory blob URLs without touching IndexedDB. */
+/** Test helper: drop in-memory blob URLs without touching the SQLite cache. */
 export function resetBlobUrlCacheForTests() {
   for (const [, url] of blobUrlCache) {
     URL.revokeObjectURL(url);

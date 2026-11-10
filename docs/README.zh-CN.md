@@ -2,14 +2,14 @@
 
 [English](../README.md) | [中文](./README.zh-CN.md)
 
-个人电子书浏览器：从 `configs.json` 拉取远程 EPUB / PDF 书目，首次打开时下载到浏览器 IndexedDB，之后可离线阅读。纯静态部署，无后端。
+个人电子书浏览器：从 `configs.json` 拉取远程 EPUB / PDF 书目，首次打开时下载到本机 SQLite Wasm + OPFS 缓存，之后可离线阅读。纯静态部署，无后端。
 
 ## 功能
 
 - 书目列表与在线阅读器（EPUB / PDF）
 - 按远程 URL 缓存整书；支持清除缓存后重新下载
 - 书目以 `configs.json` 为唯一数据源，添加书籍只需改配置
-- 可安装 PWA（生产构建）：应用壳与静态资源可离线；书籍内容仍存 IndexedDB
+- 可安装 PWA（生产构建）：应用壳与静态资源可离线；书籍内容存本机 SQLite / OPFS 缓存
 
 ## 技术栈
 
@@ -17,7 +17,7 @@
 - PWA：`vite-plugin-pwa`（生产环境 Service Worker + Web App Manifest）
 - EPUB：`jszip` + `fast-xml-parser`
 - PDF：`pdfjs-dist`
-- 书籍缓存：`dexie`（IndexedDB）
+- 书籍缓存：`wa-sqlite`（SQLite Wasm + OPFS；单测用 MemoryVFS）
 
 详见 [tech-stacks.md](./tech-stacks.md)。
 
@@ -60,7 +60,7 @@ npm run dev      # 开发：http://localhost:3000
 ```
 public/sample/   默认书目（configs.json）+ 示例书籍
 src/views/       列表页、阅读页
-src/lib/         书目加载、IndexedDB 缓存、EPUB/PDF 解析
+src/lib/         书目加载、书籍缓存、EPUB/PDF 解析
 ```
 
 更细的约定见 [conventions.md](./conventions.md)，目录结构见 [file-structure.md](./file-structure.md)，数据模型见 [AGENTS.md](../AGENTS.md)。
