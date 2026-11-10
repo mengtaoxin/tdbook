@@ -7,7 +7,7 @@ Two layers, both run from the repo root:
 | Unit  | Vitest (jsdom)        | `src/**/*.test.ts`, next to the module | `src/lib/` logic: catalog, cache, EPUB/PDF parsing |
 | E2E   | Playwright (Chromium) | `e2e/*.spec.ts`                        | User-visible flows: navigation, open book, paging  |
 
-Command reference: [commands.md](./commands.md).
+Command reference: [commands.md](./commands.md). Suite entrypoints (`test`, `test:coverage`, `test:e2e`, `verify`) honor `RUN_TESTS_IN_CONTAINER` (`1` = ephemeral `ubuntu-b` Docker; unset/`0` = host).
 
 ## Unit tests (Vitest)
 

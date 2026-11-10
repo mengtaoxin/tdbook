@@ -8,6 +8,7 @@ Personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, dow
 - Run commands from the repo root (this app is not under `web/`) via `package.json` scripts.
 - Route identity is the catalog `id` (`/book/$id`), not the title; cache key is the catalog `path`.
 - `tdkit` comes from GitHub Packages: set `NODE_AUTH_TOKEN` (PAT with `read:packages`) so `.npmrc` can fetch `@mengtaoxin/tdkit`.
+- Tests default to the host. Export `RUN_TESTS_IN_CONTAINER=1` so `test*` / `verify` run in ephemeral `ubuntu-b` ([docs/commands.md](docs/commands.md)); leave unset/`0` on Cursor Cloud. Edit / format / lint stay on the host.
 
 ## Browser verification is forbidden
 

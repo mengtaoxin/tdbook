@@ -30,6 +30,8 @@ npm run dev      # 开发：http://localhost:3000
 
 打开 [http://localhost:3000](http://localhost:3000)。停止：Ctrl+C。
 
+可选：`export RUN_TESTS_IN_CONTAINER=1`，则 `npm run test` / `test:e2e` / `verify` 在临时 Docker `ubuntu-b` 容器中跑（默认在宿主机；Cursor Cloud 上保持未设置）。
+
 全部命令见 [commands.md](./commands.md)，测试说明见 [testing.md](./testing.md)。
 
 ## 添加书籍
