@@ -49,6 +49,5 @@ npm run test:e2e -- -g "opens an EPUB"
 
 ## What to run before finishing
 
-- Any code change: `npm run verify` (see [change-code-steps.md](./change-code-steps.md)).
-- Reader, cache, format adapters, routes, or navigation: also `npm run test:e2e`.
+- Any code change: `npm run verify` (check + unit + e2e; see [change-code-steps.md](./change-code-steps.md)).
 - Production build smoke when routing or bundling changed: `npm run build` (see [commands.md](./commands.md)).

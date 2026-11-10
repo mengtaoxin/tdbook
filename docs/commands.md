@@ -9,7 +9,7 @@ When to run these while changing code: [change-code-steps.md](change-code-steps.
 ```sh
 export NODE_AUTH_TOKEN=<GitHub PAT with read:packages>   # needed for @mengtaoxin/* packages
 npm install
-npx playwright install chromium                          # only if you run e2e tests
+npx playwright install chromium                          # needed for verify / e2e
 ```
 
 `.npmrc` routes `@mengtaoxin/*` (the `tdkit` dependency and `@mengtaoxin/oxc-config`) to GitHub Packages; without the token, `npm install` fails on those packages.
@@ -36,7 +36,7 @@ npm run test            # Vitest unit tests, once
 npm run test:watch      # Vitest in watch mode
 npm run test:coverage   # unit tests + V8 coverage (coverage/)
 npm run test:e2e        # Playwright e2e (Chromium)
-npm run verify          # check + full unit suite (read-only)
+npm run verify          # check + unit + e2e (read-only)
 ```
 
 Running a single file or test, fixtures, and which layer to use: [testing.md](./testing.md).
@@ -53,5 +53,3 @@ npm run check         # format:check + lint + type-check (read-only)
 ```
 
 Rules come from `@mengtaoxin/oxc-config` via `oxlint.config.ts` and `oxfmt.config.ts`.
-
-Add `npm run test:e2e` when the change touches the reader, cache, format adapters, or navigation.
