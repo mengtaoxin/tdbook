@@ -35,9 +35,7 @@ src/
     epubIngest.ts     EPUB zip → cached files
     pdfFormat.ts      PDF adapter (ingest + cover snapshot + pdf.js unload on cache clear)
     bookCache.ts      cache lifecycle: ensureBookCached (one shared download per source, progress fan-out) + clear (aborts in-flight downloads, notifies format adapters)
-    cacheStore.ts     book cache façade (blob URL lifecycle + SQLite backend selection)
-    cacheDb.ts        CacheDb interface + OPFS capability check
-    cacheSqlite*.ts   wa-sqlite open (MemoryVFS / OPFS worker), SQL helpers, module load
+    cacheStore.ts     Dexie DB (meta + files tables) + blob URL lifecycle
     cacheIngest.ts    abortable pipeline: fetch → format ingest → snapshot → ready meta
     paths.ts          path safety, EPUB path normalize
     rewriteHtml.ts    EPUB page HTML rewrite (assets → blob URLs)
@@ -55,7 +53,7 @@ src/
     spaUpdateNotice.ts  thin wrapper: load hosted spa-update-notice, install/handle/isChunkError only
     pwaManifest.ts    web app manifest fields for vite-plugin-pwa
   i18n/               i18next setup + en/zh message catalogs
-  test/setup.ts       Vitest setup (fake-indexeddb for tdkit / Blob polyfill)
+  test/setup.ts       Vitest setup (fake-indexeddb / Blob polyfill)
   **/*.test.ts        unit tests colocated next to the module under test
 e2e/                  Playwright
 ```

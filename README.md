@@ -2,14 +2,14 @@
 
 [English](./README.md) | [中文](./docs/README.zh-CN.md)
 
-A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, download once into a SQLite Wasm + OPFS book cache, then read offline in the browser. Static deploy only — no backend.
+A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, download once into IndexedDB, then read offline in the browser. Static deploy only — no backend.
 
 ## Features
 
 - Book list and in-browser reader (EPUB / PDF)
 - Cache whole books by remote URL; clear cache to re-download
 - Catalog is driven solely by `configs.json` — add books by editing the config
-- Installable PWA (production build): app shell + static assets work offline; book bytes stay in the local SQLite/OPFS cache
+- Installable PWA (production build): app shell + static assets work offline; book bytes stay in IndexedDB
 
 ## Stack
 
@@ -17,7 +17,7 @@ A personal ebook browser SPA: list remote EPUB/PDF titles from `configs.json`, d
 - PWA: `vite-plugin-pwa` (production service worker + web app manifest)
 - EPUB: `jszip` + `fast-xml-parser`
 - PDF: `pdfjs-dist`
-- Book cache: `wa-sqlite` (SQLite Wasm + OPFS; MemoryVFS in unit tests)
+- Book cache: `dexie` (IndexedDB)
 
 Details: [docs/tech-stacks.md](./docs/tech-stacks.md).
 
@@ -62,7 +62,7 @@ Append an entry to the `books` array in `public/sample/configs.json` (the defaul
 ```
 public/sample/   Default catalog (configs.json) + sample books
 src/views/       List and reader pages
-src/lib/         Catalog load, book cache, EPUB/PDF parsing
+src/lib/         Catalog load, IndexedDB cache, EPUB/PDF parsing
 ```
 
 See [AGENTS.md](./AGENTS.md) for conventions and the data model.

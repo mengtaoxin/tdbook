@@ -27,6 +27,7 @@
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
     "@tanstack/react-router": "^1.170.44",
+    "dexie": "^4.4.6",
     "fast-xml-parser": "^5.11.2",
     "i18next": "^26.4.5",
     "jszip": "^3.10.2",
@@ -36,7 +37,6 @@
     "react-dom": "^19.3.1",
     "react-i18next": "^17.0.16",
     "tdkit": "npm:@mengtaoxin/tdkit@^0.3.0",
-    "wa-sqlite": "^1.0.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
