@@ -8,7 +8,8 @@ docs/commands.md           npm scripts and setup
 docs/testing.md            unit (Vitest) + e2e (Playwright) testing
 docs/tech-stacks.md        libraries, build/PWA, tooling, deploy
 docker/UBUNTU_B_VERSION  pin for ghcr.io/mengtaoxin/ubuntu-b (ephemeral test container)
-scripts/run-in-test-env.sh  RUN_TESTS_IN_CONTAINER=1 → ubuntu-b; else host
+scripts/run-in-test-env.sh  RUN_TESTS_IN_CONTAINER=1 → ubuntu-b; else host, same node/npm (no login shell)
+scripts/run-in-test-env.test.ts  host init: prefix set, prefix unset, exit status
 scripts/prepare-test-container.sh  npm ci stamp + Playwright browsers inside the container
 public/sample/        bundled sample books: configs.json (default catalog at /sample/configs.json, also used by e2e), Alice EPUB, sample.epub / sample.pdf, covers
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
