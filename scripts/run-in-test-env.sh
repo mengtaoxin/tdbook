@@ -21,6 +21,13 @@ if [[ "$#" -lt 1 ]]; then
 fi
 
 if [[ "${RUN_TESTS_IN_CONTAINER:-}" != "1" ]]; then
+  # `npm run` exports npm_config_prefix (often "/": this node's prefix). verify
+  # execs a login shell, which sources nvm. nvm refuses that variable when the
+  # value sits outside $NVM_DIR, deactivates, and leaves npm off PATH. Drop only
+  # these two names (nvm treats either spelling as the prefix setting) so the
+  # login shell can initialize. Other npm_config_* values stay. exec still
+  # returns the command's status.
+  unset npm_config_prefix NPM_CONFIG_PREFIX
   exec "$@"
 fi
 

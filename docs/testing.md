@@ -19,7 +19,7 @@ npm run test:watch                         # re-run on change
 npm run test:coverage                      # + V8 coverage (terminal summary, coverage/index.html)
 ```
 
-- Config: `vitest.config.ts`. Only `src/**/*.test.ts` is collected, so `e2e/*.spec.ts` never runs under Vitest.
+- Config: `vitest.config.ts`. Collected: `src/**/*.test.ts` and `scripts/**/*.test.ts` (host test runner). `e2e/*.spec.ts` never runs under Vitest.
 - Environment: jsdom (DOMParser does not fetch linked stylesheets).
 - Shared setup: `src/test/setup.ts` loads `fake-indexeddb/auto`, swaps in Node's `Blob` / `File` (and matching `URL.createObjectURL`), stubs missing jsdom APIs (`Range#getBoundingClientRect`, `Element#scrollBy`), and installs Map-backed `localStorage` / `sessionStorage` so `vi.spyOn(localStorage, …)` works. Put new global setup there, not in individual tests.
 - Coverage is measured for `src/lib/**` only; routes and components are covered by e2e.
