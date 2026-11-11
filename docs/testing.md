@@ -21,7 +21,7 @@ npm run test:coverage                      # + V8 coverage (terminal summary, co
 
 - Config: `vitest.config.ts`. Only `src/**/*.test.ts` is collected, so `e2e/*.spec.ts` never runs under Vitest.
 - Environment: jsdom (DOMParser does not fetch linked stylesheets).
-- Shared setup: `src/test/setup.ts` loads `fake-indexeddb/auto` (tdkit logs/settings), swaps in Node's `Blob` / `File` (and matching `URL.createObjectURL`), stubs missing jsdom APIs (`Range#getBoundingClientRect`, `Element#scrollBy`), and installs Map-backed `localStorage` / `sessionStorage` so `vi.spyOn(localStorage, …)` works. Book cache unit tests use wa-sqlite MemoryVFS (no OPFS). Put new global setup there, not in individual tests.
+- Shared setup: `src/test/setup.ts` loads `fake-indexeddb/auto`, swaps in Node's `Blob` / `File` (and matching `URL.createObjectURL`), stubs missing jsdom APIs (`Range#getBoundingClientRect`, `Element#scrollBy`), and installs Map-backed `localStorage` / `sessionStorage` so `vi.spyOn(localStorage, …)` works. Put new global setup there, not in individual tests.
 - Coverage is measured for `src/lib/**` only; routes and components are covered by e2e.
 - Name new tests `<module>.test.ts` beside the module and follow the style of neighboring tests.
 
@@ -35,9 +35,9 @@ npm run test:e2e -- -g "opens an EPUB"
 ```
 
 - Config: `playwright.config.ts`. Playwright starts `npm run dev` on `127.0.0.1:3000`. Locally it reuses a server already on port 3000; in CI (`CI` set) it always starts its own, retries once, and records a trace on the retry.
-- Specs run serially (`workers: 1`) because they share one origin's `localStorage`, IndexedDB (tdkit), and OPFS.
+- Specs run serially (`workers: 1`) because they share one origin's `localStorage` and IndexedDB.
 - E2E uses the default catalog, `public/sample/configs.json` (served at `/sample/configs.json`); there is no separate test catalog. Reader specs rely on `Sample EPUB` (2 pages, `#bookmark-target` on page 1) and `Sample PDF` (1 page), so keep those entries and files intact. Add new sample books to the same catalog.
-- Reader specs reset state in `beforeEach` (clear `localStorage`, remove the OPFS `tdbook-cache` directory). Do the same in new specs that touch books or cache.
+- Reader specs reset state in `beforeEach` (clear `localStorage`, delete the `tdbook-cache` IndexedDB). Do the same in new specs that touch books or cache.
 - Prefer `getByRole` / `getByText`, and `getByTestId` for elements without an accessible name.
 - Failure output lands in `test-results/` (gitignored).
 

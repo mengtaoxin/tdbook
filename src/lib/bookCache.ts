@@ -97,7 +97,7 @@ export async function clearBookCache(sourceUrl: string): Promise<void> {
   await deleteBookCacheRecords(sourceUrl);
 }
 
-/** Clears the SQLite book cache and in-memory blob URLs for every book. */
+/** Clears IndexedDB cache and in-memory blob URLs for every book. */
 export async function clearAllBookCaches(): Promise<void> {
   notifyFormatCacheCleared(null);
   await Promise.all([...jobs.values()].map(abortJob));

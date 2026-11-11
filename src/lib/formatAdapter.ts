@@ -43,6 +43,6 @@ export type FormatAdapter<
   pageCount(book: TBook): number;
   /** `pageIndex` is 0-based. */
   getPage(book: TBook, pageIndex: number): Promise<TPage | null>;
-  /** Called before cache/blob URLs for this source (or all) are dropped. */
+  /** Called before IndexedDB/blob URLs for this source (or all) are dropped. */
   onCacheCleared?(sourceUrl: string | null): void;
 };

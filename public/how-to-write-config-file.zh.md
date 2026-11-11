@@ -8,7 +8,7 @@ tdbook 的书目来自一份 JSON 配置文件（默认 `/sample/configs.json`�
 
 1. 按下方格式编写 `configs.json`，把 EPUB / PDF 放到静态站点、对象存储或任意可公开访问的 URL。
 2. 打开「设置」，将「图书配置文件地址」改为你的 `configs.json` 地址（例如 `https://example.com/configs.json`），然后保存。
-3. 回到「图书列表」刷新查看。首次打开某本书时会下载到本机书籍缓存，之后可离线阅读。
+3. 回到「图书列表」刷新查看。首次打开某本书时会下载到本机 IndexedDB，之后可离线阅读。
 
 ## books
 
