@@ -15,7 +15,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     // Colocated with source (Vitest default would also match e2e/*.spec.ts).
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
     setupFiles: ['src/test/setup.ts'],
     coverage: {
       provider: 'v8',

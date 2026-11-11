@@ -11,8 +11,59 @@ UBUNTU_B_VERSION="$(tr -d '[:space:]' < "${ROOT_DIR}/docker/UBUNTU_B_VERSION")"
 DEFAULT_IMAGE="ghcr.io/mengtaoxin/ubuntu-b:${UBUNTU_B_VERSION}"
 IMAGE_NAME="${TDBOOK_TEST_IMAGE:-${DEFAULT_IMAGE}}"
 
+# In-place exec keeps the caller PATH. Login bash re-reads the profile, and
+# nvm then drops npm when npm_config_prefix is set. Drop login flags on a
+# leading bash so the already resolved node and npm stay put.
+in_place_cmd=()
+build_in_place_command() {
+  in_place_cmd=()
+  if [[ $# -eq 0 ]]; then
+    return 0
+  fi
+  local argv0="$1"
+  local base="${argv0##*/}"
+  if [[ "$base" != "bash" ]]; then
+    in_place_cmd=("$@")
+    return 0
+  fi
+  in_place_cmd=("$argv0")
+  shift
+  local arg=""
+  local flags=""
+  local options_done=0
+  for arg in "$@"; do
+    if [[ "$options_done" -eq 1 ]]; then
+      in_place_cmd+=("$arg")
+      continue
+    fi
+    case "$arg" in
+      --)
+        options_done=1
+        in_place_cmd+=("$arg")
+        ;;
+      --login)
+        ;;
+      --*)
+        in_place_cmd+=("$arg")
+        ;;
+      -*)
+        flags="${arg#-}"
+        flags="${flags//l/}"
+        if [[ -n "$flags" ]]; then
+          in_place_cmd+=("-${flags}")
+        fi
+        ;;
+      *)
+        options_done=1
+        in_place_cmd+=("$arg")
+        ;;
+    esac
+  done
+}
+
 if [[ "${TDBOOK_INSIDE_TEST_CONTAINER:-}" == "1" ]]; then
-  exec "$@"
+  build_in_place_command "$@"
+  exec "${in_place_cmd[@]}"
 fi
 
 if [[ "$#" -lt 1 ]]; then
@@ -20,8 +71,10 @@ if [[ "$#" -lt 1 ]]; then
   exit 2
 fi
 
+build_in_place_command "$@"
+
 if [[ "${RUN_TESTS_IN_CONTAINER:-}" != "1" ]]; then
-  exec "$@"
+  exec "${in_place_cmd[@]}"
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -129,6 +182,6 @@ fi
 
 docker_args+=("${IMAGE_NAME}")
 docker_args+=(/workspaces/tdbook/scripts/prepare-test-container.sh)
-docker_args+=("$@")
+docker_args+=("${in_place_cmd[@]}")
 
 exec docker "${docker_args[@]}"

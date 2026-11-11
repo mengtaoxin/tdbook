@@ -41,6 +41,8 @@ npm run verify          # check + unit + e2e (read-only)
 
 By default those suite scripts run on the host. Set `RUN_TESTS_IN_CONTAINER=1` (exact `1` only; unset/`0` = host) so `test` / `test:unit` / `test:coverage` / `test:e2e` / `verify` run in an ephemeral [`ubuntu-b`](https://github.com/mengtaoxin/dockers/tree/main/ubuntu-b) container (`scripts/run-in-test-env.sh`, pin `docker/UBUNTU_B_VERSION`). Prefer a sibling `../dockers/ubuntu-b` build when present; otherwise pull the pinned GHCR tag. Nested suite calls inside the container do not spawn another container. Leave the var unset on Cursor Cloud. Edit / format / lint / `check` stay on the host for day-to-day work.
 
+On the host, `run-in-test-env.sh` keeps the current `PATH` and does not start a login shell, so `node` and `npm` stay the ones already resolved when `npm_config_prefix` is set.
+
 Running a single file or test, fixtures, and which layer to use: [testing.md](./testing.md).
 
 ## Lint, format, and type-check
