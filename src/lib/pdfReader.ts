@@ -8,6 +8,7 @@ import {
 } from 'pdfjs-dist';
 // oxlint-disable-next-line import/default -- Vite `?url` imports are typed by vite/client, not the module.
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { commitPdfRenderBuffer, createPdfRenderBuffer } from '@/lib/pdfRenderBuffer';
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -93,32 +94,34 @@ export function renderPdfPage(
     const scale = target.cssWidth / unscaled.width;
     const viewport = page.getViewport({ scale });
     const outputScale = window.devicePixelRatio || 1;
+    const cssWidth = Math.floor(viewport.width);
+    const cssHeight = Math.floor(viewport.height);
+    const pixelWidth = Math.max(1, Math.floor(viewport.width * outputScale));
+    const pixelHeight = Math.max(1, Math.floor(viewport.height * outputScale));
 
-    const canvas = target.canvas;
-    canvas.width = Math.max(1, Math.floor(viewport.width * outputScale));
-    canvas.height = Math.max(1, Math.floor(viewport.height * outputScale));
-    canvas.style.width = `${Math.floor(viewport.width)}px`;
-    canvas.style.height = `${Math.floor(viewport.height)}px`;
-
-    const pageEl = target.pageEl;
-    pageEl.style.width = `${Math.floor(viewport.width)}px`;
-    pageEl.style.height = `${Math.floor(viewport.height)}px`;
-    pageEl.style.setProperty('--scale-factor', String(scale));
-    pageEl.style.setProperty('--user-unit', String(page.userUnit || 1));
-
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('errors.canvasCreateFailed');
+    // Paint offscreen so the previous page stays visible until this one is ready.
+    const buffer = createPdfRenderBuffer(pixelWidth, pixelHeight);
+    const bufferContext = buffer.getContext('2d');
+    if (!bufferContext) throw new Error('errors.canvasCreateFailed');
 
     const transform = outputScale === 1 ? undefined : [outputScale, 0, 0, outputScale, 0, 0];
 
     renderTask = page.render({
-      canvas,
-      canvasContext: context,
+      canvas: buffer,
+      canvasContext: bufferContext,
       viewport,
       transform,
     });
     await renderTask.promise;
     if (cancelled) return;
+
+    commitPdfRenderBuffer(target.canvas, buffer, cssWidth, cssHeight);
+
+    const pageEl = target.pageEl;
+    pageEl.style.width = `${cssWidth}px`;
+    pageEl.style.height = `${cssHeight}px`;
+    pageEl.style.setProperty('--scale-factor', String(scale));
+    pageEl.style.setProperty('--user-unit', String(page.userUnit || 1));
 
     target.textLayerEl.replaceChildren();
     textLayer = new TextLayer({

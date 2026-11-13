@@ -4,7 +4,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { FormatReaderPane } from '@/components/FormatReaderPane';
-import { usesPaintGate } from '@/components/formatTraits';
+import { showPaintProgress, usesPaintGate } from '@/components/formatTraits';
 import { useBookReader } from '@/hooks/useBookReader';
 
 export function BookReaderPage() {
@@ -22,14 +22,22 @@ export function BookReaderPage() {
     goToPage,
   } = useBookReader();
   const [paintReady, setPaintReady] = useState(false);
+  const [hasPaintedPage, setHasPaintedPage] = useState(false);
   const [paintedContent, setPaintedContent] = useState(pageContent);
   if (paintedContent !== pageContent) {
     setPaintedContent(pageContent);
     setPaintReady(false);
+    if (!pageContent) setHasPaintedPage(false);
   }
 
   const awaitingPaint = Boolean(pageContent && usesPaintGate(pageContent.type) && !paintReady);
-  const showRenderProgress = loading || (awaitingPaint && !error);
+  const paintChrome = showPaintProgress(awaitingPaint, hasPaintedPage);
+  const showRenderProgress = loading || (paintChrome && !error);
+
+  function handlePaintReady(ready: boolean) {
+    setPaintReady(ready);
+    if (ready) setHasPaintedPage(true);
+  }
 
   return (
     <Container maxWidth={false} sx={{ py: 2, maxWidth: 960 }}>
@@ -62,9 +70,9 @@ export function BookReaderPage() {
           totalPages={totalPages}
           prevPage={prevPage}
           nextPage={nextPage}
-          awaitingPaint={awaitingPaint}
+          awaitingPaint={paintChrome}
           onGo={goToPage}
-          onReady={setPaintReady}
+          onReady={handlePaintReady}
         />
       ) : null}
     </Container>

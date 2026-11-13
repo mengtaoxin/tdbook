@@ -44,6 +44,7 @@ src/
     epubAnchor.ts     content-stable EPUB in-page anchors (#char:N) for bookmarks
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
+    pdfRenderBuffer.ts  offscreen PDF canvas create + commit (no blank flash)
     settings.ts       configs URL preference (localStorage)
     bookmarks.ts      bookmark pure logic: add (10 recent per book), rename (= permanent), remove, group, time label
     bookmarkStorage.ts  bookmark JSON in localStorage (load with strict validation / store)
