@@ -9,6 +9,7 @@ import { useBookReader } from '@/hooks/useBookReader';
 
 export function BookReaderPage() {
   const {
+    id,
     page,
     pageContent,
     loading,
@@ -64,6 +65,7 @@ export function BookReaderPage() {
 
       {pageContent && !error ? (
         <FormatReaderPane
+          bookId={id}
           content={pageContent}
           hash={hash ?? ''}
           page={page}

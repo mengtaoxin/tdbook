@@ -20,8 +20,8 @@ src/
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
-  components/         AppShell (layout + bookmark notice + Outlet), AppNav (desktop/drawer/More), FeedbackConfirmDialog, ChunkErrorBoundary (stale-chunk recover → spa-update-notice), ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (menu/list shell), BookmarkRows, BookmarkEditDialog, ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
-  stores/             Zustand (locale, settings, books list, bookmarks, recent reads)
+  components/         AppShell (layout + bookmark notice + Outlet), AppNav (desktop/drawer/More), FeedbackConfirmDialog, ChunkErrorBoundary (stale-chunk recover → spa-update-notice), ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (menu/list shell), BookmarkRows, BookmarkEditDialog, ReaderPager, PdfMarginTightenControl, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
+  stores/             Zustand (locale, settings, books list, bookmarks, recent reads, PDF margin tighten)
   hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging) + useReaderBookmarks + useCompactNav
   lib/
     catalog/          configs.json: types, normalize, localStorage persist, SWR fetch (barrel `@/lib/catalog`)
@@ -45,6 +45,8 @@ src/
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
     pdfRenderBuffer.ts  offscreen PDF canvas create + commit (no blank flash)
+    pdfMarginTighten.ts  clamp + crop/scale math for PDF side-margin tighten
+    pdfMarginTightenStorage.ts  per-book tighten JSON in localStorage (load with strict validation / store)
     settings.ts       configs URL preference (localStorage)
     bookmarks.ts      bookmark pure logic: add (10 recent per book), rename (= permanent), remove, group, time label
     bookmarkStorage.ts  bookmark JSON in localStorage (load with strict validation / store)

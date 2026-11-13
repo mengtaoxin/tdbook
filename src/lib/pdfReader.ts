@@ -8,6 +8,7 @@ import {
 } from 'pdfjs-dist';
 // oxlint-disable-next-line import/default -- Vite `?url` imports are typed by vite/client, not the module.
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { pdfMarginTightenLayout } from '@/lib/pdfMarginTighten';
 import { commitPdfRenderBuffer, createPdfRenderBuffer } from '@/lib/pdfRenderBuffer';
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
@@ -63,6 +64,8 @@ export type PdfPageTarget = {
   textLayerEl: HTMLElement;
   pageEl: HTMLElement;
   cssWidth: number;
+  /** Fraction of page width cropped from each side; see `pdfMarginTighten`. */
+  tighten: number;
 };
 
 export type PdfPageRender = {
@@ -91,7 +94,11 @@ export function renderPdfPage(
     if (cancelled) return;
 
     const unscaled = page.getViewport({ scale: 1 });
-    const scale = target.cssWidth / unscaled.width;
+    const { scale, insetCss } = pdfMarginTightenLayout(
+      unscaled.width,
+      target.cssWidth,
+      target.tighten,
+    );
     const viewport = page.getViewport({ scale });
     const outputScale = window.devicePixelRatio || 1;
     const cssWidth = Math.floor(viewport.width);
@@ -120,6 +127,7 @@ export function renderPdfPage(
     const pageEl = target.pageEl;
     pageEl.style.width = `${cssWidth}px`;
     pageEl.style.height = `${cssHeight}px`;
+    pageEl.style.transform = insetCss > 0 ? `translateX(${-Math.floor(insetCss)}px)` : '';
     pageEl.style.setProperty('--scale-factor', String(scale));
     pageEl.style.setProperty('--user-unit', String(page.userUnit || 1));
 

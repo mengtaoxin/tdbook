@@ -81,6 +81,8 @@ export default {
     prevPage: 'Previous page',
     nextPage: 'Next page',
     pageOf: 'Page {page} / {total}',
+    marginTighten: 'Tighten margins ({percent}%)',
+    marginTightenAria: 'Tighten PDF side margins',
   },
   bookmarks: {
     save: 'Save bookmark',
