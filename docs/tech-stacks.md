@@ -34,8 +34,7 @@ Static single-page app, no backend. Versions are the ranges in `package.json`; c
 ## Testing
 
 - **Vitest 5** with **jsdom**, **fake-indexeddb**, and `@vitest/coverage-v8` for unit tests.
-- **Playwright** (Chromium) for e2e; keep `@playwright/test` aligned with the `ubuntu-b` image pin (`1.64.1`) when using `RUN_TESTS_IN_CONTAINER=1`.
-- Optional ephemeral test container: [`ubuntu-b`](https://github.com/mengtaoxin/dockers/tree/main/ubuntu-b) via `scripts/run-in-test-env.sh` and pin `docker/UBUNTU_B_VERSION`.
+- **Playwright** (Chromium) for e2e.
 
 Details: [testing.md](./testing.md). Commands: [commands.md](./commands.md).
 
