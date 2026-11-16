@@ -1,14 +1,17 @@
 import Paper from '@mui/material/Paper';
 import { useEffect, useRef } from 'react';
+import { getPdfMarginTightenForBook } from '@/lib/pdfMarginTightenStorage';
 import { loadPdfDocument, renderPdfPage, type PdfPageRender } from '@/lib/pdfReader';
+import { usePdfMarginTightenStore } from '@/stores/pdfMarginTightenStore';
 
 type PdfReaderPaneProps = {
+  bookId: string;
   pdfUrl: string;
   pageNumber: number;
   onReady: (ready: boolean) => void;
 };
 
-export function PdfReaderPane({ pdfUrl, pageNumber, onReady }: PdfReaderPaneProps) {
+export function PdfReaderPane({ bookId, pdfUrl, pageNumber, onReady }: PdfReaderPaneProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const pageRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -18,6 +21,9 @@ export function PdfReaderPane({ pdfUrl, pageNumber, onReady }: PdfReaderPaneProp
   const lastWidthRef = useRef(0);
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
+  const tighten = usePdfMarginTightenStore((state) =>
+    getPdfMarginTightenForBook(state.byBookId, bookId),
+  );
 
   useEffect(() => {
     let disposed = false;
@@ -56,6 +62,7 @@ export function PdfReaderPane({ pdfUrl, pageNumber, onReady }: PdfReaderPaneProp
         textLayerEl: textLayer,
         pageEl: pageNode,
         cssWidth,
+        tighten,
       });
       paintRef.current = task;
       try {
@@ -91,11 +98,11 @@ export function PdfReaderPane({ pdfUrl, pageNumber, onReady }: PdfReaderPaneProp
       stopPaint();
       stopResizeObserver();
     };
-  }, [pdfUrl, pageNumber]);
+  }, [pdfUrl, pageNumber, tighten]);
 
   return (
     <Paper elevation={3} sx={{ mx: 'auto', maxWidth: 900, borderRadius: 1, overflow: 'hidden' }}>
-      <div ref={hostRef} className="pdf-host" data-testid="pdf-host" style={{ width: '100%' }}>
+      <div ref={hostRef} className="pdf-host" data-testid="pdf-host">
         <div ref={pageRef} className="pdf-page">
           <canvas ref={canvasRef} />
           <div ref={textLayerRef} className="textLayer" />

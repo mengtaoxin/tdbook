@@ -1,6 +1,11 @@
+.pdf-host {
+  overflow: hidden;
+  width: 100%;
+}
+
 .pdf-page {
   position: relative;
-  margin: 0 auto;
+  margin: 0;
   background: #fff;
   --scale-factor: 1;
   --user-unit: 1;

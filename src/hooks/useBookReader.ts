@@ -132,6 +132,7 @@ export function useBookReader() {
   const loading = sessionLoading || (pageLoading && !pageContent);
 
   return {
+    id,
     book,
     page,
     pageContent,

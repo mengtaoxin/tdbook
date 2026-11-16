@@ -7,9 +7,6 @@ docs/data-model.md         catalog entries, cache keys, offline, reader, bookmar
 docs/commands.md           npm scripts and setup
 docs/testing.md            unit (Vitest) + e2e (Playwright) testing
 docs/tech-stacks.md        libraries, build/PWA, tooling, deploy
-docker/UBUNTU_B_VERSION  pin for ghcr.io/mengtaoxin/ubuntu-b (ephemeral test container)
-scripts/run-in-test-env.sh  RUN_TESTS_IN_CONTAINER=1 → ubuntu-b; else host
-scripts/prepare-test-container.sh  npm ci stamp + Playwright browsers inside the container
 public/sample/        bundled sample books: configs.json (default catalog at /sample/configs.json, also used by e2e), Alice EPUB, sample.epub / sample.pdf, covers
 public/how-to-write-config-file.md(.zh.md)  Config Guide content (fetched + marked)
 public/icons/         PWA icons (192 / 512 / maskable)
@@ -19,11 +16,11 @@ src/
   theme.ts            MUI theme (primary #3D5A80)
   router/             TanStack code route tree
   routes/             page components (Home, Books, Reader, Settings, Logs, …)
-  components/         AppShell, ChunkErrorBoundary (stale-chunk recover → spa-update-notice), ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (bookmark menu / drawer list + edit dialog), ReaderPager, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
-  stores/             Zustand (locale, settings, books list, bookmarks, recent reads)
-  hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging)
+  components/         AppShell (layout + bookmark notice + Outlet), AppNav (desktop/drawer/More), FeedbackConfirmDialog, ChunkErrorBoundary (stale-chunk recover → spa-update-notice), ConfigJsonSample (annotated configs.json on Home), ReaderBookmarks (menu/list shell), BookmarkRows, BookmarkEditDialog, ReaderPager, PdfMarginTightenControl, FormatReaderPane, formatPanes, formatTraits, Epub/Pdf panes
+  stores/             Zustand (locale, settings, books list, bookmarks, recent reads, PDF margin tighten)
+  hooks/              useBookSession (open book) + useBookReader (page view) + useReaderSwipe (touch paging) + useReaderBookmarks + useCompactNav
   lib/
-    catalog.ts        configs.json fetch + normalize (BookConfig); stale-while-revalidate over in-memory + localStorage copies (getBookConfigs / revalidateBookConfigs)
+    catalog/          configs.json: types, normalize, localStorage persist, SWR fetch (barrel `@/lib/catalog`)
     configGuideMarkdown.ts  locale → guide .md URL + marked render
     navLayout.ts      shouldCollapseNav + toolbarNavAvailableWidth for compact header
     bookTypes.ts      BookRecord / BookListItem / BookType / bookPageCount
@@ -43,6 +40,9 @@ src/
     epubAnchor.ts     content-stable EPUB in-page anchors (#char:N) for bookmarks
     readerSwipe.ts    touch swipe → prev/next page decision (threshold + axis)
     pdfReader.ts      pdf.js document load + page/cover render
+    pdfRenderBuffer.ts  offscreen PDF canvas create + commit (no blank flash)
+    pdfMarginTighten.ts  clamp + crop/scale math for PDF side-margin tighten
+    pdfMarginTightenStorage.ts  per-book tighten JSON in localStorage (load with strict validation / store)
     settings.ts       configs URL preference (localStorage)
     bookmarks.ts      bookmark pure logic: add (10 recent per book), rename (= permanent), remove, group, time label
     bookmarkStorage.ts  bookmark JSON in localStorage (load with strict validation / store)

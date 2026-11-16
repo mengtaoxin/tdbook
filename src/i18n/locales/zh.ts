@@ -80,6 +80,8 @@ export default {
     prevPage: '上一页',
     nextPage: '下一页',
     pageOf: '第 {page} / {total} 页',
+    marginTighten: '边距收紧（{percent}%）',
+    marginTightenAria: '收紧 PDF 左右边距',
   },
   bookmarks: {
     save: '保存书签',

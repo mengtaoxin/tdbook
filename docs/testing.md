@@ -7,7 +7,7 @@ Two layers, both run from the repo root:
 | Unit  | Vitest (jsdom)        | `src/**/*.test.ts`, next to the module | `src/lib/` logic: catalog, cache, EPUB/PDF parsing |
 | E2E   | Playwright (Chromium) | `e2e/*.spec.ts`                        | User-visible flows: navigation, open book, paging  |
 
-Command reference: [commands.md](./commands.md). Suite entrypoints (`test`, `test:coverage`, `test:e2e`, `verify`) honor `RUN_TESTS_IN_CONTAINER` (`1` = ephemeral `ubuntu-b` Docker; unset/`0` = host).
+Command reference: [commands.md](./commands.md).
 
 ## Unit tests (Vitest)
 
@@ -19,7 +19,7 @@ npm run test:watch                         # re-run on change
 npm run test:coverage                      # + V8 coverage (terminal summary, coverage/index.html)
 ```
 
-- Config: `vitest.config.ts`. Only `src/**/*.test.ts` is collected, so `e2e/*.spec.ts` never runs under Vitest.
+- Config: `vitest.config.ts`. Collected files are `src/**/*.test.ts`, so `e2e/*.spec.ts` never runs under Vitest.
 - Environment: jsdom (DOMParser does not fetch linked stylesheets).
 - Shared setup: `src/test/setup.ts` loads `fake-indexeddb/auto`, swaps in Node's `Blob` / `File` (and matching `URL.createObjectURL`), stubs missing jsdom APIs (`Range#getBoundingClientRect`, `Element#scrollBy`), and installs Map-backed `localStorage` / `sessionStorage` so `vi.spyOn(localStorage, …)` works. Put new global setup there, not in individual tests.
 - Coverage is measured for `src/lib/**` only; routes and components are covered by e2e.

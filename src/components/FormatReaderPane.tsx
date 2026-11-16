@@ -4,6 +4,7 @@ import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EpubFormatPane, PdfFormatPane, type FormatPaneProps } from '@/components/formatPanes';
 import { pagerWide } from '@/components/formatTraits';
+import { PdfMarginTightenControl } from '@/components/PdfMarginTightenControl';
 import { ReaderPager } from '@/components/ReaderPager';
 import { useReaderSwipe } from '@/hooks/useReaderSwipe';
 import type { PageContent } from '@/lib/formatAdapter';
@@ -17,6 +18,7 @@ const formatPanes: {
 };
 
 type FormatReaderPaneProps = {
+  bookId: string;
   content: PageContent;
   hash: string;
   page: number;
@@ -29,6 +31,7 @@ type FormatReaderPaneProps = {
 };
 
 export function FormatReaderPane({
+  bookId,
   content,
   hash,
   page,
@@ -51,13 +54,14 @@ export function FormatReaderPane({
   return (
     <>
       <Box {...swipeBind}>
-        <Pane content={content} hash={hash} onReady={onReady} />
+        <Pane bookId={bookId} content={content} hash={hash} onReady={onReady} />
       </Box>
       {awaitingPaint ? (
         <Typography align="center" color="text.secondary" sx={{ mt: 2 }}>
           {t('reader.rendering')}
         </Typography>
       ) : null}
+      {content.type === 'pdf' ? <PdfMarginTightenControl bookId={bookId} /> : null}
       <ReaderPager
         wide={pagerWide(content.type)}
         page={page}
