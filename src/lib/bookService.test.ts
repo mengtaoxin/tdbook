@@ -17,7 +17,7 @@ const catalog = {
       id: 'sample-epub',
       title: 'Sample EPUB',
       type: 'epub',
-      path: 'https://example.com/sample.epub',
+      url: 'https://example.com/sample.epub',
     },
   ],
 };

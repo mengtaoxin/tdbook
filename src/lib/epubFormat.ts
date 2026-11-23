@@ -25,11 +25,11 @@ async function snapshotEpub(sourceUrl: string): Promise<FormatSnapshot | null> {
 }
 
 async function openEpub(id: string, config: BookConfig): Promise<EpubBookRecord | null> {
-  const parsed = await parseCachedEpubPackage(config.path, config.title);
+  const parsed = await parseCachedEpubPackage(config.url, config.title);
   if (!parsed) return null;
 
   const extractedCover = parsed.coverHref
-    ? await getCachedBlobUrl(config.path, parsed.coverHref)
+    ? await getCachedBlobUrl(config.url, parsed.coverHref)
     : null;
 
   return {
@@ -38,7 +38,7 @@ async function openEpub(id: string, config: BookConfig): Promise<EpubBookRecord 
     title: parsed.title,
     author: parsed.author,
     description: parsed.description,
-    sourceUrl: config.path,
+    sourceUrl: config.url,
     opfDir: parsed.opfDir,
     coverHref: parsed.coverHref,
     coverUrl: extractedCover,

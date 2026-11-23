@@ -35,7 +35,7 @@ export default {
         title: 'Shown on the bookshelf',
         author: 'Author; can be left out',
         type: 'epub or pdf; defaults to epub',
-        path: 'Book file URL; saved in this browser on first open',
+        url: 'Book file URL; saved in this browser on first open',
         hover: 'Cover image; overrides the one in the book',
         more: 'More books, same shape',
       },

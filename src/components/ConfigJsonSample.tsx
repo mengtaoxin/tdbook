@@ -60,7 +60,7 @@ const SAMPLE_LINE_SPECS: SampleLineSpec[] = [
   field('title', 'Alice in Wonderland', 'required'),
   field('author', 'Lewis Carroll', 'optional'),
   field('type', 'epub', 'optional'),
-  field('path', 'https://…/alice.epub', 'required'),
+  field('url', 'https://…/alice.epub', 'required'),
   field('hover', 'https://…/alice.jpg', 'optional', { last: true }),
   { depth: 2, tokens: [punct('},')] },
   { depth: 2, tokens: [{ kind: 'fold', text: '{ … }' }], noteKey: 'home.sample.notes.more' },

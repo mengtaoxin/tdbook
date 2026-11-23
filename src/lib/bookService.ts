@@ -21,7 +21,7 @@ async function coverFromSnapshot(config: BookConfig, meta: BookCacheMeta): Promi
   if (coverPath === undefined) {
     try {
       const adapter = getFormatAdapter(bookTypeOf(config));
-      const snap = await adapter.snapshot(config.path);
+      const snap = await adapter.snapshot(config.url);
       if (snap) {
         const next: BookCacheMeta = {
           ...meta,
@@ -36,7 +36,7 @@ async function coverFromSnapshot(config: BookConfig, meta: BookCacheMeta): Promi
     }
   }
   if (!coverPath) return null;
-  return getCachedBlobUrl(config.path, coverPath);
+  return getCachedBlobUrl(config.url, coverPath);
 }
 
 /** Look up `id`, re-downloading the catalog once when the cached copy predates the book. */
@@ -58,7 +58,7 @@ export async function getBook(
   const adapter = getFormatAdapter(bookTypeOf(config));
 
   try {
-    await ensureBookCached(config.path, { format: adapter, catalogId: config.id, onProgress });
+    await ensureBookCached(config.url, { format: adapter, catalogId: config.id, onProgress });
   } catch (error) {
     throw error instanceof Error ? error : new Error('errors.cacheBookFailed');
   }
@@ -80,7 +80,7 @@ export async function listBooks(): Promise<BookListResult> {
   const books = await Promise.all(
     configs.map(async (config) => {
       const type = bookTypeOf(config);
-      const meta = await getBookCacheMeta(config.path);
+      const meta = await getBookCacheMeta(config.url);
       const cached = Boolean(meta);
       let extractedCover: string | null = null;
 
@@ -97,7 +97,7 @@ export async function listBooks(): Promise<BookListResult> {
         type,
         title: config.title,
         author: (config.author ?? '').trim(),
-        sourceUrl: config.path,
+        sourceUrl: config.url,
         cached,
         coverUrl: resolveCoverUrl(config, extractedCover),
       };

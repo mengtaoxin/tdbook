@@ -10,7 +10,7 @@ const catalog = {
       id: 'sample-epub',
       title: 'Sample EPUB',
       type: 'epub',
-      path: 'https://example.com/sample.epub',
+      url: 'https://example.com/sample.epub',
     },
   ],
 };
@@ -70,7 +70,7 @@ describe('booksStore load refresh', () => {
     const updated = {
       books: [
         ...catalog.books,
-        { id: 'new-pdf', title: 'New PDF', type: 'pdf', path: 'https://example.com/new.pdf' },
+        { id: 'new-pdf', title: 'New PDF', type: 'pdf', url: 'https://example.com/new.pdf' },
       ],
     };
     vi.stubGlobal(

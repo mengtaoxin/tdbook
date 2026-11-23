@@ -35,7 +35,7 @@ export default {
         title: '书架上显示的书名',
         author: '作者，可省略',
         type: 'epub 或 pdf，默认 epub',
-        path: '图书地址，首次打开后存进浏览器',
+        url: '图书地址，首次打开后存进浏览器',
         hover: '封面图，优先于书内封面',
         more: '更多图书，结构完全相同',
       },

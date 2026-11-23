@@ -18,8 +18,8 @@ tdbook 的书目来自一份 JSON 配置文件（默认 `/sample/configs.json`�
 - `title` — 显示标题，可与其他书重复（必填）
 - `author` — 作者；可省略或填空字符串（可选）
 - `type` — 格式：`epub` 或 `pdf`。省略时按 `epub` 处理（可选）
-- `path` — 图书文件地址（必填）。须为 `http(s)://…` 远程链接，或站点绝对路径 `/…`（例如放在 `public/` 下）。不支持相对路径、`//…` 或本地文件系统路径。
-- `hover` — 封面图地址，规则与 `path` 相同（可选）。设置后会覆盖从 EPUB/PDF 内提取的封面，用于图书列表展示。
+- `url` — 图书文件地址（必填）。须为 `http(s)://…` 远程链接，或站点绝对路径 `/…`（例如放在 `public/` 下）。不支持相对路径、`//…` 或本地文件系统路径。
+- `hover` — 封面图地址，规则与 `url` 相同（可选）。设置后会覆盖从 EPUB/PDF 内提取的封面，用于图书列表展示。
 
 ## 示例
 
@@ -31,14 +31,14 @@ tdbook 的书目来自一份 JSON 配置文件（默认 `/sample/configs.json`�
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/sample/alices-adventures-in-wonderland.epub",
+      "url": "/sample/alices-adventures-in-wonderland.epub",
       "hover": "/sample/sample.jpg"
     },
     {
       "id": "sample-pdf",
       "title": "Sample PDF",
       "type": "pdf",
-      "path": "https://example.com/books/sample.pdf",
+      "url": "https://example.com/books/sample.pdf",
       "hover": "/sample/example-hover.webp"
     }
   ]
@@ -47,7 +47,7 @@ tdbook 的书目来自一份 JSON 配置文件（默认 `/sample/configs.json`�
 
 ## 注意事项
 
-- 无效条目（缺 id、非法 path、未知 type 等）会被静默忽略，不会出现在列表中。
+- 无效条目（缺 id、非法 url、未知 type 等）会被静默忽略，不会出现在列表中。
 - 若存在重复 `id`，列表页会提示，且只保留第一次出现的书。
 - 跨域托管配置或图书文件时，服务器需允许浏览器跨域读取（CORS）。
 - 成功下载的 `configs.json` 会保存在本地存储中，以便离线时仍能加载书目；可在设置中「清除目录缓存」删除。

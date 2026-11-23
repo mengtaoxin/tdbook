@@ -14,7 +14,7 @@ export function isSiteAbsolutePath(path: string) {
   );
 }
 
-/** Catalog `path` / `hover`: remote `http(s)://…` or site-absolute `/…`. */
+/** Catalog `url` / `hover`: remote `http(s)://…` or site-absolute `/…`. */
 export function isCatalogResourcePath(path: string) {
   const trimmed = path.trim();
   return isRemotePath(trimmed) || isSiteAbsolutePath(trimmed);

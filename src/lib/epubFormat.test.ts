@@ -75,7 +75,7 @@ describe('epubAdapter', () => {
     const book = await epubAdapter.open('sample-epub', {
       id: 'sample-epub',
       title: 'Fallback',
-      path: sourceUrl,
+      url: sourceUrl,
       type: 'epub',
     });
 
@@ -98,7 +98,7 @@ describe('epubAdapter', () => {
     const book = await epubAdapter.open('sample-epub', {
       id: 'sample-epub',
       title: 'Fallback',
-      path: sourceUrl,
+      url: sourceUrl,
       type: 'epub',
     });
     expect(book).not.toBeNull();

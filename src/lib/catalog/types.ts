@@ -5,7 +5,7 @@ export type BookConfig = {
   author?: string;
   type?: string;
   /** Remote `http(s)://…` or site-absolute `/…` (e.g. under `public/`). */
-  path: string;
+  url: string;
   /** Optional cover image: `http(s)://…` or site path `/…` (e.g. under `public/`). */
   hover?: string;
 };

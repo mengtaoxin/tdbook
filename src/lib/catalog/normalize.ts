@@ -24,8 +24,8 @@ export function normalizeBookConfigs(books: BookConfig[]): BookConfigsResult {
       typeof book.id !== 'string' ||
       !isSafeSegment(book.id) ||
       (type !== 'epub' && type !== 'pdf') ||
-      typeof book.path !== 'string' ||
-      !isCatalogResourcePath(book.path)
+      typeof book.url !== 'string' ||
+      !isCatalogResourcePath(book.url)
     ) {
       continue;
     }
@@ -40,7 +40,7 @@ export function normalizeBookConfigs(books: BookConfig[]): BookConfigsResult {
     seen.add(book.id);
     deduped.push({
       ...book,
-      path: book.path.trim(),
+      url: book.url.trim(),
       hover: optionalCoverUrl(book.hover),
     });
   }

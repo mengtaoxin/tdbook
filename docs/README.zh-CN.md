@@ -42,7 +42,7 @@ npm run dev      # 开发：http://localhost:3000
   "title": "书名",
   "author": "作者（可选）",
   "type": "epub",
-  "path": "https://example.com/book.epub"
+  "url": "https://example.com/book.epub"
 }
 ```
 
@@ -52,8 +52,8 @@ npm run dev      # 开发：http://localhost:3000
 | `title`  | 展示标题，可重复                                                                              |
 | `author` | 可选                                                                                          |
 | `type`   | `epub` 或 `pdf`（可省略，由扩展名推断）                                                       |
-| `path`   | 远程 `http(s)://…`，或同源静态路径 `/…`（如 `public/` 下的文件）                              |
-| `hover`  | 可选封面图，规则同 `path`；有则优先于从书内提取的封面                                         |
+| `url`    | 远程 `http(s)://…`，或同源静态路径 `/…`（如 `public/` 下的文件）                              |
+| `hover`  | 可选封面图，规则同 `url`；有则优先于从书内提取的封面                                          |
 
 ## 目录结构（简要）
 

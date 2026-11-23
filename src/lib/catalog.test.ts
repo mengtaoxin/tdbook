@@ -14,7 +14,7 @@ const remoteCatalog = {
       id: 'remote-book',
       title: 'Remote Book',
       type: 'epub',
-      path: 'https://example.com/remote.epub',
+      url: 'https://example.com/remote.epub',
     },
   ],
 };
@@ -139,7 +139,7 @@ const updatedCatalog = {
       id: 'new-book',
       title: 'New Book',
       type: 'pdf',
-      path: 'https://example.com/new.pdf',
+      url: 'https://example.com/new.pdf',
     },
   ],
 };

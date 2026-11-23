@@ -88,7 +88,7 @@ async function coverUrlForPdf(sourceUrl: string): Promise<string | null> {
 
 async function openPdf(id: string, config: BookConfig): Promise<PdfBookRecord | null> {
   try {
-    const loaded = await loadCachedPdf(config.path);
+    const loaded = await loadCachedPdf(config.url);
     if (!loaded) return null;
 
     return {
@@ -97,9 +97,9 @@ async function openPdf(id: string, config: BookConfig): Promise<PdfBookRecord | 
       title: config.title,
       author: '',
       description: '',
-      sourceUrl: config.path,
+      sourceUrl: config.url,
       coverHref: null,
-      coverUrl: await coverUrlForPdf(config.path),
+      coverUrl: await coverUrlForPdf(config.url),
       pdfUrl: loaded.pdfUrl,
       pageCount: loaded.doc.numPages,
     };

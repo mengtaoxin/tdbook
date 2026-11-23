@@ -18,8 +18,8 @@ The root object contains a `books` array; each item describes one book.
 - `title` — display title; may repeat across books (required)
 - `author` — author; may be omitted or an empty string (optional)
 - `type` — format: `epub` or `pdf`. Defaults to `epub` when omitted (optional)
-- `path` — book file URL (required). Must be an `http(s)://…` remote link or a site-absolute path `/…` (e.g. under `public/`). Relative paths, `//…`, and local filesystem paths are rejected.
-- `hover` — cover image URL; same rules as `path` (optional). When set, it overrides covers extracted from EPUB/PDF on the book list.
+- `url` — book file URL (required). Must be an `http(s)://…` remote link or a site-absolute path `/…` (e.g. under `public/`). Relative paths, `//…`, and local filesystem paths are rejected.
+- `hover` — cover image URL; same rules as `url` (optional). When set, it overrides covers extracted from EPUB/PDF on the book list.
 
 ## Example
 
@@ -31,14 +31,14 @@ The root object contains a `books` array; each item describes one book.
       "title": "Alice's Adventures in Wonderland",
       "author": "Lewis Carroll",
       "type": "epub",
-      "path": "/sample/alices-adventures-in-wonderland.epub",
+      "url": "/sample/alices-adventures-in-wonderland.epub",
       "hover": "/sample/sample.jpg"
     },
     {
       "id": "sample-pdf",
       "title": "Sample PDF",
       "type": "pdf",
-      "path": "https://example.com/books/sample.pdf",
+      "url": "https://example.com/books/sample.pdf",
       "hover": "/sample/example-hover.webp"
     }
   ]
@@ -47,7 +47,7 @@ The root object contains a `books` array; each item describes one book.
 
 ## Notes
 
-- Invalid entries (missing id, illegal path, unknown type, etc.) are silently ignored and do not appear in the list.
+- Invalid entries (missing id, illegal url, unknown type, etc.) are silently ignored and do not appear in the list.
 - If a duplicate `id` appears, the book list shows a warning and only the first occurrence is kept.
 - When the config or book files are hosted cross-origin, the server must allow browser CORS reads.
 - A successful download of `configs.json` is also stored in local storage so the book list can load offline; use “Clear catalog cache” in Settings to remove it.

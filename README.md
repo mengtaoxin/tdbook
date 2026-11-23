@@ -42,7 +42,7 @@ Append an entry to the `books` array in `public/sample/configs.json` (the defaul
   "title": "Book title",
   "author": "Author (optional)",
   "type": "epub",
-  "path": "https://example.com/book.epub"
+  "url": "https://example.com/book.epub"
 }
 ```
 
@@ -52,8 +52,8 @@ Append an entry to the `books` array in `public/sample/configs.json` (the defaul
 | `title`  | Display title; may repeat                                                                                                              |
 | `author` | Optional                                                                                                                               |
 | `type`   | `epub` or `pdf` (optional; inferred from the file extension)                                                                           |
-| `path`   | Remote `http(s)://…`, or a same-origin absolute path `/…` (e.g. a file under `public/`)                                                |
-| `hover`  | Optional cover image URL with the same rules as `path`; when set, overrides covers extracted from the book                             |
+| `url`    | Remote `http(s)://…`, or a same-origin absolute path `/…` (e.g. a file under `public/`)                                                |
+| `hover`  | Optional cover image URL with the same rules as `url`; when set, overrides covers extracted from the book                              |
 
 ## Layout (brief)
 

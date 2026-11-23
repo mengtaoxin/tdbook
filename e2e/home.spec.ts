@@ -9,7 +9,7 @@ test.describe('home page', () => {
     const sample = page.getByTestId('home-json-sample');
     await expect(sample).toBeVisible();
     await expect(sample.getByText('configs.json')).toBeVisible();
-    await expect(sample.getByText(/^"(books|id|title|author|type|path|hover)"$/)).toHaveCount(7);
+    await expect(sample.getByText(/^"(books|id|title|author|type|url|hover)"$/)).toHaveCount(7);
     await expect(sample.getByText(/becomes the reader url/i)).toBeVisible();
     await expect(sample.getByText('required').first()).toBeVisible();
     await expect(sample.getByText('optional').first()).toBeVisible();
