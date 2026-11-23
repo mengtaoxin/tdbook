@@ -42,6 +42,9 @@ lerna-debug.log*
 tmp/
 temp/
 
+# Vercel CLI (local link / pull)
+.vercel/
+
 # Node / Vite
 node_modules
 dist
