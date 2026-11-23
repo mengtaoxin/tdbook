@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('app shell navigation', () => {
-  test('title goes home and Home is not in the menu', async ({ page }) => {
+  test('brand goes home, breadcrumb shows the route, and Home is not in the menu', async ({
+    page,
+  }) => {
     await page.goto('/books');
-    await expect(page.getByRole('heading', { name: 'Books' })).toBeVisible();
+    await expect(page.getByTestId('nav-breadcrumb')).toHaveText('Books');
 
     await expect(page.getByTestId('desktop-nav').getByRole('link', { name: 'Home' })).toHaveCount(
       0,
@@ -17,7 +19,13 @@ test.describe('app shell navigation', () => {
 
     await brand.click();
     await expect(page).toHaveURL('/');
+    await expect(page.getByTestId('nav-breadcrumb')).toHaveCount(0);
     await expect(page.getByText(/personal ebook reader/i)).toBeVisible();
+  });
+
+  test('breadcrumb shows More trail for nested menu routes', async ({ page }) => {
+    await page.goto('/settings');
+    await expect(page.getByTestId('nav-breadcrumb')).toHaveText(/More\s*\/\s*Settings/);
   });
 
   test('collapses header actions into a hamburger when the toolbar is too narrow', async ({

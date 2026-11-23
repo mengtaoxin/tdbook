@@ -112,10 +112,6 @@ export function SettingsPage() {
   return (
     <>
       <Container maxWidth="sm" sx={{ py: 8 }}>
-        <Typography variant="h5" component="h1" sx={{ mb: 3 }}>
-          {t('settings.title')}
-        </Typography>
-
         {message ? (
           <Alert severity={messageType} onClose={() => setMessage('')} sx={{ mb: 2 }}>
             {message}

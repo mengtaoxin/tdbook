@@ -151,6 +151,8 @@ export function AppNav({
         </Box>
       </Drawer>
 
+      <Box sx={{ flexGrow: 1 }} />
+
       {compactNav ? (
         <IconButton
           color="inherit"
@@ -161,8 +163,6 @@ export function AppNav({
           <MenuIcon />
         </IconButton>
       ) : null}
-
-      <Box sx={{ flexGrow: 1 }} />
 
       <Box
         component="nav"

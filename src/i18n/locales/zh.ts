@@ -14,7 +14,9 @@ export default {
     openMenu: '打开菜单',
     bookmarks: '书签',
     beta: 'Beta',
+    breadcrumb: '当前位置',
   },
+
   locale: {
     en: 'English',
     zh: '中文',

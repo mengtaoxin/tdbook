@@ -47,14 +47,11 @@ export function LogsPage() {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           mb: 2,
           gap: 1.5,
         }}
       >
-        <Typography variant="h5" component="h1" sx={{ m: 0 }}>
-          {t('nav.logs')}
-        </Typography>
         <Button
           data-testid="logs-clear"
           color="error"

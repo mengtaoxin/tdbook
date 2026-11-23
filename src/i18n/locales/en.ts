@@ -14,7 +14,9 @@ export default {
     openMenu: 'Open menu',
     bookmarks: 'Bookmarks',
     beta: 'Beta',
+    breadcrumb: 'Current location',
   },
+
   locale: {
     en: 'English',
     zh: '中文',

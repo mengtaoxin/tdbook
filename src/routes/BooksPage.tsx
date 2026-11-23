@@ -63,20 +63,11 @@ export function BooksPage() {
       }}
     >
       <Container maxWidth="lg" sx={{ py: 5 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h5"
-            component="h1"
-            sx={{ fontWeight: 500, letterSpacing: '-0.01em', mb: 0.5 }}
-          >
-            {t('books.title')}
+        {!loading && books.length > 0 ? (
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+            {t('books.count', { n: books.length })}
           </Typography>
-          {!loading && books.length > 0 ? (
-            <Typography variant="body1" color="text.secondary">
-              {t('books.count', { n: books.length })}
-            </Typography>
-          ) : null}
-        </Box>
+        ) : null}
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>

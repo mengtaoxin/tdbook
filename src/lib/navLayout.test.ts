@@ -22,28 +22,28 @@ describe('shouldCollapseNav', () => {
 });
 
 describe('toolbarNavAvailableWidth', () => {
-  it('subtracts toolbar padding, brand size, brand margin, and gap', () => {
+  it('subtracts toolbar padding, left cluster size, cluster margin, and gap', () => {
     expect(
       toolbarNavAvailableWidth({
         toolbarClientWidth: 405,
         toolbarPaddingLeft: 16,
         toolbarPaddingRight: 16,
         toolbarGap: 8,
-        brandWidth: 147,
-        brandMarginEnd: 8,
+        leftClusterWidth: 147,
+        leftClusterMarginEnd: 8,
       }),
     ).toBe(210);
   });
 
-  it('is smaller than clientWidth minus brand alone when chrome is present', () => {
+  it('is smaller than clientWidth minus left cluster alone when chrome is present', () => {
     const simple = 405 - 147;
     const available = toolbarNavAvailableWidth({
       toolbarClientWidth: 405,
       toolbarPaddingLeft: 16,
       toolbarPaddingRight: 16,
       toolbarGap: 8,
-      brandWidth: 147,
-      brandMarginEnd: 8,
+      leftClusterWidth: 147,
+      leftClusterMarginEnd: 8,
     });
     expect(available).toBeLessThan(simple);
     expect(shouldCollapseNav(257, simple)).toBe(false);

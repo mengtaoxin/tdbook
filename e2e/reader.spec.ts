@@ -11,7 +11,7 @@ test.describe('books reader', () => {
 
   test('lists sample books and opens an EPUB', async ({ page }) => {
     await page.goto('/books');
-    await expect(page.getByRole('heading', { name: 'Books' })).toBeVisible();
+    await expect(page.getByTestId('nav-breadcrumb')).toHaveText('Books');
     await expect(page.getByText("Alice's Adventures in Wonderland")).toBeVisible();
     await expect(page.getByText('Sample EPUB')).toBeVisible();
     await expect(page.getByText('Sample PDF')).toBeVisible();

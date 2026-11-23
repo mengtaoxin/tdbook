@@ -9,9 +9,6 @@ export function AboutPage() {
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
-      <Typography variant="h5" component="h1" sx={{ mb: 3 }}>
-        {t('about.title')}
-      </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         {t('about.body')}
       </Typography>
