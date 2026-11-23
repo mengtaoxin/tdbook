@@ -43,6 +43,7 @@ Details: [testing.md](./testing.md). Commands: [commands.md](./commands.md).
 - `npm run build` outputs static files to `dist/`.
 - `vercel.json` rewrites every path to `/index.html` so client-side routes (e.g. `/book/<id>`) work on reload. Any static host with the same SPA fallback works.
 - `vercel.json` also sets `Cache-Control: no-cache` on `/index.html` so browsers pick up new chunk hashes after deploy (hashed `/assets/*` stay long-lived via Vite defaults).
+- Production via GitHub Actions + Vercel CLI: [deployment.md](./deployment.md).
 
 ## Not used
 

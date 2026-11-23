@@ -2,6 +2,7 @@
 
 ```
 docs/file-structure.md     this file
+docs/deployment.md         Vercel production via GitHub Actions + secrets
 docs/conventions.md        coding conventions
 docs/data-model.md         catalog entries, cache keys, offline, reader, bookmarks, app logs
 docs/commands.md           npm scripts and setup

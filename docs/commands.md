@@ -53,3 +53,7 @@ npm run check         # format:check + lint + type-check (read-only)
 ```
 
 Rules come from `@mengtaoxin/oxc-config` via `oxlint.config.ts` and `oxfmt.config.ts`.
+
+## Deploy
+
+Production publishing and required GitHub / Vercel setup: [deployment.md](./deployment.md).
