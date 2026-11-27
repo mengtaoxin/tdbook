@@ -42,22 +42,6 @@ lerna-debug.log*
 tmp/
 temp/
 
-# Vercel CLI (local link / pull)
-.vercel/
-
-# Node / Vite
-node_modules
-dist
-dist-ssr
-*.local
-
-# Tests
-coverage/
-test-results/
-playwright-report/
-blob-report/
-playwright/.cache/
-
 # Secrets
 .env
 .env.*
@@ -74,6 +58,22 @@ secrets.json
 *.tgz
 *.rar
 *.7z
+
+# Vercel CLI (local link / pull)
+.vercel/
+
+# Node / Vite
+node_modules
+dist
+dist-ssr
+*.local
+
+# Tests (Vitest & Playwright)
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # Calibre / ebook tooling
 .calibre/
